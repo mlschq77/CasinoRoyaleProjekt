@@ -1,8 +1,117 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model CasinoRoyale.Models.ViewModels.HomeIndexViewModel
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Strona główna";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="casino-home">
+    <nav class="navbar navbar-expand-lg casino-navbar py-3">
+        <div class="container">
+            <a class="navbar-brand casino-brand" asp-controller="Home" asp-action="Index">
+                <i class="fa-solid fa-crown me-2"></i>CasinoRoyale
+            </a>
+            <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#casinoNavbar" aria-controls="casinoNavbar" aria-expanded="false" aria-label="Przełącz nawigację">
+                <i class="fa-solid fa-bars text-gold"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="casinoNavbar">
+                <ul class="navbar-nav mx-auto mb-3 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link casino-nav-link" href="#gry">Gry</a>
+                    </li>
+                </ul>
+                <div class="d-flex flex-column flex-lg-row gap-2">
+                        <a href="/Account/Login" class="btn btn-outline-light casino-btn-secondary">Logowanie</a>
+                        <a href="/Account/Register" class="btn casino-btn-primary">Rejestracja</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="casino-hero">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="casino-eyebrow">Platforma premium dla graczy online</span>
+                    <h1 class="display-3 fw-bold text-white mt-3">Graj odważnie. Wygrywaj po królewsku.</h1>
+                    <p class="lead casino-hero-text mt-4">
+                        Odkrywaj ekskluzywne stoły, automaty premium i rozgrywkę zaprojektowaną z myślą o szybkości, bezpieczeństwie oraz uczciwych zasadach.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <a href="#gry" class="btn casino-btn-primary btn-lg">Przejdź do katalogu gier</a>
+                        <a href="#kyc" class="btn btn-outline-light btn-lg casino-btn-secondary">Poznaj proces KYC</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="gry" class="casino-section py-5">
+        <div class="container">
+            <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+                <div>
+                    <span class="casino-section-label">Katalog gier</span>
+                    <h2 class="text-white mb-2">Najpopularniejsze tytuły</h2>
+                </div>
+                <a href="#provably-fair" class="btn btn-outline-light casino-btn-secondary">Sprawdź zasady uczciwej gry</a>
+            </div>
+
+            <div class="row g-4">
+                @foreach (var gra in Model.Gry)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <article class="card casino-game-card h-100 border-0">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between align-items-start mb-4">
+                                    <span class="casino-game-category">@gra.Rodzaj</span>
+                                    <i class="fa-solid fa-coins text-gold"></i>
+                                </div>
+                                <h3 class="h4 text-white">@gra.Nazwa</h3>
+                                <a href="#" class="btn casino-btn-primary w-100">Graj</a>
+                            </div>
+                        </article>
+                    </div>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section id="kyc" class="casino-section py-5">
+        <div class="container">
+            <div class="row g-4 align-items-stretch">
+                <div class="col-lg-6">
+                    <div class="casino-info-card h-100">
+                        <span class="casino-section-label">Weryfikacja KYC</span>
+                        <h2 class="text-white mt-2">Bezpieczeństwo konta i szybkie wypłaty</h2>
+                        <p class="casino-section-text">
+                            Weryfikacja tożsamości pomaga chronić środki graczy, ograniczać nadużycia oraz przyspieszać akceptację wypłat i limitów konta.
+                        </p>
+                        <ul class="casino-check-list list-unstyled mb-0">
+                            <li><i class="fa-solid fa-check text-gold me-2"></i>Weryfikacja dokumentu tożsamości</li>
+                            <li><i class="fa-solid fa-check text-gold me-2"></i>Potwierdzenie adresu i danych płatniczych</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="casino-info-card h-100" id="provably-fair">
+                        <span class="casino-section-label">Provably Fair</span>
+                        <h2 class="text-white mt-2">Transparentne wyniki rozgrywki</h2>
+                        <p class="casino-section-text">
+                            Udostępniamy mechanizmy weryfikacji losowości, aby każdy gracz mógł sprawdzić integralność wyników i przebieg rozgrywki.
+                        </p>
+                        <a href="/provably-fair" class="btn btn-outline-light casino-btn-secondary mt-3">Przejdź do sekcji Provably Fair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="casino-footer py-4">
+        <div class="container d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <p class="mb-0 text-secondary">© 2026 CasinoRoyale</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="/provably-fair" class="casino-footer-link">Provably Fair</a>
+            </div>
+        </div>
+    </footer>
 </div>

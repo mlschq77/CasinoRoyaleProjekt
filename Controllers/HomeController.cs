@@ -1,32 +1,45 @@
 using System.Diagnostics;
+using CasinoRoyale.Data;
 using CasinoRoyale.Models;
+using CasinoRoyale.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace CasinoRoyale.Controllers
+namespace CasinoRoyale.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    private readonly ILogger<HomeController> _logger;
+    private readonly Automaty _dbContext;
+
+    public HomeController(ILogger<HomeController> logger, Automaty dbContext)
     {
-        private readonly ILogger<HomeController> _logger;
+        _logger = logger;
+        _dbContext = dbContext;
+    }
 
-        public HomeController(ILogger<HomeController> logger)
+    public async Task<IActionResult> Index()
+    {
+        var model = new HomeIndexViewModel
         {
-            _logger = logger;
-        }
+            Gry = await _dbContext.AutomatyInfo
+                .AsNoTracking()
+                .Where(automat => automat.Rodzaj == "Automat")
+                .OrderBy(automat => automat.Nazwa)
+                .ToListAsync()
+        };
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+        return View(model);
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }
