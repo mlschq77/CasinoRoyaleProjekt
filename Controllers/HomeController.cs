@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using CasinoRoyale.Data;
 using CasinoRoyale.Models;
-using CasinoRoyale.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,21 +19,17 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var model = new HomeIndexViewModel
-        {
-            Gry = await _dbContext.AutomatyInfo
-                .AsNoTracking()
-                .Where(automat => automat.Rodzaj == "Automat")
-                .OrderBy(automat => automat.Nazwa)
-                .ToListAsync()
-        };
-
-        return View(model);
+        return View();
     }
 
     public IActionResult Privacy()
     {
         return View();
+    }
+
+    public IActionResult Oferta()
+    {
+        return RedirectToAction("Oferta", "Automaty");
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

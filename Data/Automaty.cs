@@ -1,5 +1,4 @@
-﻿
-using CasinoRoyale.Models.ViewModels;
+﻿using CasinoRoyale.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CasinoRoyale.Data
 {

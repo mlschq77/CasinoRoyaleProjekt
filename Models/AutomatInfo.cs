@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace CasinoRoyale.Models.ViewModels;
+namespace CasinoRoyale.Models;
 
 public class AutomatInfo
 {
@@ -12,5 +12,5 @@ public class AutomatInfo
     public string Nazwa { get; init; } = string.Empty;
 
     [Required]
-    public string Rodzaj { get; init; } = string.Empty;
+    public string Kategoria { get; init; } = string.Empty;
 }
