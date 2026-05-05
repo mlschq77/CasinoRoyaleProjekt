@@ -1,0 +1,110 @@
+﻿@using CasinoRoyale.ViewModels
+@model SlotsViewModel
+
+@{
+    ViewData["Title"] = "Oferta";
+
+    var gry = Model.Gry ?? Array.Empty<CasinoRoyale.Models.AutomatInfo>();
+    var kategorie = Model.Kategorie ?? Array.Empty<string>();
+    var wybranaKategoria = Model.WybranaKategoria;
+}
+
+<div class="casino-home">
+    <main class="casino-section py-5" id="sloty">
+        <div class="container">
+            <div class="row align-items-end gy-4 mb-4">
+                <div class="col-lg-8">
+                    <span class="casino-section-label">
+                        <i class="fa-solid fa-dice"></i>Katalog slotów
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mt-3 mb-2">
+                        @(string.IsNullOrWhiteSpace(wybranaKategoria) ? "Pełna oferta" : wybranaKategoria)
+                    </h1>
+                    <p class="casino-section-text mb-0">
+                        Wybierz automat, sprawdź dostawcę gry i przejdź bezpośrednio do rozgrywki.
+                    </p>
+                </div>
+                <div class="col-lg-4">
+                    <div class="d-flex justify-content-lg-end">
+                        <span class="casino-chip">
+                            <i class="fa-solid fa-dice"></i>
+                            @gry.Count() gry
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <aside class="col-lg-3" id="kategorie">
+                    <div class="casino-info-card h-100">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h2 class="h5 text-white mb-0">Kategorie</h2>
+                            <i class="fa-solid fa-filter text-gold"></i>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <a class="btn @(string.IsNullOrWhiteSpace(wybranaKategoria) ? "casino-btn-primary" : "btn-outline-light casino-btn-secondary") text-start"
+                               asp-controller="Automaty"
+                               asp-action="Oferta">
+                                <i class="fa-solid fa-layer-group me-2"></i>Wszystkie
+                            </a>
+                            @foreach (var kat in kategorie)
+                            {
+                                var isSelected = string.Equals(kat, wybranaKategoria, StringComparison.OrdinalIgnoreCase);
+
+                                <a class="btn @(isSelected ? "casino-btn-primary" : "btn-outline-light casino-btn-secondary") text-start"
+                                   asp-controller="Automaty"
+                                   asp-action="Oferta"
+                                   asp-route-kategoria="@kat">
+                                    <i class="fa-solid fa-tag me-2"></i>@kat
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </aside>
+
+                <section class="col-lg-9">
+                    <div class="row g-4">
+                        @foreach (var gra in gry)
+                        {
+                            var kategoria = string.IsNullOrWhiteSpace(gra.Kategoria) ? "Slot" : gra.Kategoria;
+
+                            <div class="col-md-6 col-xl-4">
+                                <article class="card casino-game-card h-100 border-0">
+                                    <div class="card-body p-4 d-flex flex-column">
+                                        <div class="d-flex justify-content-between align-items-start mb-4">
+                                            <span class="casino-game-category">
+                                                <i class="fa-solid fa-star"></i>
+                                                @kategoria
+                                            </span>
+                                            <i class="fa-solid fa-coins text-gold fs-4"></i>
+                                        </div>
+
+                                        <h3 class="h4 text-white mb-2">@gra.Nazwa</h3>
+                                        <p class="casino-section-text mb-3">
+                                            <i class="fa-solid fa-building me-2 text-gold"></i>Slot Własny <!-- Tu bedzie Provider -->
+                                        </p>
+
+                                        <a class="btn casino-btn-primary w-100 mt-auto" asp-controller="Gra" asp-action="Graj" asp-route-id="@gra.Id">
+                                            <i class="fa-solid fa-play me-2"></i>Graj teraz
+                                        </a>
+                                    </div>
+                                </article>
+                            </div>
+                        }
+
+                        @if (!gry.Any())
+                        {
+                            <div class="col-12">
+                                <div class="casino-info-card text-center">
+                                    <i class="fa-solid fa-circle-info text-gold fs-2 mb-3"></i>
+                                    <h2 class="h4 text-white">Brak gier w katalogu</h2>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+

@@ -1,0 +1,65 @@
+@using System.Security.Claims
+
+@{
+    ViewData["Title"] = "Strona główna";
+}
+
+<div class="casino-home">
+    <section class="casino-hero">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="casino-eyebrow">Platforma premium dla graczy online</span>
+                    <h1 class="display-3 fw-bold text-white mt-3">Graj odważnie. Wygrywaj po królewsku.</h1>
+                    <p class="lead casino-hero-text mt-4">
+                        Odkrywaj ekskluzywne stoły, automaty premium i rozgrywkę zaprojektowaną z myślą o szybkości, bezpieczeństwie oraz uczciwych zasadach.
+                    </p>
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <a class="btn casino-btn-primary btn-lg" asp-controller="Home" asp-action="Oferta">Przejdź do katalogu gier</a>
+                        <a href="#kyc" class="btn btn-outline-light btn-lg casino-btn-secondary">Poznaj proces KYC</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section id="kyc" class="casino-section py-5">
+        <div class="container">
+            <div class="row g-4 align-items-stretch">
+                <div class="col-lg-6">
+                    <div class="casino-info-card h-100">
+                        <span class="casino-section-label">Weryfikacja KYC</span>
+                        <h2 class="text-white mt-2">Bezpieczeństwo konta i szybkie wypłaty</h2>
+                        <p class="casino-section-text">
+                            Weryfikacja tożsamości pomaga chronić środki graczy, ograniczać nadużycia oraz przyspieszać akceptację wypłat i limitów konta.
+                        </p>
+                        <ul class="casino-check-list list-unstyled mb-0">
+                            <li><i class="fa-solid fa-check text-gold me-2"></i>Weryfikacja dokumentu tożsamości</li>
+                            <li><i class="fa-solid fa-check text-gold me-2"></i>Potwierdzenie adresu i danych płatniczych</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="casino-info-card h-100" id="provably-fair">
+                        <span class="casino-section-label">Provably Fair</span>
+                        <h2 class="text-white mt-2">Transparentne wyniki rozgrywki</h2>
+                        <p class="casino-section-text">
+                            Udostępniamy mechanizmy weryfikacji losowości, aby każdy gracz mógł sprawdzić integralność wyników i przebieg rozgrywki.
+                        </p>
+                        <a href="/provably-fair" class="btn btn-outline-light casino-btn-secondary mt-3">Przejdź do sekcji Provably Fair</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="casino-footer py-4">
+        <div class="container d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
+            <p class="mb-0 text-secondary">© 2026 CasinoRoyale</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a href="/provably-fair" class="casino-footer-link">Provably Fair</a>
+            </div>
+        </div>
+    </footer>
+</div>
