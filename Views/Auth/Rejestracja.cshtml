@@ -1,0 +1,71 @@
+@model CasinoRoyale.ViewModels.RejestracjaViewModel
+@{
+    ViewData["Title"] = "Rejestracja";
+}
+
+<div class="casino-auth-page d-flex align-items-center justify-content-center py-5">
+    <div class="casino-auth-card">
+
+        <div class="text-center mb-4">
+            <span class="casino-eyebrow mb-3 d-inline-flex">
+                <i class="fa-solid fa-crown me-2"></i>Nowe konto
+            </span>
+            <h1 class="h2 text-white fw-bold">Dołącz do CasinoRoyale</h1>
+            <p class="casino-hero-text mt-2">Utwórz konto i zacznij grać już teraz.</p>
+        </div>
+
+        <form asp-action="Rejestracja" asp-controller="Auth" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="casino-form-group mb-3">
+                <label asp-for="Nazwa" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-user casino-input-icon"></i>
+                    <input asp-for="Nazwa" class="casino-input" placeholder="Twoja nazwa gracza" autocomplete="username" />
+                </div>
+                <span asp-validation-for="Nazwa" class="casino-validation"></span>
+            </div>
+
+            <div class="casino-form-group mb-3">
+                <label asp-for="Email" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-envelope casino-input-icon"></i>
+                    <input asp-for="Email" class="casino-input" placeholder="twoj@email.com" autocomplete="email" />
+                </div>
+                <span asp-validation-for="Email" class="casino-validation"></span>
+            </div>
+
+            <div class="casino-form-group mb-3">
+                <label asp-for="Haslo" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-lock casino-input-icon"></i>
+                    <input asp-for="Haslo" class="casino-input" placeholder="Minimum 8 znaków" autocomplete="new-password" />
+                </div>
+                <span asp-validation-for="Haslo" class="casino-validation"></span>
+            </div>
+
+            <div class="casino-form-group mb-4">
+                <label asp-for="PotwierdzHaslo" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-lock casino-input-icon"></i>
+                    <input asp-for="PotwierdzHaslo" class="casino-input" placeholder="Powtórz hasło" autocomplete="new-password" />
+                </div>
+                <span asp-validation-for="PotwierdzHaslo" class="casino-validation"></span>
+            </div>
+
+            <button type="submit" class="btn casino-btn-primary w-100 py-3 fw-bold">
+                <i class="fa-solid fa-user-plus me-2"></i>Utwórz konto
+            </button>
+        </form>
+
+        <p class="text-center mt-4 casino-section-text">
+            Masz już konto?
+            <a asp-action="Logowanie" asp-controller="Auth" class="casino-link">Zaloguj się</a>
+        </p>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

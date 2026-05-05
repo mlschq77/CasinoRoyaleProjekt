@@ -1,0 +1,70 @@
+@model CasinoRoyale.ViewModels.LogowanieViewModel
+@{
+    ViewData["Title"] = "Logowanie";
+}
+
+<div class="casino-auth-page d-flex align-items-center justify-content-center py-5">
+    <div class="casino-auth-card">
+
+        <div class="text-center mb-4">
+            <span class="casino-eyebrow mb-3 d-inline-flex">
+                <i class="fa-solid fa-crown me-2"></i>Witaj z powrotem
+            </span>
+            <h1 class="h2 text-white fw-bold">Zaloguj się</h1>
+            <p class="casino-hero-text mt-2">Wróć do gry i ciesz się zwycięstwami.</p>
+        </div>
+
+        @if (!ViewData.ModelState.IsValid && ViewData.ModelState.ErrorCount > 0)
+        {
+            <div class="casino-alert mb-4">
+                <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+            </div>
+        }
+
+        <form asp-action="Logowanie" asp-controller="Auth" method="post">
+            @Html.AntiForgeryToken()
+            @if (ViewBag.ReturnUrl != null)
+            {
+                <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+            }
+
+            <div class="casino-form-group mb-3">
+                <label asp-for="Email" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-envelope casino-input-icon"></i>
+                    <input asp-for="Email" class="casino-input" placeholder="twoj@email.com" autocomplete="email" />
+                </div>
+                <span asp-validation-for="Email" class="casino-validation"></span>
+            </div>
+
+            <div class="casino-form-group mb-4">
+                <label asp-for="Haslo" class="casino-label"></label>
+                <div class="casino-input-wrapper">
+                    <i class="fa-solid fa-lock casino-input-icon"></i>
+                    <input asp-for="Haslo" class="casino-input" placeholder="Twoje hasło" autocomplete="current-password" />
+                </div>
+                <span asp-validation-for="Haslo" class="casino-validation"></span>
+            </div>
+
+            <div class="d-flex align-items-center mb-4">
+                <input asp-for="ZapamiętajMnie" class="casino-checkbox" id="pamietaj" />
+                <label for="pamietaj" class="casino-label ms-2 mb-0">Zapamiętaj mnie</label>
+            </div>
+
+            <button type="submit" class="btn casino-btn-primary w-100 py-3 fw-bold">
+                <i class="fa-solid fa-right-to-bracket me-2"></i>Zaloguj się
+            </button>
+        </form>
+
+        <p class="text-center mt-4 casino-section-text">
+            Nie masz jeszcze konta?
+            <a asp-action="Rejestracja" asp-controller="Auth" class="casino-link">Zarejestruj się</a>
+        </p>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

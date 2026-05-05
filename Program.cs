@@ -1,4 +1,5 @@
 using CasinoRoyale.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 namespace CasinoRoyale;
@@ -10,8 +11,20 @@ public class Program
         var builder = WebApplication.CreateBuilder(args);
 
         builder.Services.AddControllersWithViews();
+
         builder.Services.AddDbContext<Automaty>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("AutomatyConnection")));
+
+        // ↓ NOWE — rejestracja cookie auth
+        builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+            .AddCookie(options =>
+            {
+                options.LoginPath = "/Auth/Logowanie";
+                options.LogoutPath = "/Auth/Wylogowanie";
+                options.ExpireTimeSpan = TimeSpan.FromHours(2);
+                options.Cookie.Name = "CasinoRoyale.Auth";
+                options.Cookie.HttpOnly = true;
+            });
 
         var app = builder.Build();
 
@@ -23,9 +36,9 @@ public class Program
 
         app.UseHttpsRedirection();
         app.UseStaticFiles();
-
         app.UseRouting();
 
+        app.UseAuthentication(); // ← NOWA LINIA (przed UseAuthorization!)
         app.UseAuthorization();
 
         app.MapControllerRoute(
