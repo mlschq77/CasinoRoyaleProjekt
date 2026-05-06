@@ -315,3 +315,40 @@ body.casino-body {
     .casino-user-badge .fa-user-circle {
         color: var(--casino-gold-soft);
     }
+
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 80px);
+    gap: 12px;
+    justify-content: center;
+}
+
+.tile {
+    width: 80px;
+    height: 80px;
+    background: var(--casino-black-soft);
+    border: 1px solid var(--casino-border);
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+    .tile:hover {
+        border-color: var(--casino-gold-soft);
+        transform: scale(1.05);
+    }
+
+.safe {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: #22c55e;
+}
+
+.mine {
+    background: rgba(239, 68, 68, 0.3);
+    border-color: #ef4444;
+}

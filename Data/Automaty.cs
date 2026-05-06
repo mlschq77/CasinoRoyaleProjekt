@@ -10,5 +10,6 @@ namespace CasinoRoyale.Data
 
         public DbSet<AutomatInfo> AutomatyInfo { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<MinesGame> MinesGames { get; set; }
     }
 }

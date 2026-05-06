@@ -1,4 +1,5 @@
 using CasinoRoyale.Data;
+using CasinoRoyale.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,8 +13,13 @@ public class Program
 
         builder.Services.AddControllersWithViews();
 
+
+
         builder.Services.AddDbContext<Automaty>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("AutomatyConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+
+
 
         // ↓ NOWE — rejestracja cookie auth
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -25,6 +31,8 @@ public class Program
                 options.Cookie.Name = "CasinoRoyale.Auth";
                 options.Cookie.HttpOnly = true;
             });
+
+        builder.Services.AddScoped<MinesService>();
 
         var app = builder.Build();
 

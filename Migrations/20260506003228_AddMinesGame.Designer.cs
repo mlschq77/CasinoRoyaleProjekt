@@ -4,6 +4,7 @@ using CasinoRoyale.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasinoRoyale.Migrations
 {
     [DbContext(typeof(Automaty))]
-    partial class AutomatyModelSnapshot : ModelSnapshot
+    [Migration("20260506003228_AddMinesGame")]
+    partial class AddMinesGame
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,42 +44,6 @@ namespace CasinoRoyale.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AutomatyInfo");
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.MinesGame", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BetAmount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("GridSize")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("MineCount")
-                        .HasColumnType("int");
-
-                    b.Property<string>("MinePositions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RevealedPositions")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MinesGames");
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.User", b =>
