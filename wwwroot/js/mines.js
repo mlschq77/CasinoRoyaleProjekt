@@ -1,5 +1,4 @@
-﻿
-let gameId = null;
+﻿let gameId = null;
 
 function createGrid() {
     const grid = document.getElementById("grid");
@@ -15,30 +14,28 @@ function createGrid() {
     }
 }
 
-
 async function startGame() {
-        const bet = document.getElementById("bet").value;
-        const mines = document.getElementById("mines").value;
+    const bet = document.getElementById("bet").value;
+    const mines = document.getElementById("mines").value;
 
-        try {
-            const res = await fetch(`/api/mines/start?mineCount=${mines}&bet=${bet}`, {
-                method: "POST"
-            });
+    try {
+        const res = await fetch(`/api/mines/start?mineCount=${mines}&bet=${bet}`, {
+            method: "POST"
+        });
 
-            const data = await res.json();
+        const data = await res.json();
 
-            gameId = data.id;
+        gameId = data.id;
 
-            createGrid();
+        createGrid();
 
-            document.getElementById("status").innerText = "Game started 🎰";
-        }
-        catch (err) {
-            console.error(err);
-            document.getElementById("status").innerText = "Error starting game";
-        }
+        document.getElementById("status").innerText = "Game started 🎰";
     }
-
+    catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "Error starting game";
+    }
+}
 
 async function clickTile(position, tile) {
     if (!gameId) return;
@@ -56,7 +53,6 @@ async function clickTile(position, tile) {
             tile.classList.add("mine");
             tile.innerText = "💣";
 
-            // BONUS 🔥 pokaż wszystkie bomby
             revealMines();
 
             document.getElementById("status").innerText = "💥 You lost!";
@@ -71,30 +67,28 @@ async function clickTile(position, tile) {
     }
 }
 
-
 async function cashout() {
-        if (!gameId) return;
+    if (!gameId) return;
 
-        try {
-            const res = await fetch(`/api/mines/cashout?gameId=${gameId}`, {
-                method: "POST"
-            });
+    try {
+        const res = await fetch(`/api/mines/cashout?gameId=${gameId}`, {
+            method: "POST"
+        });
 
-            const data = await res.json();
+        const data = await res.json();
 
-            await revealMines(); // 🔥 dodaj to
+        await revealMines();
 
-            document.getElementById("status").innerText =
-                `💰 Win: ${data.win} (x${data.multiplier})`;
+        document.getElementById("status").innerText =
+            `💰 Win: ${data.win} (x${data.multiplier})`;
 
-            gameId = null;
-        }
-        catch (err) {
-            console.error(err);
-            document.getElementById("status").innerText = "Error...";
-        }
+        gameId = null;
+    }
+    catch (err) {
+        console.error(err);
+        document.getElementById("status").innerText = "Error...";
+    }
 }
-
 
 async function revealMines() {
     try {
@@ -102,12 +96,13 @@ async function revealMines() {
         const data = await res.json();
 
         const mines = data.mines;
-
         const tiles = document.querySelectorAll(".tile");
 
         mines.forEach(pos => {
             tiles[pos].classList.add("mine");
             tiles[pos].innerText = "💣";
         });
-    } catch { }
+    } catch (err) {
+        console.error(err);
+    }
 }

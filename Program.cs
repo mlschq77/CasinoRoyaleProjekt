@@ -2,6 +2,7 @@ using CasinoRoyale.Data;
 using CasinoRoyale.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.SqlClient;
 
 namespace CasinoRoyale;
 
@@ -13,10 +14,11 @@ public class Program
 
         builder.Services.AddControllersWithViews();
 
-
-
         builder.Services.AddDbContext<Automaty>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(
+                builder.Configuration.GetConnectionString("DefaultConnection"),
+                sql => sql.EnableRetryOnFailure()
+            ));
 
 
 
@@ -36,13 +38,15 @@ public class Program
 
         var app = builder.Build();
 
+        ApplyDatabaseMigrations(app);
+
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
         }
 
-        app.UseHttpsRedirection();
+        //app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
 
@@ -59,5 +63,28 @@ public class Program
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
         app.Run();
+    }
+
+    private static void ApplyDatabaseMigrations(WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        var dbContext = scope.ServiceProvider.GetRequiredService<Automaty>();
+
+        const int maxAttempts = 10;
+
+        for (var attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            try
+            {
+                dbContext.Database.Migrate();
+                return;
+            }
+            catch (SqlException ex) when (attempt < maxAttempts)
+            {
+                logger.LogWarning(ex, "Database is not ready yet. Retrying migration attempt {Attempt}/{MaxAttempts}.", attempt, maxAttempts);
+                Thread.Sleep(TimeSpan.FromSeconds(5));
+            }
+        }
     }
 }
