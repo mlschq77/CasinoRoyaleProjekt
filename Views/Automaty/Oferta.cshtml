@@ -4,11 +4,10 @@
 @{
     ViewData["Title"] = "Oferta";
 
-    var gry = Model.Gry ?? Array.Empty<CasinoRoyale.Models.AutomatInfo>();
+    var gry = (Model.Gry ?? Array.Empty<CasinoRoyale.Models.AutomatInfo>()).ToList();
     var kategorie = Model.Kategorie ?? Array.Empty<string>();
     var wybranaKategoria = Model.WybranaKategoria;
 }
-
 <div class="casino-home">
     <main class="casino-section py-5" id="sloty">
         <div class="container">

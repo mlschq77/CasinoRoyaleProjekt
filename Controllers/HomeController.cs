@@ -1,4 +1,4 @@
-using System.Diagnostics;
+    using System.Diagnostics;
 using CasinoRoyale.Data;
 using CasinoRoyale.Models;
 using Microsoft.AspNetCore.Mvc;

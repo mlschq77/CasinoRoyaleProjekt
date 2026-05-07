@@ -103,6 +103,23 @@ namespace CasinoRoyale.Controllers
 
             return Ok(new { win, multiplier });
         }
+
+        [HttpGet("reveal")]
+        public IActionResult Reveal(int gameId)
+        {
+            var game = _context.MinesGames.Find(gameId);
+
+            if (game == null)
+                return BadRequest("Game not found");
+
+            var mines = game.MinePositions
+                .Split(',')
+                .Select(int.Parse)
+                .ToList();
+
+            return Ok(new { mines });
+        }
+
     }
 
 }
