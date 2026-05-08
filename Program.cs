@@ -22,8 +22,6 @@ public class Program
 
 
 
-
-        // ↓ NOWE — rejestracja cookie auth
         builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
             .AddCookie(options =>
             {
@@ -35,6 +33,7 @@ public class Program
             });
 
         builder.Services.AddScoped<MinesService>();
+        builder.Services.AddScoped<IBalanceService, BalanceService>();
 
         var app = builder.Build();
 
@@ -46,11 +45,11 @@ public class Program
             app.UseHsts();
         }
 
-        //app.UseHttpsRedirection();
+        
         app.UseStaticFiles();
         app.UseRouting();
 
-        app.UseAuthentication(); // ← NOWA LINIA (przed UseAuthorization!)
+        app.UseAuthentication(); 
         app.UseAuthorization();
 
         app.MapControllerRoute(

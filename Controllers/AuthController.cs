@@ -59,6 +59,7 @@ public class AuthController : Controller
 			Nazwa = model.Nazwa,
 			Email = model.Email,
 			HasloHash = BCrypt.Net.BCrypt.HashPassword(model.Haslo),
+			Balance = 1000m,
 			DataRejestracji = DateTime.UtcNow
 		};
 
@@ -126,7 +127,8 @@ public class AuthController : Controller
 		{
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 			new Claim(ClaimTypes.Name, user.Nazwa),
-			new Claim(ClaimTypes.Email, user.Email)
+			new Claim(ClaimTypes.Email, user.Email), 
+			new Claim("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
 		};
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

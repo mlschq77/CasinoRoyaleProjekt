@@ -1,4 +1,30 @@
-﻿let gameId = null;
+let gameId = null;
+
+function updateBalance(balance) {
+    const balanceDisplay = document.getElementById("balance-display");
+    if (!balanceDisplay || balance === undefined || balance === null) return;
+
+    balanceDisplay.innerText = Number(balance).toFixed(2);
+}
+
+async function parseResponse(res) {
+    const text = await res.text();
+    let data = null;
+
+    if (text) {
+        try {
+            data = JSON.parse(text);
+        } catch {
+            data = { error: text };
+        }
+    }
+
+    if (!res.ok) {
+        throw new Error(data?.error || "Request failed");
+    }
+
+    return data || {};
+}
 
 function createGrid() {
     const grid = document.getElementById("grid");
@@ -23,9 +49,10 @@ async function startGame() {
             method: "POST"
         });
 
-        const data = await res.json();
+        const data = await parseResponse(res);
 
         gameId = data.id;
+        updateBalance(data.balance);
 
         createGrid();
 
@@ -33,7 +60,7 @@ async function startGame() {
     }
     catch (err) {
         console.error(err);
-        document.getElementById("status").innerText = "Error starting game";
+        document.getElementById("status").innerText = err.message || "Error starting game";
     }
 }
 
@@ -47,15 +74,16 @@ async function clickTile(position, tile) {
             method: "POST"
         });
 
-        const data = await res.json();
+        const data = await parseResponse(res);
 
         if (data.result === "lose") {
             tile.classList.add("mine");
             tile.innerText = "💣";
 
-            revealMines();
+            await revealMines();
 
             document.getElementById("status").innerText = "💥 You lost!";
+            gameId = null;
         } else {
             tile.classList.add("safe");
             tile.innerText = "✅";
@@ -63,7 +91,7 @@ async function clickTile(position, tile) {
     }
     catch (err) {
         console.error(err);
-        document.getElementById("status").innerText = "Error...";
+        document.getElementById("status").innerText = err.message || "Error...";
     }
 }
 
@@ -75,25 +103,26 @@ async function cashout() {
             method: "POST"
         });
 
-        const data = await res.json();
+        const data = await parseResponse(res);
 
         await revealMines();
+        updateBalance(data.balance);
 
         document.getElementById("status").innerText =
-            `💰 Win: ${data.win} (x${data.multiplier})`;
+            `💰 Win: ${Number(data.win).toFixed(2)} (x${data.multiplier})`;
 
         gameId = null;
     }
     catch (err) {
         console.error(err);
-        document.getElementById("status").innerText = "Error...";
+        document.getElementById("status").innerText = err.message || "Error...";
     }
 }
 
 async function revealMines() {
     try {
         const res = await fetch(`/api/mines/reveal?gameId=${gameId}`);
-        const data = await res.json();
+        const data = await parseResponse(res);
 
         const mines = data.mines;
         const tiles = document.querySelectorAll(".tile");

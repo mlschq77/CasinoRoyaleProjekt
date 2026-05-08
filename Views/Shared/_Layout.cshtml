@@ -28,6 +28,9 @@
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <span class="casino-user-badge">
+                        <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
+                    </span>
+                    <span class="casino-user-badge">
                         <i class="fa-solid fa-user-circle me-2"></i>@User.Identity.Name
                     </span>
                     <form asp-action="Wylogowanie" asp-controller="Auth" method="post" class="m-0">
