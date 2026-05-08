@@ -30,8 +30,11 @@
       "launchBrowser": true,
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
       "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
         "ASPNETCORE_HTTPS_PORTS": "8081",
-        "ASPNETCORE_HTTP_PORTS": "8080"
+        "ASPNETCORE_HTTP_PORTS": "8080",
+        "Stripe__SecretKey": "sk_test_51TUcQdPPVxf1VniAZ8rqcE1bysvsqwhfayIUIiLSFYtx71ynbRZH7hNZhSjoILfYDTWRt3cFypO38LS6I3Ksgb3J002cMQc8s5",
+        "Stripe__PublishableKey": "pk_test_51TUcQdPPVxf1VniAnvyDLV9S99afdzxNdjZvOJAF1lQwZ14xDisuRFgRJCBxKvHmE4sK06u4Fa8TyEfdmszZRNiJ00IenKxDa3"
       },
       "publishAllPorts": true,
       "useSSL": true

@@ -6,6 +6,8 @@ services:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_URLS: http://+:8080
       ConnectionStrings__DefaultConnection: Server=db,1433;Database=CasinoDB;User Id=sa;Password=Haslo123!;TrustServerCertificate=True;Encrypt=False;
+      Stripe__SecretKey: ${STRIPE_SECRET_KEY:-sk_test_51TUcQdPPVxf1VniAZ8rqcE1bysvsqwhfayIUIiLSFYtx71ynbRZH7hNZhSjoILfYDTWRt3cFypO38LS6I3Ksgb3J002cMQc8s5}
+      Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY:-pk_test_51TUcQdPPVxf1VniAnvyDLV9S99afdzxNdjZvOJAF1lQwZ14xDisuRFgRJCBxKvHmE4sK06u4Fa8TyEfdmszZRNiJ00IenKxDa3}
     ports:
       - "8080:8080"
     depends_on:
