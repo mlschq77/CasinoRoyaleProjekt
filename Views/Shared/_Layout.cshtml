@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - CasinoRoyale</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CasinoRoyale.styles.css" asp-append-version="true" />
+</head>
+<body class="casino-body casino-home">
+<nav class="navbar navbar-expand-lg casino-navbar py-3">
+    <div class="container">
+        <a class="navbar-brand casino-brand" asp-controller="Home" asp-action="Index">
+                <i class="fa-solid fa-crown me-2"></i>CasinoRoyale
+        </a>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#casinoNavbar" aria-controls="casinoNavbar" aria-expanded="false" aria-label="Prze³¹cz nawigacjê">
+            <i class="fa-solid fa-bars text-gold"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="casinoNavbar">
+            <ul class="navbar-nav mx-auto mb-3 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link casino-nav-link" asp-controller="Home" asp-action="Oferta">Gry</a>
+                </li>
+            </ul>
+            <div class="d-flex flex-column flex-lg-row align-items-center gap-2">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    <span class="casino-user-badge">
+                        <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
+                    </span>
+                    <span class="casino-user-badge">
+                        <i class="fa-solid fa-user-circle me-2"></i>@User.Identity.Name
+                    </span>
+                    <a class="btn casino-btn-primary" asp-controller="Payments" asp-action="Deposit">
+                        <i class="fa-solid fa-plus me-1"></i>Doladuj
+                    </a>
+                    <form asp-action="Wylogowanie" asp-controller="Auth" method="post" class="m-0">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-light casino-btn-secondary">
+                            <i class="fa-solid fa-right-from-bracket me-1"></i>Wyloguj
+                        </button>
+                    </form>
+                }
+                else
+                {
+                    <a class="btn btn-outline-light casino-btn-secondary" asp-controller="Auth" asp-action="Logowanie">Logowanie</a>
+                    <a class="btn casino-btn-primary" asp-controller="Auth" asp-action="Rejestracja">Rejestracja</a>
+                }
+            </div>
+            </div>
+        </div>
+    </div>
+</nav>
+<main role="main">
+    @RenderBody()
+</main>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
