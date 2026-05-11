@@ -148,6 +148,77 @@ public class PaymentsController : Controller
         return RedirectToAction(nameof(Deposit), new { message = "Platnosc zostala anulowana." });
     }
 
+    [HttpGet]
+    public IActionResult Withdraw(string? message = null)
+    {
+        return View(new WithdrawViewModel
+        {
+            Message = message,
+            StripeConfigured = IsStripeConfigured()
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateTransfer(decimal amount, string destinationAccountId)
+    {
+        if (!IsStripeConfigured())
+            return RedirectToAction(nameof(Withdraw), new { message = "Stripe test nie jest jeszcze skonfigurowany." });
+
+        if (amount < 10 || amount > 10000)
+            return RedirectToAction(nameof(Withdraw), new { message = "Kwota wyplaty musi byc w zakresie 10-10000." });
+
+        destinationAccountId = destinationAccountId?.Trim() ?? string.Empty;
+        if (!destinationAccountId.StartsWith("acct_", StringComparison.Ordinal))
+            return RedirectToAction(nameof(Withdraw), new { message = "Podaj poprawne konto Stripe Connect zaczynajace sie od acct_." });
+
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var withdrawResult = await _balanceService.WithdrawAsync(userId.Value, amount);
+        if (!withdrawResult.Success)
+            return RedirectToAction(nameof(Withdraw), new { message = withdrawResult.Error });
+
+        StripeConfiguration.ApiKey = GetStripeSecretKey();
+
+        try
+        {
+            var service = new TransferService();
+            var transfer = await service.CreateAsync(new TransferCreateOptions
+            {
+                Amount = (long)(amount * 100),
+                Currency = Currency,
+                Destination = destinationAccountId,
+                Description = $"Wyplata CasinoRoyale dla uzytkownika {userId.Value}",
+                Metadata = new Dictionary<string, string>
+                {
+                    ["userId"] = userId.Value.ToString(),
+                    ["amount"] = amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
+                }
+            });
+
+            _dbContext.StripeWithdrawals.Add(new StripeWithdrawal
+            {
+                UserId = userId.Value,
+                TransferId = transfer.Id,
+                DestinationAccountId = destinationAccountId,
+                Amount = amount,
+                Currency = transfer.Currency ?? Currency,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Withdraw), new { message = $"Zlecono wyplate {amount:0.00} PLN przez Stripe." });
+        }
+        catch (StripeException ex)
+        {
+            await _balanceService.PayoutAsync(userId.Value, amount);
+            return RedirectToAction(nameof(Withdraw), new { message = $"Stripe odrzucil wyplate: {ex.StripeError?.Message ?? ex.Message}" });
+        }
+    }
+
     private string? GetStripeSecretKey()
     {
         var configuredKey = _configuration["Stripe:SecretKey"]?.Trim();

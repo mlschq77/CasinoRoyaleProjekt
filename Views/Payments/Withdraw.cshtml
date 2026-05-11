@@ -1,0 +1,46 @@
+@model CasinoRoyale.ViewModels.WithdrawViewModel
+
+@{
+    ViewData["Title"] = "Wyplata";
+}
+
+<div class="container py-5">
+    <div class="casino-highlight-card p-4 mx-auto" style="max-width: 560px;">
+        <div class="text-center mb-4">
+            <h1 class="h2 text-gold mb-2">Wyplata balansu</h1>
+            <p class="casino-section-text mb-0">Wyplata testowa przez Stripe Connect.</p>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Message))
+        {
+            <div class="alert alert-info">@Model.Message</div>
+        }
+
+        @if (!Model.StripeConfigured)
+        {
+            <div class="alert alert-warning">
+                Brakuje klucza testowego Stripe. Ustaw konfiguracje <code>Stripe:SecretKey</code> na klucz zaczynajacy sie od <code>sk_test_</code>.
+            </div>
+        }
+
+        <form asp-controller="Payments" asp-action="CreateTransfer" method="post" class="d-grid gap-3">
+            @Html.AntiForgeryToken()
+
+            <label class="casino-label" for="amount">Kwota PLN</label>
+            <input id="amount" name="amount" type="number" min="10" max="10000" step="1" value="@Model.Amount" class="casino-input" />
+
+            <label class="casino-label" for="destinationAccountId">Konto Stripe Connect</label>
+            <input id="destinationAccountId" name="destinationAccountId" type="text" value="@Model.DestinationAccountId" placeholder="acct_..." class="casino-input" />
+
+            <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" onclick="document.getElementById('amount').value = 50">50</button>
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" onclick="document.getElementById('amount').value = 100">100</button>
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" onclick="document.getElementById('amount').value = 250">250</button>
+            </div>
+
+            <button type="submit" class="btn casino-btn-primary" disabled="@(!Model.StripeConfigured)">
+                <i class="fa-solid fa-money-bill-transfer me-2"></i>Zlec wyplate
+            </button>
+        </form>
+    </div>
+</div>
