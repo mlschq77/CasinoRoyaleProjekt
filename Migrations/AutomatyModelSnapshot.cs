@@ -44,6 +44,72 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("AutomatyInfo");
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.BlackjackGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DealerHandJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DeckJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("FinishedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPlayerTurn")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsPlayingSplitHand")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSplitActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("PayoutProcessed")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PlayerHandJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Result")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("SplitBetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SplitHandJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("WinAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BlackjackGames");
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
                 {
                     b.Property<int>("Id")

@@ -141,14 +141,15 @@ namespace CasinoRoyale.Services
             });
         }
 
-        public async Task<(bool success, string error, BlackjackGame? game)> HitAsync(int userId, int gameId)
+        public async Task<(bool success, string error, BlackjackGame? game, decimal balance)> HitAsync(int userId, int gameId)
         {
             var game = await _db.BlackjackGames.FindAsync(gameId);
 
             if (game == null || game.UserId != userId || !game.IsActive || !game.IsPlayerTurn)
-                return (false, "Nieprawidlowa akcja.", null);
+                return (false, "Nieprawidlowa akcja.", null, 0);
 
             var deck = JsonConvert.DeserializeObject<List<BlackjackCard>>(game.DeckJson)!;
+            decimal balance = 0;
 
             if (game.IsPlayingSplitHand)
             {
@@ -158,7 +159,10 @@ namespace CasinoRoyale.Services
                 game.DeckJson = JsonConvert.SerializeObject(deck);
 
                 if (IsBust(splitHand))
+                {
                     game.IsPlayerTurn = false;
+                    (game, balance) = await RunDealerAndFinishAsync(game);
+                }
             }
             else
             {
@@ -172,12 +176,15 @@ namespace CasinoRoyale.Services
                     if (game.IsSplitActive)
                         game.IsPlayingSplitHand = true;
                     else
+                    {
                         game.IsPlayerTurn = false;
+                        (game, balance) = await RunDealerAndFinishAsync(game);
+                    }
                 }
             }
 
             await _db.SaveChangesAsync();
-            return (true, "", game);
+            return (true, "", game, balance);
         }
 
         public async Task<(bool success, string error, BlackjackGame? game, decimal balance)> StandAsync(int userId, int gameId)
@@ -200,7 +207,7 @@ namespace CasinoRoyale.Services
             return (true, "", finalGame, balance);
         }
 
-        public async Task<(bool success, string error, BlackjackGame? game, decimal balance)> DoubleDownAsync(int userId, int gameId)
+        public async Task<(bool success, string error, BlackjackGame? game, decimal balance)> DoubleDownAsync(int userId, int gameId, bool faceDown)
         {
             var game = await _db.BlackjackGames.FindAsync(gameId);
 
@@ -391,6 +398,26 @@ namespace CasinoRoyale.Services
             return 0;
         }
 
+        private object ResolveHandState(int playerVal, int dealerVal, bool playerBust, bool dealerBust, decimal bet)
+        {
+            var winAmount = ResolveHand(playerVal, dealerVal, playerBust, dealerBust, bet);
+            string result;
+
+            if (winAmount > bet)
+                result = "win";
+            else if (winAmount == bet)
+                result = "push";
+            else
+                result = "lose";
+
+            return new
+            {
+                result,
+                winAmount,
+                netAmount = winAmount - bet
+            };
+        }
+
         public object BuildGameState(BlackjackGame game)
         {
             var playerHand = JsonConvert.DeserializeObject<List<BlackjackCard>>(game.PlayerHandJson)!;
@@ -412,6 +439,20 @@ namespace CasinoRoyale.Services
             bool canSplit = playerHand.Count == 2 && !game.IsSplitActive && game.IsPlayerTurn
                             && !game.IsPlayingSplitHand && playerHand[0].GetValue() == playerHand[1].GetValue();
 
+            string activeHand = game.IsSplitActive && game.IsPlayingSplitHand ? "split" : "main";
+            object? handResults = null;
+
+            if (!game.IsActive && game.IsSplitActive)
+            {
+                int dealerFullValue = CalculateHandValue(dealerHand);
+
+                handResults = new
+                {
+                    main = ResolveHandState(playerValue, dealerFullValue, IsBust(playerHand), IsBust(dealerHand), game.BetAmount),
+                    split = ResolveHandState(splitValue, dealerFullValue, IsBust(splitHand), IsBust(dealerHand), game.SplitBetAmount)
+                };
+            }
+
             return new
             {
                 gameId = game.Id,
@@ -419,6 +460,7 @@ namespace CasinoRoyale.Services
                 isPlayerTurn = game.IsPlayerTurn,
                 isSplitActive = game.IsSplitActive,
                 isPlayingSplitHand = game.IsPlayingSplitHand,
+                activeHand,
                 playerHand,
                 dealerHand = visibleDealerHand,
                 splitHand,
@@ -430,7 +472,8 @@ namespace CasinoRoyale.Services
                 canDouble,
                 canSplit,
                 result = game.Result,
-                winAmount = game.WinAmount
+                winAmount = game.WinAmount,
+                handResults
             };
         }
     }

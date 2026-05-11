@@ -6,12 +6,12 @@ public class GraController : Controller
 {
     public IActionResult Graj(int id)
     {
-        if (id == 0)
-            return RedirectToAction("Mines", "Games");
-
-        if (id == 2)
-            return RedirectToAction("Plinko", "Games");
-
-        return Content($"Gra ID: {id}");
+        return id switch
+        {
+            0 => RedirectToAction("Mines", "Games"),
+            1 => RedirectToAction("Blackjack", "Games"),
+            2 => RedirectToAction("Plinko", "Games"),
+            _ => RedirectToAction("Oferta", "Automaty")
+        };
     }
 }

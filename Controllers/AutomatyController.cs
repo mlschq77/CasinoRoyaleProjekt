@@ -10,28 +10,10 @@ public class AutomatyController : Controller
 {
     private readonly Automaty _dbContext;
 
-
-    public class GraController : Controller
-    {
-        public IActionResult Graj(int id)
-        {
-            
-            if (id == 1)
-            {
-                return Redirect("Home");
-            }
-
-            
-            return Content($"Gra ID: {id}");
-        }
-    }
-
-
     public AutomatyController(Automaty dbContext)
     {
         _dbContext = dbContext;
     }
-
 
     public async Task<IActionResult> Oferta(string? kategoria)
     {
@@ -49,33 +31,33 @@ public class AutomatyController : Controller
             .OrderBy(automat => automat.Nazwa)
             .ToListAsync();
 
-        if (string.IsNullOrWhiteSpace(kategoria) || kategoria == "Originals") // to trzeba przeniesc do bazy zamiast tutaj dodawac
+        if (string.IsNullOrWhiteSpace(kategoria) || kategoria == "Originals")
         {
-            gry.Add(new CasinoRoyale.Models.AutomatInfo
+            var provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" };
+            var originalsCat = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } };
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 1,
+                Nazwa = "Blackjack",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
             {
                 Id = 0,
                 Nazwa = "Mines",
-                Provider = new CasinoRoyale.Models.AutomatProvider
-                {
-                    Id = 0,
-                    Nazwa = "Casino Royale"
-                },
-                Kategorie =
-                [
-                    new CasinoRoyale.Models.Kategoria
-                    {
-                        Id = 0,
-                        Nazwa = "Originals"
-                    }
-                ]
+                Provider = provider,
+                Kategorie = originalsCat
             });
 
             gry.Add(new AutomatInfo
             {
                 Id = 2,
                 Nazwa = "Plinko",
-                Provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" },
-                Kategorie = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } }
+                Provider = provider,
+                Kategorie = originalsCat
             });
         }
 
@@ -88,7 +70,7 @@ public class AutomatyController : Controller
                 .Where(nazwa => !string.IsNullOrWhiteSpace(nazwa))
                 .OrderBy(k => k)
                 .ToListAsync())
-                .Append("Originals") 
+                .Append("Originals")
                 .Distinct()
                 .ToList(),
 
@@ -97,5 +79,4 @@ public class AutomatyController : Controller
 
         return View(model);
     }
-
 }

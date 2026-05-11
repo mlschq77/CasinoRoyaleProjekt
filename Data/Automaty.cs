@@ -1,5 +1,6 @@
 using CasinoRoyale.Models;
 using Microsoft.EntityFrameworkCore;
+
 namespace CasinoRoyale.Data
 {
     public class Automaty : DbContext
@@ -58,6 +59,21 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<AutomatProvider>()
                 .HasIndex(provider => provider.Nazwa)
                 .IsUnique();
+
+            modelBuilder.Entity<BlackjackGame>()
+                .ToTable("BlackjackGames");
+
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(game => game.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(game => game.SplitBetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(game => game.WinAmount)
+                .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<AutomatInfo>()
                 .HasOne(automat => automat.Provider)

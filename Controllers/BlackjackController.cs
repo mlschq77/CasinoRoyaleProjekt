@@ -38,15 +38,8 @@ namespace CasinoRoyale.Controllers
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
 
-            var (success, error, game) = await _service.HitAsync(userId.Value, req.GameId);
-            if (!success) return BadRequest(new { error });
-
-            decimal balance = 0;
-            if (!game!.IsActive || (!game.IsPlayerTurn && !game.PayoutProcessed))
-            {
-                var bal = await _balanceService.GetBalanceAsync(userId.Value);
-                balance = bal ?? 0;
-            }
+            var (success, error, game, balance) = await _service.HitAsync(userId.Value, req.GameId);
+            if (!success) return BadRequest(new { error, balance });
 
             var state = _service.BuildGameState(game!);
             return Ok(new { state, balance });
@@ -71,8 +64,8 @@ namespace CasinoRoyale.Controllers
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
 
-            var (success, error, game, balance) = await _service.DoubleDownAsync(userId.Value, req.GameId);
-            if (!success) return BadRequest(new { error });
+            var (success, error, game, balance) = await _service.DoubleDownAsync(userId.Value, req.GameId, req.FaceDown);
+            if (!success) return BadRequest(new { error, balance });
 
             var state = _service.BuildGameState(game!);
             return Ok(new { state, balance });
@@ -116,5 +109,6 @@ namespace CasinoRoyale.Controllers
     public class GameActionRequest
     {
         public int GameId { get; set; }
+        public bool FaceDown { get; set; }
     }
 }
