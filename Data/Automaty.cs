@@ -12,6 +12,7 @@ namespace CasinoRoyale.Data
         public DbSet<User> Users { get; set; }
         public DbSet<MinesGame> MinesGames { get; set; }
         public DbSet<StripePayment> StripePayments { get; set; }
+        public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +32,14 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<StripePayment>()
                 .HasIndex(payment => payment.SessionId)
+                .IsUnique();
+
+            modelBuilder.Entity<StripeWithdrawal>()
+                .Property(withdrawal => withdrawal.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<StripeWithdrawal>()
+                .HasIndex(withdrawal => withdrawal.TransferId)
                 .IsUnique();
         }
     }

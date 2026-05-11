@@ -53,6 +53,13 @@ public class AutomatyController : Controller
                 Nazwa = "Mines",
                 Kategoria = "Originals"
             });
+
+            gry.Add(new CasinoRoyale.Models.AutomatInfo
+            {
+                Id = 2,
+                Nazwa = "Plinko",
+                Kategoria = "Originals"
+            });
         }
 
         var model = new SlotsViewModel
