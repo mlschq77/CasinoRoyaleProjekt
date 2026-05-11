@@ -17,6 +17,29 @@
         <form asp-action="Rejestracja" asp-controller="Auth" method="post">
             @Html.AntiForgeryToken()
 
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="casino-form-group mb-3">
+                        <label asp-for="Imie" class="casino-label"></label>
+                        <div class="casino-input-wrapper">
+                            <i class="fa-solid fa-id-card casino-input-icon"></i>
+                            <input asp-for="Imie" class="casino-input" placeholder="Jan" autocomplete="given-name" />
+                        </div>
+                        <span asp-validation-for="Imie" class="casino-validation"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="casino-form-group mb-3">
+                        <label asp-for="Nazwisko" class="casino-label"></label>
+                        <div class="casino-input-wrapper">
+                            <i class="fa-solid fa-id-card casino-input-icon"></i>
+                            <input asp-for="Nazwisko" class="casino-input" placeholder="Kowalski" autocomplete="family-name" />
+                        </div>
+                        <span asp-validation-for="Nazwisko" class="casino-validation"></span>
+                    </div>
+                </div>
+            </div>
+
             <div class="casino-form-group mb-3">
                 <label asp-for="Nazwa" class="casino-label"></label>
                 <div class="casino-input-wrapper">
