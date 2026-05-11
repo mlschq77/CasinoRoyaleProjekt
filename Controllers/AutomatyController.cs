@@ -1,4 +1,5 @@
 using CasinoRoyale.Data;
+using CasinoRoyale.Models;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,35 +35,49 @@ public class AutomatyController : Controller
 
     public async Task<IActionResult> Oferta(string? kategoria)
     {
-        var gryQuery = _dbContext.AutomatyInfo.AsNoTracking();
+        IQueryable<AutomatInfo> gryQuery = _dbContext.AutomatyInfo
+            .AsNoTracking()
+            .Include(automat => automat.Kategorie)
+            .Include(automat => automat.Provider);
 
         if (!string.IsNullOrWhiteSpace(kategoria))
         {
-            gryQuery = gryQuery.Where(automat => automat.Kategoria == kategoria);
+            gryQuery = gryQuery.Where(automat => automat.Kategorie.Any(k => k.Nazwa == kategoria));
         }
 
         var gry = await gryQuery
             .OrderBy(automat => automat.Nazwa)
             .ToListAsync();
 
-        if (string.IsNullOrWhiteSpace(kategoria) || kategoria == "Originals")
+        if (string.IsNullOrWhiteSpace(kategoria) || kategoria == "Originals") // to trzeba przeniesc do bazy zamiast tutaj dodawac
         {
             gry.Add(new CasinoRoyale.Models.AutomatInfo
             {
-                Id = 1,
+                Id = 0,
                 Nazwa = "Mines",
-                Kategoria = "Originals"
+                Provider = new CasinoRoyale.Models.AutomatProvider
+                {
+                    Id = 0,
+                    Nazwa = "Casino Royale"
+                },
+                Kategorie =
+                [
+                    new CasinoRoyale.Models.Kategoria
+                    {
+                        Id = 0,
+                        Nazwa = "Originals"
+                    }
+                ]
             });
         }
 
         var model = new SlotsViewModel
         {
             Gry = gry,
-            Kategorie = (await _dbContext.AutomatyInfo
+            Kategorie = (await _dbContext.Kategorie
                 .AsNoTracking()
-                .Select(a => a.Kategoria)
-                .Where(k => !string.IsNullOrWhiteSpace(k))
-                .Distinct()
+                .Select(k => k.Nazwa)
+                .Where(nazwa => !string.IsNullOrWhiteSpace(nazwa))
                 .OrderBy(k => k)
                 .ToListAsync())
                 .Append("Originals") 

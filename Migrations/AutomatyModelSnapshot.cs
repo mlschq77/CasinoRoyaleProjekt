@@ -30,17 +30,75 @@ namespace CasinoRoyale.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Kategoria")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nazwa")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int?>("ProviderId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("ProviderId");
+
                     b.ToTable("AutomatyInfo");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nazwa")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nazwa")
+                        .IsUnique();
+
+                    b.ToTable("Kategorie");
+                });
+
+            modelBuilder.Entity("AutomatyKategorie", b =>
+                {
+                    b.Property<int>("AutomatId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KategoriaId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AutomatId", "KategoriaId");
+
+                    b.HasIndex("KategoriaId");
+
+                    b.ToTable("AutomatyKategorie", (string)null);
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Nazwa")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Nazwa")
+                        .IsUnique();
+
+                    b.ToTable("AutomatProviderzy");
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.MinesGame", b =>
@@ -141,6 +199,46 @@ namespace CasinoRoyale.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("AutomatyKategorie", b =>
+                {
+                    b.HasOne("CasinoRoyale.Models.AutomatInfo", null)
+                        .WithMany()
+                        .HasForeignKey("AutomatId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CasinoRoyale.Models.Kategoria", null)
+                        .WithMany()
+                        .HasForeignKey("KategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.AutomatInfo", b =>
+                {
+                    b.HasOne("CasinoRoyale.Models.AutomatProvider", "Provider")
+                        .WithMany("Automaty")
+                        .HasForeignKey("ProviderId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Provider");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.AutomatInfo", b =>
+                {
+                    b.Navigation("Kategorie");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
+                {
+                    b.Navigation("Automaty");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
+                {
+                    b.Navigation("Automaty");
                 });
 #pragma warning restore 612, 618
         }
