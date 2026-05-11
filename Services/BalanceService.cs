@@ -58,4 +58,25 @@ public class BalanceService : IBalanceService
 
         return BalanceResult.Ok(balance.Value);
     }
+
+    public async Task<BalanceResult> WithdrawAsync(int userId, decimal amount)
+    {
+        if (amount <= 0)
+            return BalanceResult.Failed("Kwota wyplaty musi byc wieksza od zera.");
+
+        var updatedRows = await _dbContext.Users
+            .Where(user => user.Id == userId && user.Balance >= amount)
+            .ExecuteUpdateAsync(setters => setters
+                .SetProperty(user => user.Balance, user => user.Balance - amount));
+
+        var balance = await GetBalanceAsync(userId);
+
+        if (balance == null)
+            return BalanceResult.Failed("Nie znaleziono uzytkownika.");
+
+        if (updatedRows == 0)
+            return BalanceResult.Failed("Brak wystarczajacych srodkow.", balance.Value);
+
+        return BalanceResult.Ok(balance.Value);
+    }
 }
