@@ -56,6 +56,8 @@ public class AuthController : Controller
 
 		var user = new User
 		{
+			Imie = model.Imie,
+			Nazwisko = model.Nazwisko,
 			Nazwa = model.Nazwa,
 			Email = model.Email,
 			HasloHash = BCrypt.Net.BCrypt.HashPassword(model.Haslo),
@@ -127,6 +129,8 @@ public class AuthController : Controller
 		{
 			new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
 			new Claim(ClaimTypes.Name, user.Nazwa),
+			new Claim(ClaimTypes.GivenName, user.Imie),
+			new Claim(ClaimTypes.Surname, user.Nazwisko),
 			new Claim(ClaimTypes.Email, user.Email), 
 			new Claim("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
 		};

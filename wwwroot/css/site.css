@@ -316,6 +316,122 @@ body.casino-body {
         color: var(--casino-gold-soft);
     }
 
+.casino-profile-link {
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+    .casino-profile-link:hover {
+        color: var(--casino-ivory);
+        border-color: var(--casino-gold-soft);
+        background: rgba(212, 175, 55, 0.12);
+    }
+
+.casino-profile-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.casino-profile-card {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.98) 0%, rgba(12, 12, 12, 0.95) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.75rem;
+}
+
+.casino-profile-head {
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.16);
+}
+
+.casino-profile-avatar {
+    width: 76px;
+    height: 76px;
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    color: #1a1a1a;
+    border-radius: 50%;
+    font-size: 1.6rem;
+    font-weight: 900;
+    background: radial-gradient(circle at 35% 25%, #fff4b8, #f3d67a 35%, #d4af37 74%, #8c6413 100%);
+    box-shadow: 0 0 30px rgba(243, 214, 122, 0.28);
+}
+
+.casino-profile-name {
+    margin: 0;
+    color: #fff;
+    font-size: 1.65rem;
+}
+
+.casino-profile-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.casino-profile-field {
+    min-height: 94px;
+    padding: 1.1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 0.9rem;
+}
+
+    .casino-profile-field span {
+        display: block;
+        margin-bottom: 0.5rem;
+        color: rgba(245, 241, 230, 0.58);
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .casino-profile-field strong {
+        display: block;
+        color: #fff;
+        font-size: 1.12rem;
+        overflow-wrap: anywhere;
+    }
+
+.casino-profile-field-wide {
+    grid-column: 1 / -1;
+}
+
+.casino-profile-stat {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(212, 175, 55, 0.14);
+}
+
+    .casino-profile-stat span {
+        color: rgba(245, 241, 230, 0.66);
+    }
+
+    .casino-profile-stat strong {
+        color: var(--casino-gold-soft);
+        text-align: right;
+    }
+
+.casino-profile-note {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    color: rgba(245, 241, 230, 0.72);
+    background: rgba(212, 175, 55, 0.07);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 0.9rem;
+    line-height: 1.5;
+}
+
 
 .grid {
     display: grid;
@@ -475,9 +591,27 @@ body.casino-body {
     .plinko-shell {
         grid-template-columns: 1fr;
     }
+
+    .casino-profile-layout,
+    .casino-profile-fields {
+        grid-template-columns: 1fr;
+    }
+
+    .casino-profile-field-wide {
+        grid-column: auto;
+    }
 }
 
 @media (max-width: 575.98px) {
+    .casino-profile-card {
+        padding: 1rem;
+    }
+
+    .casino-profile-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
     .plinko-controls,
     .plinko-board-wrap {
         padding: 1rem;
