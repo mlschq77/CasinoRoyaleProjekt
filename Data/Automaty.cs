@@ -38,15 +38,12 @@ namespace CasinoRoyale.Data
                 .HasIndex(payment => payment.SessionId)
                 .IsUnique();
 
-            modelBuilder.Entity<Kategoria>()
-                .ToTable("Kategorie");
+            modelBuilder.Entity<StripeWithdrawal>()
+                .Property(withdrawal => withdrawal.Amount)
+                .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<Kategoria>()
-                .Property(kategoria => kategoria.Nazwa)
-                .HasMaxLength(450);
-
-            modelBuilder.Entity<Kategoria>()
-                .HasIndex(kategoria => kategoria.Nazwa)
+            modelBuilder.Entity<StripeWithdrawal>()
+                .HasIndex(withdrawal => withdrawal.TransferId)
                 .IsUnique();
 
             modelBuilder.Entity<AutomatProvider>()
@@ -59,21 +56,6 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<AutomatProvider>()
                 .HasIndex(provider => provider.Nazwa)
                 .IsUnique();
-
-            modelBuilder.Entity<BlackjackGame>()
-                .ToTable("BlackjackGames");
-
-            modelBuilder.Entity<BlackjackGame>()
-                .Property(game => game.BetAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<BlackjackGame>()
-                .Property(game => game.SplitBetAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<BlackjackGame>()
-                .Property(game => game.WinAmount)
-                .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<AutomatInfo>()
                 .HasOne(automat => automat.Provider)
