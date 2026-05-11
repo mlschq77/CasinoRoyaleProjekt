@@ -70,11 +70,12 @@ public class AutomatyController : Controller
                 ]
             });
 
-            gry.Add(new CasinoRoyale.Models.AutomatInfo
+            gry.Add(new AutomatInfo
             {
                 Id = 2,
                 Nazwa = "Plinko",
-                Kategoria = "Originals"
+                Provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" },
+                Kategorie = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } }
             });
         }
 

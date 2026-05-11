@@ -15,6 +15,7 @@ namespace CasinoRoyale.Data
         public DbSet<MinesGame> MinesGames { get; set; }
         public DbSet<StripePayment> StripePayments { get; set; }
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
+        public DbSet<BlackjackGame> BlackjackGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
