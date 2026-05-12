@@ -15,7 +15,7 @@
         <a class="navbar-brand casino-brand" asp-controller="Home" asp-action="Index">
                 <i class="fa-solid fa-crown me-2"></i>CasinoRoyale
         </a>
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#casinoNavbar" aria-controls="casinoNavbar" aria-expanded="false" aria-label="Prze³¹cz nawigacjê">
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="collapse" data-bs-target="#casinoNavbar" aria-controls="casinoNavbar" aria-expanded="false" aria-label="PrzeÅ‚Ä…cz nawigacjÄ™">
             <i class="fa-solid fa-bars text-gold"></i>
         </button>
         <div class="collapse navbar-collapse" id="casinoNavbar">
@@ -30,11 +30,14 @@
                     <span class="casino-user-badge">
                         <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
                     </span>
-                    <span class="casino-user-badge">
+                    <a class="casino-user-badge casino-profile-link" asp-controller="Profile" asp-action="Index">
                         <i class="fa-solid fa-user-circle me-2"></i>@User.Identity.Name
-                    </span>
+                    </a>
                     <a class="btn casino-btn-primary" asp-controller="Payments" asp-action="Deposit">
                         <i class="fa-solid fa-plus me-1"></i>Doladuj
+                    </a>
+                    <a class="btn btn-outline-light casino-btn-secondary" asp-controller="Payments" asp-action="Withdraw">
+                        <i class="fa-solid fa-money-bill-transfer me-1"></i>Wyplac
                     </a>
                     <form asp-action="Wylogowanie" asp-controller="Auth" method="post" class="m-0">
                         @Html.AntiForgeryToken()

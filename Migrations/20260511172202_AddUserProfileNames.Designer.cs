@@ -4,6 +4,7 @@ using CasinoRoyale.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasinoRoyale.Migrations
 {
     [DbContext(typeof(Automaty))]
-    partial class AutomatyModelSnapshot : ModelSnapshot
+    [Migration("20260511172202_AddUserProfileNames")]
+    partial class AddUserProfileNames
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,111 +33,17 @@ namespace CasinoRoyale.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Kategoria")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Nazwa")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ProviderId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("ProviderId");
 
                     b.ToTable("AutomatyInfo");
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Nazwa")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nazwa")
-                        .IsUnique();
-
-                    b.ToTable("Kategorie");
-                });
-
-            modelBuilder.Entity("AutomatyKategorie", b =>
-                {
-                    b.Property<int>("AutomatId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("KategoriaId")
-                        .HasColumnType("int");
-
-                    b.HasKey("AutomatId", "KategoriaId");
-
-                    b.HasIndex("KategoriaId");
-
-                    b.ToTable("AutomatyKategorie", (string)null);
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.KodBonusowy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("BonusKwotowy")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("BonusProcentowy")
-                        .HasColumnType("decimal(5,2)");
-
-                    b.Property<string>("Kod")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<decimal>("MinimalnaWplata")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("Utworzono")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("WaznyDo")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Kod")
-                        .IsUnique();
-
-                    b.ToTable("KodyBonusowe", (string)null);
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Nazwa")
-                        .IsRequired()
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Nazwa")
-                        .IsUnique();
-
-                    b.ToTable("AutomatProviderzy");
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.MinesGame", b =>
@@ -280,46 +189,6 @@ namespace CasinoRoyale.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("AutomatyKategorie", b =>
-                {
-                    b.HasOne("CasinoRoyale.Models.AutomatInfo", null)
-                        .WithMany()
-                        .HasForeignKey("AutomatId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CasinoRoyale.Models.Kategoria", null)
-                        .WithMany()
-                        .HasForeignKey("KategoriaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.AutomatInfo", b =>
-                {
-                    b.HasOne("CasinoRoyale.Models.AutomatProvider", "Provider")
-                        .WithMany("Automaty")
-                        .HasForeignKey("ProviderId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Provider");
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.AutomatInfo", b =>
-                {
-                    b.Navigation("Kategorie");
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
-                {
-                    b.Navigation("Automaty");
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
-                {
-                    b.Navigation("Automaty");
                 });
 #pragma warning restore 612, 618
         }

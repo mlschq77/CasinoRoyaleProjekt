@@ -33,6 +33,7 @@ public class Program
             });
 
         builder.Services.AddScoped<MinesService>();
+        builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
 
         var app = builder.Build();
