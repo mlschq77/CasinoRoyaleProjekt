@@ -15,9 +15,9 @@ public class ProfileViewModel
     [Display(Name = "Nazwisko")]
     public string Nazwisko { get; set; } = string.Empty;
 
-    [Required(ErrorMessage = "Nazwa u¿ytkownika jest wymagana.")]
-    [StringLength(50, MinimumLength = 3, ErrorMessage = "Nazwa musi mieæ od 3 do 50 znaków.")]
-    [Display(Name = "Nazwa u¿ytkownika")]
+    [Required(ErrorMessage = "Nazwa uï¿½ytkownika jest wymagana.")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "Nazwa musi mieï¿½ od 3 do 50 znakï¿½w.")]
+    [Display(Name = "Nazwa uï¿½ytkownika")]
     public string Nazwa { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "Adres e-mail jest wymagany.")]
