@@ -36,19 +36,23 @@
                         <div class="casino-profile-edit-grid">
                             <div>
                                 <label class="casino-label" asp-for="Imie">Imie</label>
-                                <input class="casino-input" asp-for="Imie" maxlength="80" />
+                                <input class="casino-input" asp-for="Imie" maxlength="80" placeholder="Twoje imie" />
+                                <span asp-validation-for="Imie" class="casino-validation"></span> @* Nie wiem czy powinnismy dawac mozliwosc edycji imienia i nazwiska ale to jak zrobimy ten upload dokumentu *@
                             </div>
                             <div>
                                 <label class="casino-label" asp-for="Nazwisko">Nazwisko</label>
-                                <input class="casino-input" asp-for="Nazwisko" maxlength="120" />
+                                <input class="casino-input" asp-for="Nazwisko" maxlength="120" placeholder="Twoje nazwisko" />
+                                <span asp-validation-for="Nazwisko" class="casino-validation"></span>
                             </div>
                             <div>
                                 <label class="casino-label" asp-for="Nazwa">Nazwa gracza</label>
-                                <input class="casino-input" asp-for="Nazwa" maxlength="80" />
+                                <input class="casino-input" asp-for="Nazwa" maxlength="80" placeholder="Twoja nazwa gracza" autocomplete="username" />
+                                <span asp-validation-for="Nazwa" class="casino-validation"></span>
                             </div>
                             <div>
                                 <label class="casino-label" asp-for="Email">Email</label>
-                                <input class="casino-input" asp-for="Email" type="email" maxlength="160" />
+                                <input class="casino-input" asp-for="Email" type="email" maxlength="160" placeholder="twoj@email.com" autocomplete="email" />
+                                <span asp-validation-for="Email" class="casino-validation"></span>
                             </div>
                         </div>
 
@@ -144,6 +148,9 @@
 </div>
 
 @section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script>
         document.querySelectorAll('[data-history-open]').forEach(button => {
             button.addEventListener('click', () => {

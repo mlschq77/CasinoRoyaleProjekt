@@ -2,6 +2,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CasinoRoyale.ViewModels
 {
+    public class WymaganaZgodaAttribute : ValidationAttribute
+    {
+        public override bool IsValid(object? value)
+        {
+            return value is bool b && b;
+        }
+    }
     public class RejestracjaViewModel
     {
         [Required(ErrorMessage = "Imie jest wymagane.")]
@@ -36,7 +43,7 @@ namespace CasinoRoyale.ViewModels
         [Display(Name = "Potwierdź hasło")]
         public string PotwierdzHaslo { get; set; } = string.Empty;
 
-        [Range(typeof(bool), "true", "true", ErrorMessage = "Musisz przeczytać i zaakceptować regulamin.")]
+        [WymaganaZgoda(ErrorMessage = "Musisz przeczytać i zaakceptować regulamin.")]
         [Display(Name = "Akceptacja regulaminu")]
         public bool AkceptujeRegulamin { get; set; }
     }
