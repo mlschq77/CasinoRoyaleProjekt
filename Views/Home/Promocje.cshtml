@@ -1,0 +1,126 @@
+@using System.Globalization
+@using CasinoRoyale.ViewModels
+@model PromocjeViewModel
+
+@{
+    ViewData["Title"] = "Promocje";
+    var kultura = CultureInfo.GetCultureInfo("pl-PL");
+    var kody = Model.Kody ?? Array.Empty<CasinoRoyale.Models.KodBonusowy>();
+}
+
+<div class="casino-home">
+    <section class="casino-hero casino-promo-hero border-bottom border-secondary border-opacity-25">
+        <div class="container py-4 py-lg-5">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="casino-eyebrow">
+                        <i class="fa-solid fa-gift me-1"></i>Oferta specjalna
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mt-3 mb-3">Promocje i kody bonusowe</h1>
+                    <p class="lead casino-hero-text mb-0">
+                        Aktywuj kod przy wpłacie i zwiększ saldo zgodnie z warunkami promocji. Kody obowiązują do wskazanego terminu lub bezterminowo.
+                    </p>
+                </div>
+                <div class="col-lg-4 text-lg-end">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <a class="btn casino-btn-primary btn-lg" asp-controller="Payments" asp-action="Deposit">
+                            <i class="fa-solid fa-plus me-2"></i>Wpłać i użyj kodu
+                        </a>
+                    }
+                    else
+                    {
+                        <a class="btn casino-btn-primary btn-lg" asp-controller="Auth" asp-action="Rejestracja">
+                            <i class="fa-solid fa-user-plus me-2"></i>Załóż konto
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <main class="casino-section py-5">
+        <div class="container">
+            <div class="row g-4">
+                @foreach (var kod in kody)
+                {
+                    <div class="col-md-6 col-xl-4">
+                        <article class="casino-info-card casino-promo-card h-100 d-flex flex-column">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <span class="casino-chip mb-0">
+                                    <i class="fa-solid fa-ticket"></i>Kod bonusowy
+                                </span>
+                                @if (kod.WaznyDo.HasValue)
+                                {
+                                    <span class="badge rounded-pill text-bg-dark border border-secondary border-opacity-50">
+                                        do @kod.WaznyDo.Value.ToLocalTime().ToString("dd.MM.yyyy", kultura)
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge rounded-pill text-bg-success bg-opacity-25 border border-success border-opacity-50">
+                                        bezterminowo
+                                    </span>
+                                }
+                            </div>
+
+                            <div class="casino-promo-code mb-4">
+                                <span class="casino-promo-code-label">Kod</span>
+                                <span class="casino-promo-code-value">@kod.Kod</span>
+                            </div>
+
+                            <ul class="list-unstyled mb-4 flex-grow-1">
+                                <li class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                    <span class="casino-section-text">Minimalna wpłata</span>
+                                    <strong class="text-white">@kod.MinimalnaWplata.ToString("N2", kultura) PLN</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-2 border-bottom border-secondary border-opacity-25">
+                                    <span class="casino-section-text">Bonus procentowy</span>
+                                    <strong class="text-gold">@kod.BonusProcentowy.ToString("N0", kultura) %</strong>
+                                </li>
+                                <li class="d-flex justify-content-between py-2">
+                                    <span class="casino-section-text">Bonus kwotowy</span>
+                                    <strong class="text-white">@kod.BonusKwotowy.ToString("N2", kultura) PLN</strong>
+                                </li>
+                            </ul>
+
+                            @if (User.Identity?.IsAuthenticated == true)
+                            {
+                                <a class="btn casino-btn-primary w-100" asp-controller="Payments" asp-action="Deposit">
+                                    <i class="fa-solid fa-arrow-right me-2"></i>Przejdź do wpłaty
+                                </a>
+                            }
+                            else
+                            {
+                                <a class="btn btn-outline-light casino-btn-secondary w-100" asp-controller="Auth" asp-action="Logowanie">
+                                    <i class="fa-solid fa-right-to-bracket me-2"></i>Zaloguj się, aby skorzystać
+                                </a>
+                            }
+                        </article>
+                    </div>
+                }
+
+                @if (!kody.Any())
+                {
+                    <div class="col-12">
+                        <div class="casino-info-card text-center py-5">
+                            <i class="fa-solid fa-box-open text-gold fs-1 mb-3"></i>
+                            <h2 class="h4 text-white mb-2">Brak aktywnych promocji</h2>
+                            <p class="casino-section-text mb-4">
+                                Obecnie nie ma dostępnych kodów bonusowych. Wróć później lub sprawdź ofertę gier.
+                            </p>
+                            <a class="btn casino-btn-primary" asp-controller="Home" asp-action="Oferta">
+                                <i class="fa-solid fa-dice me-2"></i>Przeglądaj gry
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="casino-profile-note mt-5 mb-0">
+                <i class="fa-solid fa-circle-info me-2 text-gold"></i>
+                Regulamin bonusów oraz zasady obrotu mogą się różnić w zależności od promocji. Szczegóły znajdziesz w <a class="casino-link" asp-controller="Home" asp-action="Regulamin">regulaminie serwisu</a>.
+            </div>
+        </div>
+    </main>
+</div>

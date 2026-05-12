@@ -60,24 +60,6 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
-            gry.Add(new CasinoRoyale.Models.AutomatInfo
-            {
-                Id = 1,
-                Nazwa = "Plinko",
-                Provider = new CasinoRoyale.Models.AutomatProvider
-                {
-                    Id = 0,
-                    Nazwa = "Casino Royale"
-                },
-                Kategorie =
-                [
-                    new CasinoRoyale.Models.Kategoria
-                    {
-                        Id = 2,
-                        Nazwa = "Originals"
-                    }
-                ]
-            });
         }
 
         var model = new SlotsViewModel

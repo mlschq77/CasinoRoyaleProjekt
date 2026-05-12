@@ -1,0 +1,112 @@
+@{
+    ViewData["Title"] = "Weryfikacja KYC";
+}
+
+<div class="casino-home">
+    <section class="casino-section py-5 border-bottom border-secondary border-opacity-25">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <span class="casino-section-label">
+                        <i class="fa-solid fa-id-card"></i>Know Your Customer
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mt-3 mb-3">Weryfikacja tożsamości (KYC)</h1>
+                    <p class="casino-section-text lead mb-0">
+                        Proces KYC pozwala potwierdzić, że konto należy do Ciebie i że korzystasz z usług zgodnie z regulaminem.
+                        Dzięki temu możemy lepiej chronić środki, ograniczać oszustwa oraz realizować wypłaty zgodnie z polityką bezpieczeństwa.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="casino-section py-5">
+        <div class="container">
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-shield-halved text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Po co jest KYC</h2>
+                        <p class="casino-section-text mb-0">
+                            Wymóg wynika z potrzeby bezpieczeństwa finansowego i przeciwdziałania praniu pieniędzy.
+                            Weryfikacja pomaga dopasować profil do prawdziwej osoby i chronić dostęp do środków.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-clock text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Czas rozpatrzenia</h2>
+                        <p class="casino-section-text mb-0">
+                            Typowy czas weryfikacji zależy od kompletności dokumentów i kolejki — zwykle od kilku minut do jednego dnia roboczego.
+                            W razie niejasności możesz otrzymać prośbę o dodatkowe materiały.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-lock text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Dane i poufność</h2>
+                        <p class="casino-section-text mb-0">
+                            Dokumenty przetwarzamy wyłącznie w celu weryfikacji i zgodnie z obowiązującymi zasadami ochrony danych.
+                            Nie udostępniamy ich osobom trzecim w celach marketingowych.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="casino-info-card">
+                        <h2 class="h4 text-white mb-4">Etapy weryfikacji</h2>
+                        <ol class="casino-section-text ps-3 mb-0">
+                            <li class="mb-3">
+                                <strong class="text-white">Dane podstawowe.</strong> Upewnij się, że imię, nazwisko i data urodzenia w profilu
+                                zgadzaj się z dokumentem tożsamości.
+                            </li>
+                            <li class="mb-3">
+                                <strong class="text-white">Dokument tożsamości.</strong> Może to być dowód osobisty lub paszport (lista akceptowanych dokumentów
+                                może być doprecyzowana w panelu konta). Zdjęcia powinny być czytelne, bez odblasków i przycięć ramki dokumentu.
+                            </li>
+                            <li class="mb-3">
+                                <strong class="text-white">Potwierdzenie adresu.</strong> Na żądanie — np. rachunek lub wyciąg bankowy z widocznym adresem i datą
+                                nie starszą niż wskazana w procedurze.
+                            </li>
+                            <li class="mb-0">
+                                <strong class="text-white">Metoda płatności.</strong> W niektórych przypadkach konieczne jest potwierdzenie, że używasz własnego
+                                środka płatniczego zgodnie z polityką antyfraudową.
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="casino-profile-note mt-4 mb-0">
+                        <i class="fa-solid fa-circle-exclamation me-2 text-gold"></i>
+                        Po zakończeniu weryfikacji status konta zostanie zaktualizowany w panelu użytkownika.
+                        Jeśli korzystasz z aplikacji demonstracyjnej, szczegóły techniczne uploadu mogą nie być wdrożone — treść strony opisuje docelowy proces.
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <a class="btn casino-btn-primary btn-lg" asp-controller="Home" asp-action="Index">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Strona główna
+                        </a>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <a class="btn btn-outline-light casino-btn-secondary btn-lg" asp-controller="Profile" asp-action="Index">
+                                <i class="fa-solid fa-user me-2"></i>Moje konto
+                            </a>
+                        }
+                        else
+                        {
+                            <a class="btn btn-outline-light casino-btn-secondary btn-lg" asp-controller="Auth" asp-action="Rejestracja">
+                                <i class="fa-solid fa-user-plus me-2"></i>Załóż konto
+                            </a>
+                        }
+                        <a class="btn btn-outline-light casino-btn-secondary btn-lg" asp-controller="Home" asp-action="Regulamin">
+                            <i class="fa-solid fa-scale-balanced me-2"></i>Regulamin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

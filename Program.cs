@@ -60,6 +60,21 @@ public class Program
             defaults: new { controller = "Home", action = "ProvablyFair" });
 
         app.MapControllerRoute(
+            name: "promocje",
+            pattern: "promocje",
+            defaults: new { controller = "Home", action = "Promocje" });
+
+        app.MapControllerRoute(
+            name: "regulamin",
+            pattern: "regulamin",
+            defaults: new { controller = "Home", action = "Regulamin" });
+
+        app.MapControllerRoute(
+            name: "kyc",
+            pattern: "kyc",
+            defaults: new { controller = "Home", action = "Kyc" });
+
+        app.MapControllerRoute(
             name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 

@@ -35,6 +35,10 @@ namespace CasinoRoyale.ViewModels
         [Compare("Haslo", ErrorMessage = "Hasła nie są identyczne.")]
         [Display(Name = "Potwierdź hasło")]
         public string PotwierdzHaslo { get; set; } = string.Empty;
+
+        [Range(typeof(bool), "true", "true", ErrorMessage = "Musisz przeczytać i zaakceptować regulamin.")]
+        [Display(Name = "Akceptacja regulaminu")]
+        public bool AkceptujeRegulamin { get; set; }
     }
 
     public class LogowanieViewModel

@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CasinoRoyale.Controllers;
 
+[Authorize]
 public class GamesController : Controller
 {
     public IActionResult Mines()
@@ -23,5 +25,4 @@ public class GamesController : Controller
     {
         return View();
     }
-}
 }

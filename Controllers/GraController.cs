@@ -1,7 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CasinoRoyale.Controllers;
 
+[Authorize]
 public class GraController : Controller
 {
     public IActionResult Graj(int id)
@@ -11,7 +13,7 @@ public class GraController : Controller
             0 => RedirectToAction("Mines", "Games"),
             1 => RedirectToAction("Blackjack", "Games"),
             2 => RedirectToAction("Plinko", "Games"),
-            _ => RedirectToAction("Oferta", "Automaty")
+            _ => Content($"Gra ID: {id}")
         };
     }
 }

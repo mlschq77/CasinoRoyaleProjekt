@@ -1,6 +1,7 @@
-    using System.Diagnostics;
+using System.Diagnostics;
 using CasinoRoyale.Data;
 using CasinoRoyale.Models;
+using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,28 @@ public class HomeController : Controller
     public IActionResult ProvablyFair()
     {
         return View();
+    }
+
+    public IActionResult Regulamin()
+    {
+        return View();
+    }
+
+    public IActionResult Kyc()
+    {
+        return View();
+    }
+
+    public async Task<IActionResult> Promocje()
+    {
+        var teraz = DateTime.UtcNow;
+        var kody = await _dbContext.KodyBonusowe
+            .AsNoTracking()
+            .Where(k => k.WaznyDo == null || k.WaznyDo >= teraz)
+            .OrderByDescending(k => k.Utworzono)
+            .ToListAsync();
+
+        return View(new PromocjeViewModel { Kody = kody });
     }
 
     public IActionResult Oferta()

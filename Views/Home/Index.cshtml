@@ -16,7 +16,7 @@
                     </p>
                     <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
                         <a class="btn casino-btn-primary btn-lg" asp-controller="Home" asp-action="Oferta">Przejdź do katalogu gier</a>
-                        <a href="#kyc" class="btn btn-outline-light btn-lg casino-btn-secondary">Poznaj proces KYC</a>
+                        <a class="btn btn-outline-light btn-lg casino-btn-secondary" asp-controller="Home" asp-action="Kyc">Poznaj proces KYC</a>
                     </div>
                 </div>
             </div>
@@ -34,10 +34,11 @@
                         <p class="casino-section-text">
                             Weryfikacja tożsamości pomaga chronić środki graczy, ograniczać nadużycia oraz przyspieszać akceptację wypłat i limitów konta.
                         </p>
-                        <ul class="casino-check-list list-unstyled mb-0">
+                        <ul class="casino-check-list list-unstyled mb-4">
                             <li><i class="fa-solid fa-check text-gold me-2"></i>Weryfikacja dokumentu tożsamości</li>
                             <li><i class="fa-solid fa-check text-gold me-2"></i>Potwierdzenie adresu i danych płatniczych</li>
                         </ul>
+                        <a class="btn btn-outline-light casino-btn-secondary" asp-controller="Home" asp-action="Kyc">Szczegóły procesu KYC</a>
                     </div>
                 </div>
                 <div class="col-lg-6">
@@ -53,13 +54,4 @@
             </div>
         </div>
     </section>
-
-    <footer class="casino-footer py-4">
-        <div class="container d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3">
-            <p class="mb-0 text-secondary">© 2026 CasinoRoyale</p>
-            <div class="d-flex flex-wrap gap-3">
-                <a href="/provably-fair" class="casino-footer-link">Provably Fair</a>
-            </div>
-        </div>
-    </footer>
 </div>

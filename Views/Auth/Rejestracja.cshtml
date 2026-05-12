@@ -76,6 +76,18 @@
                 <span asp-validation-for="PotwierdzHaslo" class="casino-validation"></span>
             </div>
 
+            <div class="casino-form-group mb-4">
+                <div class="form-check">
+                    <input asp-for="AkceptujeRegulamin" class="form-check-input casino-checkbox" />
+                    <label class="form-check-label casino-section-text" for="@Html.IdFor(m => m.AkceptujeRegulamin)">
+                        Potwierdzam zapoznanie się z
+                        <a asp-controller="Home" asp-action="Regulamin" class="casino-link" target="_blank" rel="noopener noreferrer">regulaminem</a>
+                        i akceptuję jego postanowienia.
+                    </label>
+                </div>
+                <span asp-validation-for="AkceptujeRegulamin" class="casino-validation d-block mt-2"></span>
+            </div>
+
             <button type="submit" class="btn casino-btn-primary w-100 py-3 fw-bold">
                 <i class="fa-solid fa-user-plus me-2"></i>Utwórz konto
             </button>
