@@ -13,4 +13,9 @@ public class GamesController : Controller
     {
         return View();
     }
+
+    public IActionResult Slot()
+    {
+        return View();
+    }
 }

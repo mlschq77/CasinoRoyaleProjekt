@@ -72,7 +72,7 @@ public class AutomatyController : Controller
 
             gry.Add(new CasinoRoyale.Models.AutomatInfo
             {
-                Id = 0,
+                Id = 1,
                 Nazwa = "Plinko",
                 Provider = new CasinoRoyale.Models.AutomatProvider
                 {

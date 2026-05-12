@@ -9,7 +9,7 @@ public class GraController : Controller
         if (id == 0)
             return RedirectToAction("Mines", "Games");
 
-        if (id == 2)
+        if (id == 1)
             return RedirectToAction("Plinko", "Games");
 
         return Content($"Gra ID: {id}");
