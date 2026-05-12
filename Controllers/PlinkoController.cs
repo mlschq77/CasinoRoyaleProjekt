@@ -1,4 +1,5 @@
 using CasinoRoyale.Data;
+using CasinoRoyale.Models;
 using CasinoRoyale.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,15 @@ public class PlinkoController : ControllerBase
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
             var result = _plinkoService.Play(bet, risk);
+            _context.PlinkoGames.Add(new PlinkoGame
+            {
+                UserId = userId.Value,
+                BetAmount = bet,
+                Risk = result.Risk,
+                WinAmount = result.Win
+            });
+            await _context.SaveChangesAsync();
+
             var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
 
             if (!payoutResult.Success)

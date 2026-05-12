@@ -26,4 +26,3 @@ public class GamesController : Controller
         return View();
     }
 }
-}

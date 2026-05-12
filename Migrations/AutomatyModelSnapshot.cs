@@ -214,6 +214,9 @@ namespace CasinoRoyale.Migrations
                     b.Property<decimal>("BetAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("GridSize")
                         .HasColumnType("int");
 
@@ -237,6 +240,35 @@ namespace CasinoRoyale.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MinesGames");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.PlinkoGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Risk")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("WinAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PlinkoGames");
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.StripePayment", b =>

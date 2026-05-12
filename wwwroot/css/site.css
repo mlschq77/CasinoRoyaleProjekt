@@ -432,6 +432,109 @@ body.casino-body {
     line-height: 1.5;
 }
 
+.casino-profile-success {
+    padding: 0.85rem 1rem;
+    color: #c6f6d5;
+    background: rgba(42, 167, 69, 0.12);
+    border: 1px solid rgba(42, 167, 69, 0.35);
+    border-radius: 0.9rem;
+}
+
+.casino-profile-edit-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.casino-profile-actions {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+
+.casino-history-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.72);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.casino-history-modal.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.casino-history-panel {
+    width: min(720px, 100%);
+    max-height: min(720px, 86vh);
+    overflow: auto;
+    padding: 1.5rem;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.99) 0%, rgba(12, 12, 12, 0.98) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.2rem;
+    box-shadow: 0 24px 90px rgba(0, 0, 0, 0.65);
+    transform: translateY(18px) scale(0.98);
+    transition: transform 0.22s ease;
+}
+
+.casino-history-modal.is-open .casino-history-panel {
+    transform: translateY(0) scale(1);
+}
+
+.casino-history-panel h2 {
+    margin: 0 2.5rem 1rem 0;
+    color: #fff;
+}
+
+.casino-history-close {
+    float: right;
+    width: 36px;
+    height: 36px;
+    color: var(--casino-ivory);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(212, 175, 55, 0.22);
+    border-radius: 50%;
+}
+
+.casino-history-list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.casino-history-row {
+    display: grid;
+    grid-template-columns: minmax(110px, 1fr) minmax(120px, auto) minmax(145px, auto);
+    gap: 1rem;
+    align-items: center;
+    padding: 0.9rem 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.14);
+    border-radius: 0.85rem;
+}
+
+.casino-history-row span,
+.casino-history-row time {
+    color: rgba(245, 241, 230, 0.68);
+}
+
+.casino-history-row strong {
+    color: var(--casino-gold-soft);
+    text-align: right;
+}
+
+.casino-history-empty {
+    padding: 1rem;
+    color: rgba(245, 241, 230, 0.7);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0.85rem;
+}
+
 
 .grid {
     display: grid;
@@ -593,7 +696,8 @@ body.casino-body {
     }
 
     .casino-profile-layout,
-    .casino-profile-fields {
+    .casino-profile-fields,
+    .casino-profile-edit-grid {
         grid-template-columns: 1fr;
     }
 
@@ -651,6 +755,14 @@ body.casino-body {
     .casino-profile-head {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .casino-history-row {
+        grid-template-columns: 1fr;
+    }
+
+    .casino-history-row strong {
+        text-align: left;
     }
 
     .plinko-controls,

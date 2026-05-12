@@ -13,6 +13,7 @@ namespace CasinoRoyale.Data
         public DbSet<AutomatProvider> AutomatProviderzy { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<MinesGame> MinesGames { get; set; }
+        public DbSet<PlinkoGame> PlinkoGames { get; set; }
         public DbSet<StripePayment> StripePayments { get; set; }
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
@@ -28,6 +29,14 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<MinesGame>()
                 .Property(game => game.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PlinkoGame>()
+                .Property(game => game.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<PlinkoGame>()
+                .Property(game => game.WinAmount)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<StripePayment>()

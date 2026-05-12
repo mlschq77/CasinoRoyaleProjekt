@@ -12,8 +12,13 @@
             </span>
             <h1 class="display-5 fw-bold text-white mt-3 mb-2">Twoje konto</h1>
             <p class="casino-section-text mb-0">
-                Podstawowe dane gracza widoczne po zalogowaniu. Ten ekran moze byc pozniej rozszerzony o historie gier, wplaty, wyplaty i ustawienia konta.
+                Edytuj dane profilu i sprawdz historie aktywnosci konta.
             </p>
+
+            @if (TempData["ProfileMessage"] is string message)
+            {
+                <div class="casino-profile-success mt-4">@message</div>
+            }
 
             <div class="casino-profile-layout mt-4">
                 <article class="casino-profile-card">
@@ -25,20 +30,32 @@
                         </div>
                     </div>
 
-                    <div class="casino-profile-fields">
-                        <div class="casino-profile-field">
-                            <span>Imie</span>
-                            <strong>@Model.Imie</strong>
+                    <form asp-action="Update" method="post" class="casino-profile-form mt-4">
+                        @Html.AntiForgeryToken()
+
+                        <div class="casino-profile-edit-grid">
+                            <div>
+                                <label class="casino-label" asp-for="Imie">Imie</label>
+                                <input class="casino-input" asp-for="Imie" maxlength="80" />
+                            </div>
+                            <div>
+                                <label class="casino-label" asp-for="Nazwisko">Nazwisko</label>
+                                <input class="casino-input" asp-for="Nazwisko" maxlength="120" />
+                            </div>
+                            <div>
+                                <label class="casino-label" asp-for="Nazwa">Nazwa gracza</label>
+                                <input class="casino-input" asp-for="Nazwa" maxlength="80" />
+                            </div>
+                            <div>
+                                <label class="casino-label" asp-for="Email">Email</label>
+                                <input class="casino-input" asp-for="Email" type="email" maxlength="160" />
+                            </div>
                         </div>
-                        <div class="casino-profile-field">
-                            <span>Nazwisko</span>
-                            <strong>@Model.Nazwisko</strong>
-                        </div>
-                        <div class="casino-profile-field casino-profile-field-wide">
-                            <span>Email</span>
-                            <strong>@Model.Email</strong>
-                        </div>
-                    </div>
+
+                        <button class="casino-btn-primary btn mt-4" type="submit">
+                            <i class="fa-solid fa-floppy-disk me-1"></i>Zapisz dane
+                        </button>
+                    </form>
                 </article>
 
                 <aside class="casino-profile-card">
@@ -59,11 +76,87 @@
                         <span>Data rejestracji</span>
                         <strong>@Model.DataRejestracji.ToLocalTime().ToString("dd.MM.yyyy")</strong>
                     </div>
-                    <div class="casino-profile-note">
-                        W pierwszej wersji profil jest tylko do odczytu. Edycje danych mozemy dodac jako kolejny krok.
+
+                    <div class="casino-profile-actions">
+                        <button class="casino-btn-secondary btn" type="button" data-history-open="transactions">
+                            <i class="fa-solid fa-receipt me-1"></i>Historia transakcji
+                        </button>
+                        <button class="casino-btn-secondary btn" type="button" data-history-open="bets">
+                            <i class="fa-solid fa-coins me-1"></i>Historia zakladow
+                        </button>
                     </div>
                 </aside>
             </div>
         </div>
     </main>
 </div>
+
+<div class="casino-history-modal" id="transactions-modal" aria-hidden="true">
+    <div class="casino-history-panel">
+        <button class="casino-history-close" type="button" data-history-close>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2>Historia transakcji</h2>
+        <div class="casino-history-list">
+            @if (Model.TransactionHistory.Any())
+            {
+                foreach (var item in Model.TransactionHistory)
+                {
+                    <div class="casino-history-row">
+                        <span>@item.Type</span>
+                        <strong>@item.Amount.ToString("0.00") @item.Currency</strong>
+                        <time>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="casino-history-empty">Brak transakcji.</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="casino-history-modal" id="bets-modal" aria-hidden="true">
+    <div class="casino-history-panel">
+        <button class="casino-history-close" type="button" data-history-close>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2>Historia zakladow</h2>
+        <div class="casino-history-list">
+            @if (Model.BetHistory.Any())
+            {
+                foreach (var item in Model.BetHistory)
+                {
+                    <div class="casino-history-row">
+                        <span>@item.GameName</span>
+                        <strong>@item.BetAmount.ToString("0.00") PLN</strong>
+                        <time>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="casino-history-empty">Brak zakladow.</div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-history-open]').forEach(button => {
+            button.addEventListener('click', () => {
+                const modal = document.getElementById(button.dataset.historyOpen + '-modal');
+                if (modal) modal.classList.add('is-open');
+            });
+        });
+
+        document.querySelectorAll('[data-history-close], .casino-history-modal').forEach(element => {
+            element.addEventListener('click', event => {
+                if (event.target !== element && !element.hasAttribute('data-history-close')) return;
+                document.querySelectorAll('.casino-history-modal').forEach(modal => modal.classList.remove('is-open'));
+            });
+        });
+    </script>
+}
