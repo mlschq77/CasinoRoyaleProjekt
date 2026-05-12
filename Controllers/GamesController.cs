@@ -9,6 +9,11 @@ public class GamesController : Controller
         return View();
     }
 
+    public IActionResult Blackjack()
+    {
+        return View();
+    }
+
     public IActionResult Plinko()
     {
         return View();
@@ -18,4 +23,5 @@ public class GamesController : Controller
     {
         return View();
     }
+}
 }

@@ -1,0 +1,81 @@
+@{
+    ViewData["Title"] = "Blackjack";
+}
+
+<link rel="stylesheet" href="~/css/blackjack.css" asp-append-version="true" />
+
+<div class="bj-wrapper">
+    <div class="bj-table">
+
+        <div class="bj-header">
+            <h2 class="bj-title"><i class="fa-solid fa-crown me-2"></i>Blackjack</h2>
+            <div class="bj-balance-info">
+                <span class="bj-balance-label">Saldo:</span>
+                <span class="bj-balance-value" id="bj-balance">—</span>
+            </div>
+        </div>
+
+        <div class="bj-dealer-zone">
+            <div class="bj-zone-label">Krupier <span class="bj-hand-value" id="dealer-value"></span></div>
+            <div class="bj-cards" id="dealer-cards"></div>
+        </div>
+
+        <div class="bj-result-banner" id="bj-result-banner"></div>
+
+        <div class="bj-player-zone">
+            <div class="bj-split-hand" id="split-hand-area" style="display:none">
+                <div class="bj-zone-label">Ręka 2 <span class="bj-hand-value" id="split-value"></span></div>
+                <div class="bj-cards" id="split-cards"></div>
+            </div>
+            <div class="bj-main-hand">
+                <div class="bj-zone-label">Twoja ręka <span class="bj-hand-value" id="player-value"></span></div>
+                <div class="bj-cards" id="player-cards"></div>
+            </div>
+        </div>
+
+        <div class="bj-controls">
+            <div class="bj-bet-area" id="bet-area">
+                <div class="bj-bet-chips">
+                    <button class="bj-chip" data-value="10">10</button>
+                    <button class="bj-chip" data-value="25">25</button>
+                    <button class="bj-chip" data-value="50">50</button>
+                    <button class="bj-chip" data-value="100">100</button>
+                    <button class="bj-chip" data-value="250">250</button>
+                    <button class="bj-chip" data-value="500">500</button>
+                </div>
+                <div class="bj-bet-row">
+                    <div class="bj-bet-display">
+                        Zakład: <span id="bet-display">0</span>
+                        <button class="bj-clear-btn" id="clear-bet-btn">Wyczyść</button>
+                    </div>
+                    <button class="casino-btn-primary btn bj-deal-btn" id="deal-btn">
+                        <i class="fa-solid fa-play me-1"></i>Rozdaj
+                    </button>
+                </div>
+            </div>
+
+            <div class="bj-action-area" id="action-area" style="display:none">
+                <button class="casino-btn-primary btn bj-action-btn" id="btn-hit">
+                    <i class="fa-solid fa-plus me-1"></i>Dobierz
+                </button>
+                <button class="casino-btn-secondary btn bj-action-btn" id="btn-stand">
+                    <i class="fa-solid fa-hand me-1"></i>Stój
+                </button>
+                <button class="casino-btn-secondary btn bj-action-btn" id="btn-double" style="display:none">
+                    <i class="fa-solid fa-angles-up me-1"></i>Double
+                </button>
+                <button class="casino-btn-secondary btn bj-action-btn" id="btn-split" style="display:none">
+                    <i class="fa-solid fa-code-branch me-1"></i>Split
+                </button>
+                <button class="casino-btn-primary btn bj-action-btn" id="btn-new-game" style="display:none">
+                    <i class="fa-solid fa-rotate me-1"></i>Nowa gra
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/blackjack.js" asp-append-version="true"></script>
+}

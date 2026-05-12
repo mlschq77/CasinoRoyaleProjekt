@@ -16,6 +16,7 @@ namespace CasinoRoyale.Data
         public DbSet<StripePayment> StripePayments { get; set; }
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
+        public DbSet<BlackjackGame> BlackjackGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -62,13 +63,12 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<Kategoria>()
                 .ToTable("Kategorie");
+            modelBuilder.Entity<StripeWithdrawal>()
+                .Property(withdrawal => withdrawal.Amount)
+                .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<Kategoria>()
-                .Property(kategoria => kategoria.Nazwa)
-                .HasMaxLength(450);
-
-            modelBuilder.Entity<Kategoria>()
-                .HasIndex(kategoria => kategoria.Nazwa)
+            modelBuilder.Entity<StripeWithdrawal>()
+                .HasIndex(withdrawal => withdrawal.TransferId)
                 .IsUnique();
 
             modelBuilder.Entity<AutomatProvider>()
