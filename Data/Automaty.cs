@@ -14,6 +14,7 @@ namespace CasinoRoyale.Data
         public DbSet<User> Users { get; set; }
         public DbSet<MinesGame> MinesGames { get; set; }
         public DbSet<StripePayment> StripePayments { get; set; }
+        public DbSet<KodBonusowy> KodyBonusowe { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +34,29 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<StripePayment>()
                 .HasIndex(payment => payment.SessionId)
+                .IsUnique();
+
+            modelBuilder.Entity<KodBonusowy>()
+                .ToTable("KodyBonusowe");
+
+            modelBuilder.Entity<KodBonusowy>()
+                .Property(kodBonusowy => kodBonusowy.Kod)
+                .HasMaxLength(64);
+
+            modelBuilder.Entity<KodBonusowy>()
+                .Property(kodBonusowy => kodBonusowy.MinimalnaWplata)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<KodBonusowy>()
+                .Property(kodBonusowy => kodBonusowy.BonusProcentowy)
+                .HasColumnType("decimal(5,2)");
+
+            modelBuilder.Entity<KodBonusowy>()
+                .Property(kodBonusowy => kodBonusowy.BonusKwotowy)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<KodBonusowy>()
+                .HasIndex(kodBonusowy => kodBonusowy.Kod)
                 .IsUnique();
 
             modelBuilder.Entity<Kategoria>()

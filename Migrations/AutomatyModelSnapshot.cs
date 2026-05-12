@@ -80,6 +80,42 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("AutomatyKategorie", (string)null);
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.KodBonusowy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BonusKwotowy")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BonusProcentowy")
+                        .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Kod")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<decimal>("MinimalnaWplata")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("Utworzono")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("WaznyDo")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Kod")
+                        .IsUnique();
+
+                    b.ToTable("KodyBonusowe", (string)null);
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
                 {
                     b.Property<int>("Id")
