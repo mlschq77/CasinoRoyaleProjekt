@@ -143,6 +143,7 @@ public class AdminController : Controller
             return RedirectToAction(nameof(KodyBonusowe));
         }
 
+        model.Kod = model.Kod.ToUpper();
         model.Utworzono = DateTime.UtcNow;
         _db.KodyBonusowe.Add(model);
         await _db.SaveChangesAsync();
