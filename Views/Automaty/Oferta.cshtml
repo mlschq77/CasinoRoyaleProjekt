@@ -65,7 +65,12 @@
                     <div class="row g-4">
                         @foreach (var gra in gry)
                         {
-                            var kategoria = string.IsNullOrWhiteSpace(gra.Kategoria) ? "Slot" : gra.Kategoria;
+                            var kategorieGry = gra.Kategorie?
+                                .Select(k => k.Nazwa)
+                                .Where(nazwa => !string.IsNullOrWhiteSpace(nazwa))
+                                .OrderBy(nazwa => nazwa)
+                                .ToList() ?? [];
+                            var kategoria = kategorieGry.Any() ? string.Join(", ", kategorieGry) : "Slot";
 
                             <div class="col-md-6 col-xl-4">
                                 <article class="card casino-game-card h-100 border-0">
@@ -80,7 +85,7 @@
 
                                         <h3 class="h4 text-white mb-2">@gra.Nazwa</h3>
                                         <p class="casino-section-text mb-3">
-                                            <i class="fa-solid fa-building me-2 text-gold"></i>Slot Własny <!-- Tu bedzie Provider -->
+                                            <i class="fa-solid fa-building me-2 text-gold"></i>@(gra.Provider?.Nazwa ?? "Gra własna")
                                         </p>
 
                                         <a class="btn casino-btn-primary w-100 mt-auto" asp-controller="Gra" asp-action="Graj" asp-route-id="@gra.Id">

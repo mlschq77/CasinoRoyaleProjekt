@@ -1,0 +1,422 @@
+@startuml CasinoRoyale_ClassDiagram
+!theme plain
+skinparam classAttributeIconSize 0
+title CasinoRoyale - diagram klas (stan obecny + klasy proponowane)
+
+package "CasinoRoyale.Models (obecne)" {
+  class User {
+    +Id : int
+    +Nazwa : string
+    +Email : string
+    +HasloHash : string
+    +Balance : decimal
+    +DataRejestracji : DateTime
+  }
+
+  class MinesGame {
+    +Id : int
+    +UserId : int
+    +GridSize : int
+    +MineCount : int
+    +MinePositions : string
+    +RevealedPositions : string
+    +BetAmount : decimal
+    +IsActive : bool
+  }
+
+  class StripePayment {
+    +Id : int
+    +UserId : int
+    +SessionId : string
+    +Amount : decimal
+    +Currency : string
+    +CreatedAt : DateTime
+  }
+
+  class KodBonusowy {
+    +Id : int
+    +Kod : string
+    +MinimalnaWplata : decimal
+    +BonusProcentowy : decimal
+    +BonusKwotowy : decimal
+    +Utworzono : DateTime
+    +WaznyDo : DateTime?
+  }
+
+  class AutomatInfo {
+    +Id : int
+    +Nazwa : string
+    +ProviderId : int?
+  }
+
+  class AutomatProvider {
+    +Id : int
+    +Nazwa : string
+  }
+
+  class Kategoria {
+    +Id : int
+    +Nazwa : string
+  }
+}
+
+package "CasinoRoyale.Data (obecne)" {
+  class Automaty <<DbContext>> {
+    +AutomatyInfo : DbSet<AutomatInfo>
+    +Kategorie : DbSet<Kategoria>
+    +AutomatProviderzy : DbSet<AutomatProvider>
+    +Users : DbSet<User>
+    +MinesGames : DbSet<MinesGame>
+    +StripePayments : DbSet<StripePayment>
+    +KodyBonusowe : DbSet<KodBonusowy>
+  }
+}
+
+package "CasinoRoyale.Services (obecne)" {
+  interface IBalanceService {
+    {abstract} GetBalanceAsync(userId) : Task<decimal?>
+    {abstract} PlaceBetAsync(userId, amount) : Task<BalanceResult>
+    {abstract} PayoutAsync(userId, amount) : Task<BalanceResult>
+  }
+
+  class BalanceService {
+    -_dbContext : Automaty
+    +GetBalanceAsync(userId) : Task<decimal?>
+    +PlaceBetAsync(userId, amount) : Task<BalanceResult>
+    +PayoutAsync(userId, amount) : Task<BalanceResult>
+  }
+
+  class BalanceResult {
+    +Success : bool
+    +Balance : decimal
+    +Error : string?
+  }
+
+  class MinesService {
+    +GenerateMines(mineCount) : List<int>
+    +CalculateMultiplier(revealedCount) : decimal
+  }
+}
+
+package "CasinoRoyale.ViewModels (obecne)" {
+  class RejestracjaViewModel {
+    +Nazwa : string
+    +Email : string
+    +Haslo : string
+    +PotwierdzHaslo : string
+  }
+
+  class LogowanieViewModel {
+    +Email : string
+    +Haslo : string
+    +ZapamietajMnie : bool
+  }
+
+  class DepositViewModel {
+    +Amount : decimal
+    +KodBonusowy : string?
+    +Message : string?
+    +StripeConfigured : bool
+  }
+
+  class SlotsViewModel {
+    +Gry : IReadOnlyCollection<AutomatInfo>
+    +Kategorie : IReadOnlyCollection<string>
+    +WybranaKategoria : string?
+  }
+
+  class ErrorViewModel {
+    +RequestId : string?
+    +ShowRequestId : bool
+  }
+}
+
+package "CasinoRoyale.Controllers (obecne)" {
+  abstract class Controller
+  abstract class ControllerBase
+
+  class HomeController
+  class AuthController
+  class AutomatyController
+  class GraController
+  class GamesController
+  class MinesController <<API>>
+  class BalanceController <<API>>
+  class PaymentsController
+}
+
+package "Klasy proponowane (Rejestracja + KYC)" {
+  class Role <<proposed>> {
+    +Id : int
+    +Nazwa : string
+    +Opis : string?
+  }
+
+  class UserRole <<proposed>> {
+    +UserId : int
+    +RoleId : int
+    +AssignedAt : DateTime
+    +AssignedByUserId : int?
+  }
+
+  enum KycDocumentType <<proposed>> {
+    DowodOsobisty
+    Paszport
+    PrawoJazdy
+    Inny
+  }
+
+  enum KycStatus <<proposed>> {
+    Pending
+    Approved
+    Rejected
+  }
+
+  class KycDocument <<proposed>> {
+    +Id : int
+    +UserId : int
+    +DocumentType : KycDocumentType
+    +FileName : string
+    +ContentType : string
+    +StorageKey : string
+    +UploadedAt : DateTime
+    +Status : KycStatus
+  }
+
+  class KycVerification <<proposed>> {
+    +Id : int
+    +KycDocumentId : int
+    +VerifiedByUserId : int
+    +Decision : KycStatus
+    +Comment : string?
+    +DecidedAt : DateTime
+  }
+
+  class PasswordPolicyService <<proposed>> {
+    +Validate(password) : PasswordValidationResult
+  }
+
+  class PasswordValidationResult <<proposed>> {
+    +IsValid : bool
+    +Errors : List<string>
+  }
+
+  class KycService <<proposed>> {
+    +UploadDocument(userId, file) : KycDocument
+    +Approve(documentId, adminId, comment) : void
+    +Reject(documentId, adminId, comment) : void
+  }
+}
+
+package "Klasy proponowane (Gry)" {
+  enum GameType <<proposed>> {
+    Mines
+    Slots
+    Roulette
+    Blackjack
+  }
+
+  enum SessionStatus <<proposed>> {
+    Active
+    Finished
+    Cancelled
+  }
+
+  enum RoundOutcome <<proposed>> {
+    Win
+    Loss
+    Cashout
+  }
+
+  enum AssetType <<proposed>> {
+    Symbol
+    Background
+    Logo
+    Audio
+    Animation
+  }
+
+  class GameDefinition <<proposed>> {
+    +Id : int
+    +Code : string
+    +DisplayName : string
+    +Type : GameType
+    +IsEnabled : bool
+    +Rtp : decimal
+    +AssetsManifestJson : string?
+  }
+
+  class GameAsset <<proposed>> {
+    +Id : long
+    +GameDefinitionId : int
+    +Type : AssetType
+    +AssetKey : string
+    +PathOrUrl : string
+    +ContentType : string
+    +Width : int?
+    +Height : int?
+    +VersionHash : string?
+    +SortOrder : int
+  }
+
+  class GameSession <<proposed>> {
+    +Id : long
+    +UserId : int
+    +GameDefinitionId : int
+    +StartedAt : DateTime
+    +FinishedAt : DateTime?
+    +Status : SessionStatus
+    +SeedHash : string?
+  }
+
+  class GameRound <<proposed>> {
+    +Id : long
+    +SessionId : long
+    +RoundNo : int
+    +Stake : decimal
+    +Payout : decimal
+    +Outcome : RoundOutcome
+    +CreatedAt : DateTime
+    +StateJson : string
+  }
+
+  class BetTransaction <<proposed>> {
+    +Id : long
+    +UserId : int
+    +RoundId : long
+    +Amount : decimal
+    +CreatedAt : DateTime
+  }
+
+  class WalletTransaction <<proposed>> {
+    +Id : long
+    +UserId : int
+    +Type : string
+    +Amount : decimal
+    +BalanceAfter : decimal
+    +ReferenceType : string?
+    +ReferenceId : string?
+    +CreatedAt : DateTime
+  }
+
+  class ProvablyFairProof <<proposed>> {
+    +Id : long
+    +SessionId : long
+    +ServerSeedHash : string
+    +ServerSeedRevealed : string?
+    +ClientSeed : string
+    +Nonce : long
+    +Algorithm : string
+  }
+
+  interface IGameEngine <<proposed>> {
+    {abstract} StartSession(userId, gameCode) : GameSession
+    {abstract} PlayRound(sessionId, payloadJson) : GameRound
+    {abstract} Cashout(sessionId) : GameRound
+  }
+
+  class MinesEngine <<proposed>> {
+    +StartSession(userId, gameCode) : GameSession
+    +PlayRound(sessionId, payloadJson) : GameRound
+    +Cashout(sessionId) : GameRound
+  }
+
+  class SlotsEngine <<proposed>> {
+    +StartSession(userId, gameCode) : GameSession
+    +PlayRound(sessionId, payloadJson) : GameRound
+    +Cashout(sessionId) : GameRound
+  }
+}
+
+' Relacje obecne
+AutomatInfo "0..*" --> "0..1" AutomatProvider : ProviderId
+AutomatInfo "0..*" -- "0..*" Kategoria
+MinesGame "0..*" --> "1" User : UserId
+StripePayment "0..*" --> "1" User : UserId
+Automaty ..> User
+Automaty ..> MinesGame
+Automaty ..> StripePayment
+Automaty ..> KodBonusowy
+Automaty ..> AutomatInfo
+Automaty ..> AutomatProvider
+Automaty ..> Kategoria
+IBalanceService <|.. BalanceService
+BalanceService ..> Automaty
+BalanceService ..> BalanceResult
+MinesController ..> MinesService
+MinesController ..> IBalanceService
+BalanceController ..> IBalanceService
+PaymentsController ..> IBalanceService
+HomeController ..> Automaty
+AuthController ..> Automaty
+AutomatyController ..> Automaty
+AuthController ..> RejestracjaViewModel
+AuthController ..> LogowanieViewModel
+PaymentsController ..> DepositViewModel
+AutomatyController ..> SlotsViewModel
+
+HomeController -|> Controller
+AuthController -|> Controller
+AutomatyController -|> Controller
+GraController -|> Controller
+GamesController -|> Controller
+PaymentsController -|> Controller
+MinesController -|> ControllerBase
+BalanceController -|> ControllerBase
+
+' Relacje proponowane
+User "1" -- "0..*" UserRole
+Role "1" -- "0..*" UserRole
+User "1" -- "0..*" KycDocument
+KycDocument "1" -- "0..*" KycVerification
+User "1" -- "0..*" KycVerification : verifiedBy
+PasswordPolicyService ..> PasswordValidationResult
+KycService ..> KycDocument
+KycService ..> KycVerification
+KycService ..> KycStatus
+KycDocument ..> KycStatus
+KycDocument ..> KycDocumentType
+
+' Relacje proponowane - gry
+GameDefinition ..> GameType
+GameSession ..> SessionStatus
+GameRound ..> RoundOutcome
+GameAsset ..> AssetType
+User "1" -- "0..*" GameSession
+GameDefinition "1" -- "0..*" GameSession
+GameDefinition "1" -- "0..*" GameAsset
+GameSession "1" -- "1..*" GameRound
+GameRound "1" -- "0..*" BetTransaction
+User "1" -- "0..*" BetTransaction
+User "1" -- "0..*" WalletTransaction
+GameSession "1" -- "0..1" ProvablyFairProof
+MinesGame ..> GameSession : mozliwa migracja/do zastapienia
+AutomatInfo ..> GameDefinition : mapowanie katalogu gier
+IGameEngine <|.. MinesEngine
+IGameEngine <|.. SlotsEngine
+MinesEngine ..> GameSession
+MinesEngine ..> GameRound
+SlotsEngine ..> GameSession
+SlotsEngine ..> GameRound
+
+note right of Role
+  Domyslna rola po rejestracji:
+  "Gracz"
+end note
+
+note bottom of KycDocument
+  Status "Pending" po uploadzie dokumentu.
+  Administrator zmienia status przez KycVerification.
+end note
+
+note bottom of GameSession
+  Sesja grupuje wszystkie rundy jednej gry
+  od startu do zakonczenia / cashoutu.
+end note
+
+note bottom of GameAsset
+  Rekomendacja: przechowuj pliki PNG/WebP w storage (CDN),
+  a w bazie tylko metadane i URL/sciezke.
+end note
+
+@enduml

@@ -1,0 +1,118 @@
+@model List<CasinoRoyale.Models.KodBonusowy>
+@{
+    ViewData["Title"] = "Kody Bonusowe";
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4 gap-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="mb-0 text-white">Kody Bonusowe</h1>
+    </div>
+
+    @if (TempData["AdminMsg"] != null)
+    {
+        <div class="alert border-0 mb-4" style="background: rgba(40,167,69,0.15); color: #5cb85c;">
+            <i class="fa-solid fa-check-circle me-2"></i>@TempData["AdminMsg"]
+        </div>
+    }
+
+    <!-- Formularz dodawania kodu -->
+    <div class="casino-card p-4 mb-5">
+        <h5 class="text-white mb-4"><i class="fa-solid fa-plus-circle me-2 text-gold"></i>Dodaj nowy kod</h5>
+        <form asp-action="DodajKod" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-sm-6 col-lg-3">
+                    <label class="form-label text-secondary small">Kod</label>
+                    <input type="text" name="Kod" required maxlength="64" class="form-control text-white text-uppercase"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);"
+                           placeholder="np. BONUS50" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label class="form-label text-secondary small">Min. wplata (PLN)</label>
+                    <input type="number" name="MinimalnaWplata" value="0" min="0" step="0.01" class="form-control text-white"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label class="form-label text-secondary small">Bonus % (0 = brak)</label>
+                    <input type="number" name="BonusProcentowy" value="0" min="0" max="100" step="0.01" class="form-control text-white"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label class="form-label text-secondary small">Bonus kwotowy (PLN)</label>
+                    <input type="number" name="BonusKwotowy" value="0" min="0" step="0.01" class="form-control text-white"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
+                    <label class="form-label text-secondary small">Wazny do (opcjonalnie)</label>
+                    <input type="datetime-local" name="WaznyDo" class="form-control text-white"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color-scheme: dark;" />
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn casino-btn-primary">
+                        <i class="fa-solid fa-plus me-1"></i>Dodaj kod
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista kodow -->
+    <div class="casino-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="--bs-table-bg: transparent;">
+                <thead style="background: rgba(0,0,0,.3);">
+                    <tr class="text-secondary small">
+                        <th class="px-4 py-3">Kod</th>
+                        <th class="py-3">Min. wplata</th>
+                        <th class="py-3">Bonus %</th>
+                        <th class="py-3">Bonus kwotowy</th>
+                        <th class="py-3">Wazny do</th>
+                        <th class="py-3">Status</th>
+                        <th class="py-3 text-center">Akcje</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-secondary py-5">Brak kodow bonusowych</td>
+                        </tr>
+                    }
+                    @foreach (var kod in Model)
+                    {
+                        var aktywny = kod.WaznyDo == null || kod.WaznyDo > DateTime.UtcNow;
+                        <tr>
+                            <td class="px-4">
+                                <span class="badge fs-6 fw-bold text-dark" style="background: var(--casino-gold, #c9a227); letter-spacing: 1px;">@kod.Kod</span>
+                            </td>
+                            <td class="text-white">@kod.MinimalnaWplata.ToString("F2") PLN</td>
+                            <td class="text-white">@(kod.BonusProcentowy > 0 ? $"{kod.BonusProcentowy:F0}%" : "—")</td>
+                            <td class="text-white">@(kod.BonusKwotowy > 0 ? $"{kod.BonusKwotowy:F2} PLN" : "—")</td>
+                            <td class="text-secondary small">@(kod.WaznyDo.HasValue ? kod.WaznyDo.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm") : "Bezterminowo")</td>
+                            <td>
+                                @if (aktywny)
+                                {
+                                    <span class="badge bg-success">Aktywny</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Wygasl</span>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="UsunKod" method="post" onsubmit="return confirm('Usunac kod @kod.Kod?')">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@kod.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

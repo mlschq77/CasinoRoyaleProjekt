@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-
 namespace CasinoRoyale.Models;
 
 public class AutomatInfo
@@ -11,6 +10,9 @@ public class AutomatInfo
     [Required]
     public string Nazwa { get; init; } = string.Empty;
 
-    [Required]
-    public string Kategoria { get; init; } = string.Empty;
+    public int? ProviderId { get; init; }
+
+    public AutomatProvider? Provider { get; init; }
+
+    public ICollection<Kategoria> Kategorie { get; init; } = new List<Kategoria>();
 }

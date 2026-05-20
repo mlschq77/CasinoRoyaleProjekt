@@ -39,19 +39,60 @@ public class PaymentsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CreateCheckoutSession(decimal amount)
+    public async Task<IActionResult> CreateCheckoutSession(DepositViewModel model)
     {
+        model.StripeConfigured = IsStripeConfigured();
+
+        if (!ModelState.IsValid)
+            return View(nameof(Deposit), model);
+
         if (!IsStripeConfigured())
             return RedirectToAction(nameof(Deposit), new { message = "Stripe test nie jest jeszcze skonfigurowany." });
-
-        if (amount < 10 || amount > 10000)
-            return RedirectToAction(nameof(Deposit), new { message = "Kwota doladowania musi byc w zakresie 10-10000." });
 
         var userId = GetCurrentUserId();
         if (userId == null)
             return Unauthorized();
 
+        var normalizedBonusCode = model.KodBonusowy?.Trim();
+        if (!string.IsNullOrWhiteSpace(normalizedBonusCode))
+        {
+            var kodBonusowy = await _dbContext.KodyBonusowe
+                .AsNoTracking()
+                .FirstOrDefaultAsync(kod => kod.Kod.ToLower() == normalizedBonusCode.ToLower());
+
+            if (kodBonusowy == null)
+            {
+                ModelState.AddModelError(nameof(DepositViewModel.KodBonusowy), "Podany kod bonusowy nie istnieje.");
+                return View(nameof(Deposit), model);
+            }
+
+            if (kodBonusowy.WaznyDo.HasValue && kodBonusowy.WaznyDo.Value < DateTime.UtcNow)
+            {
+                ModelState.AddModelError(nameof(DepositViewModel.KodBonusowy), "Podany kod bonusowy stracil waznosc.");
+                return View(nameof(Deposit), model);
+            }
+
+            if (model.Amount < kodBonusowy.MinimalnaWplata)
+            {
+                ModelState.AddModelError(
+                    nameof(DepositViewModel.KodBonusowy),
+                    $"Ten kod wymaga minimalnej wplaty {kodBonusowy.MinimalnaWplata:0.00} PLN.");
+                return View(nameof(Deposit), model);
+            }
+
+            model.KodBonusowy = normalizedBonusCode;
+        }
+
         StripeConfiguration.ApiKey = GetStripeSecretKey();
+
+        var metadata = new Dictionary<string, string>
+        {
+            ["userId"] = userId.Value.ToString(),
+            ["amount"] = model.Amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
+        };
+
+        if (!string.IsNullOrWhiteSpace(normalizedBonusCode))
+            metadata["kodBonusowy"] = normalizedBonusCode;
 
         var baseUrl = $"{Request.Scheme}://{Request.Host}";
         var options = new SessionCreateOptions
@@ -60,11 +101,7 @@ public class PaymentsController : Controller
             SuccessUrl = $"{baseUrl}{Url.Action(nameof(Success), "Payments")}?session_id={{CHECKOUT_SESSION_ID}}",
             CancelUrl = $"{baseUrl}{Url.Action(nameof(Cancel), "Payments")}",
             CustomerEmail = User.FindFirstValue(ClaimTypes.Email),
-            Metadata = new Dictionary<string, string>
-            {
-                ["userId"] = userId.Value.ToString(),
-                ["amount"] = amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
-            },
+            Metadata = metadata,
             LineItems = new List<SessionLineItemOptions>
             {
                 new()
@@ -73,7 +110,7 @@ public class PaymentsController : Controller
                     PriceData = new SessionLineItemPriceDataOptions
                     {
                         Currency = Currency,
-                        UnitAmount = (long)(amount * 100),
+                        UnitAmount = (long)(model.Amount * 100),
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
                             Name = "Doladowanie balansu CasinoRoyale"
@@ -110,42 +147,131 @@ public class PaymentsController : Controller
         if (session.PaymentStatus != "paid")
             return RedirectToAction(nameof(Deposit), new { message = "Platnosc nie zostala potwierdzona." });
 
-        if (!session.Metadata.TryGetValue("userId", out var metadataUserId) ||
-            metadataUserId != userId.Value.ToString())
+        if (!session.Metadata.TryGetValue("userId", out var metadataUserId) || metadataUserId != userId.Value.ToString())
         {
             return RedirectToAction(nameof(Deposit), new { message = "Ta platnosc nie nalezy do aktualnego uzytkownika." });
         }
 
-        var amount = (session.AmountTotal ?? 0) / 100m;
-        if (amount <= 0)
+        var paidAmount = (session.AmountTotal ?? 0) / 100m;
+        if (paidAmount <= 0)
             return RedirectToAction(nameof(Deposit), new { message = "Nieprawidlowa kwota platnosci." });
 
         var alreadyProcessed = await _dbContext.StripePayments.AnyAsync(payment => payment.SessionId == session.Id);
         if (alreadyProcessed)
             return RedirectToAction(nameof(Deposit), new { message = "Ta platnosc byla juz zaksiegowana." });
 
+        decimal bonusAmount = 0m;
+        if (session.Metadata.TryGetValue("kodBonusowy", out var kodString))
+        {
+            var kodBonusowy = await _dbContext.KodyBonusowe
+                .AsNoTracking()
+                .FirstOrDefaultAsync(k => k.Kod.ToLower() == kodString.ToLower());
+
+            if (kodBonusowy != null && (!kodBonusowy.WaznyDo.HasValue || kodBonusowy.WaznyDo.Value >= DateTime.UtcNow))
+            {
+                bonusAmount = (paidAmount * (kodBonusowy.BonusProcentowy / 100m)) + kodBonusowy.BonusKwotowy;
+            }
+        }
+
         _dbContext.StripePayments.Add(new StripePayment
         {
             UserId = userId.Value,
             SessionId = session.Id,
-            Amount = amount,
+            Amount = paidAmount,
             Currency = session.Currency ?? Currency,
             CreatedAt = DateTime.UtcNow
         });
 
         await _dbContext.SaveChangesAsync();
 
-        var payoutResult = await _balanceService.PayoutAsync(userId.Value, amount);
+        var finalAmountToAdd = paidAmount + bonusAmount;
+        var payoutResult = await _balanceService.PayoutAsync(userId.Value, finalAmountToAdd);
+
         if (!payoutResult.Success)
             return RedirectToAction(nameof(Deposit), new { message = payoutResult.Error });
 
-        return RedirectToAction(nameof(Deposit), new { message = $"Doladowano balans o {amount:0.00} PLN." });
+        var successMessage = bonusAmount > 0
+            ? $"Zasilenie {paidAmount:0.00} PLN udane! Otrzymujesz {bonusAmount:0.00} PLN bonusu. Lacznie dodano {finalAmountToAdd:0.00} PLN."
+            : $"Doladowano balans o {paidAmount:0.00} PLN.";
+
+        return RedirectToAction(nameof(Deposit), new { message = successMessage });
     }
 
     [HttpGet]
     public IActionResult Cancel()
     {
         return RedirectToAction(nameof(Deposit), new { message = "Platnosc zostala anulowana." });
+    }
+
+    [HttpGet]
+    public IActionResult Withdraw(string? message = null)
+    {
+        return View(new WithdrawViewModel
+        {
+            Message = message,
+            StripeConfigured = IsStripeConfigured()
+        });
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateTransfer(decimal amount, string destinationAccountId)
+    {
+        if (!IsStripeConfigured())
+            return RedirectToAction(nameof(Withdraw), new { message = "Stripe test nie jest jeszcze skonfigurowany." });
+
+        if (amount < 10 || amount > 10000)
+            return RedirectToAction(nameof(Withdraw), new { message = "Kwota wyplaty musi byc w zakresie 10-10000." });
+
+        destinationAccountId = destinationAccountId?.Trim() ?? string.Empty;
+        if (!destinationAccountId.StartsWith("acct_", StringComparison.Ordinal))
+            return RedirectToAction(nameof(Withdraw), new { message = "Podaj poprawne konto Stripe Connect zaczynajace sie od acct_." });
+
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var withdrawResult = await _balanceService.WithdrawAsync(userId.Value, amount);
+        if (!withdrawResult.Success)
+            return RedirectToAction(nameof(Withdraw), new { message = withdrawResult.Error });
+
+        StripeConfiguration.ApiKey = GetStripeSecretKey();
+
+        try
+        {
+            var service = new TransferService();
+            var transfer = await service.CreateAsync(new TransferCreateOptions
+            {
+                Amount = (long)(amount * 100),
+                Currency = Currency,
+                Destination = destinationAccountId,
+                Description = $"Wyplata CasinoRoyale dla uzytkownika {userId.Value}",
+                Metadata = new Dictionary<string, string>
+                {
+                    ["userId"] = userId.Value.ToString(),
+                    ["amount"] = amount.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture)
+                }
+            });
+
+            _dbContext.StripeWithdrawals.Add(new StripeWithdrawal
+            {
+                UserId = userId.Value,
+                TransferId = transfer.Id,
+                DestinationAccountId = destinationAccountId,
+                Amount = amount,
+                Currency = transfer.Currency ?? Currency,
+                CreatedAt = DateTime.UtcNow
+            });
+
+            await _dbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Withdraw), new { message = $"Zlecono wyplate {amount:0.00} PLN przez Stripe." });
+        }
+        catch (StripeException ex)
+        {
+            await _balanceService.PayoutAsync(userId.Value, amount);
+            return RedirectToAction(nameof(Withdraw), new { message = $"Stripe odrzucil wyplate: {ex.StripeError?.Message ?? ex.Message}" });
+        }
     }
 
     private string? GetStripeSecretKey()

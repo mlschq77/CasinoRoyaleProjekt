@@ -33,6 +33,8 @@ public class Program
             });
 
         builder.Services.AddScoped<MinesService>();
+        builder.Services.AddScoped<PlinkoService>();
+        builder.Services.AddScoped<BlackjackService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
 
         var app = builder.Build();
@@ -56,6 +58,21 @@ public class Program
             name: "provably-fair",
             pattern: "provably-fair",
             defaults: new { controller = "Home", action = "ProvablyFair" });
+
+        app.MapControllerRoute(
+            name: "promocje",
+            pattern: "promocje",
+            defaults: new { controller = "Home", action = "Promocje" });
+
+        app.MapControllerRoute(
+            name: "regulamin",
+            pattern: "regulamin",
+            defaults: new { controller = "Home", action = "Regulamin" });
+
+        app.MapControllerRoute(
+            name: "kyc",
+            pattern: "kyc",
+            defaults: new { controller = "Home", action = "Kyc" });
 
         app.MapControllerRoute(
             name: "default",

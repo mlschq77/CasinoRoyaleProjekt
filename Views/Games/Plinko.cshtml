@@ -1,0 +1,51 @@
+@{
+    ViewData["Title"] = "Plinko";
+}
+
+<div class="container py-5">
+    <section class="plinko-shell">
+        <div class="plinko-controls">
+            <span class="casino-section-label">
+                <i class="fa-solid fa-circle-dot"></i>CasinoRoyale Originals
+            </span>
+            <h1 class="text-white mt-3 mb-2">Plinko</h1>
+            <p class="casino-section-text mb-4">
+                Wybierz stawke i poziom ryzyka, a kulka spadnie po planszy do jednego z mnoznikow.
+            </p>
+
+            <label class="casino-label" for="plinko-bet">Stawka</label>
+            <div class="casino-input-wrapper mb-3">
+                <i class="fa-solid fa-coins casino-input-icon"></i>
+                <input id="plinko-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            <label class="casino-label" for="plinko-risk">Ryzyko</label>
+            <select id="plinko-risk" class="casino-input plinko-select mb-3">
+                <option value="low">Niskie</option>
+                <option value="medium" selected>Srednie</option>
+                <option value="high">Wysokie</option>
+            </select>
+
+            <button id="plinko-play" class="btn casino-btn-primary w-100">
+                <i class="fa-solid fa-play me-2"></i>Upusc kulke
+            </button>
+
+            <div class="plinko-result mt-4" aria-live="polite">
+                <span id="plinko-status">Gotowy do gry</span>
+                <strong id="plinko-win">-</strong>
+            </div>
+        </div>
+
+        <div class="plinko-board-wrap">
+            <div id="plinko-board" class="plinko-board" aria-label="Plansza Plinko">
+                <div id="plinko-ball" class="plinko-ball" hidden></div>
+                <div id="plinko-pegs" class="plinko-pegs"></div>
+            </div>
+            <div id="plinko-slots" class="plinko-slots"></div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/plinko.js" asp-append-version="true"></script>
+}

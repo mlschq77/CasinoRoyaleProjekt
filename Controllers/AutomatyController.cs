@@ -1,4 +1,5 @@
 using CasinoRoyale.Data;
+using CasinoRoyale.Models;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,36 +10,21 @@ public class AutomatyController : Controller
 {
     private readonly Automaty _dbContext;
 
-
-    public class GraController : Controller
-    {
-        public IActionResult Graj(int id)
-        {
-            
-            if (id == 1)
-            {
-                return Redirect("Home");
-            }
-
-            
-            return Content($"Gra ID: {id}");
-        }
-    }
-
-
     public AutomatyController(Automaty dbContext)
     {
         _dbContext = dbContext;
     }
 
-
     public async Task<IActionResult> Oferta(string? kategoria)
     {
-        var gryQuery = _dbContext.AutomatyInfo.AsNoTracking();
+        IQueryable<AutomatInfo> gryQuery = _dbContext.AutomatyInfo
+            .AsNoTracking()
+            .Include(automat => automat.Kategorie)
+            .Include(automat => automat.Provider);
 
         if (!string.IsNullOrWhiteSpace(kategoria))
         {
-            gryQuery = gryQuery.Where(automat => automat.Kategoria == kategoria);
+            gryQuery = gryQuery.Where(automat => automat.Kategorie.Any(k => k.Nazwa == kategoria));
         }
 
         var gry = await gryQuery
@@ -47,25 +33,45 @@ public class AutomatyController : Controller
 
         if (string.IsNullOrWhiteSpace(kategoria) || kategoria == "Originals")
         {
-            gry.Add(new CasinoRoyale.Models.AutomatInfo
+            var provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" };
+            var originalsCat = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } };
+
+            gry.Add(new AutomatInfo
             {
                 Id = 1,
-                Nazwa = "Mines",
-                Kategoria = "Originals"
+                Nazwa = "Blackjack",
+                Provider = provider,
+                Kategorie = originalsCat
             });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 0,
+                Nazwa = "Mines",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 2,
+                Nazwa = "Plinko",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
         }
 
         var model = new SlotsViewModel
         {
             Gry = gry,
-            Kategorie = (await _dbContext.AutomatyInfo
+            Kategorie = (await _dbContext.Kategorie
                 .AsNoTracking()
-                .Select(a => a.Kategoria)
-                .Where(k => !string.IsNullOrWhiteSpace(k))
-                .Distinct()
+                .Select(k => k.Nazwa)
+                .Where(nazwa => !string.IsNullOrWhiteSpace(nazwa))
                 .OrderBy(k => k)
                 .ToListAsync())
-                .Append("Originals") 
+                .Append("Originals")
                 .Distinct()
                 .ToList(),
 
@@ -74,5 +80,4 @@ public class AutomatyController : Controller
 
         return View(model);
     }
-
 }
