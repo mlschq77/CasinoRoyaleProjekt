@@ -1,0 +1,232 @@
+/* Crash Game Styles */
+
+.crash-wrapper {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem;
+}
+
+.crash-container {
+    width: 100%;
+    max-width: 1100px;
+}
+
+.crash-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.crash-title {
+    color: #fff;
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin: 0.75rem 0 0.25rem;
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+}
+
+.crash-subtitle {
+    color: rgba(245, 241, 230, 0.65);
+    font-size: 1rem;
+}
+
+.crash-main {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 1.5rem;
+    align-items: start;
+}
+
+.crash-display-area {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.98) 0%, rgba(12, 12, 12, 0.95) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s ease;
+}
+
+.crash-display-area.crash-crash-effect {
+    animation: crashFlash 0.8s ease;
+    border-color: #ef4444 !important;
+}
+
+@keyframes crashFlash {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 18px 60px rgba(0,0,0,0.35); }
+    15% { box-shadow: 0 0 60px 20px rgba(239, 68, 68, 0.35), 0 18px 60px rgba(0,0,0,0.35); }
+    30% { box-shadow: 0 0 30px 10px rgba(239, 68, 68, 0.2), 0 18px 60px rgba(0,0,0,0.35); }
+    60% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0), 0 18px 60px rgba(0,0,0,0.35); }
+}
+
+.crash-canvas-wrap {
+    position: relative;
+    width: 100%;
+}
+
+#crash-chart {
+    width: 100%;
+    height: 400px;
+    display: block;
+    border-radius: 0.75rem;
+}
+
+.crash-multiplier-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: 900;
+    color: #d4af37;
+    text-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+    pointer-events: none;
+    transition: color 0.3s ease;
+    z-index: 2;
+    letter-spacing: -0.03em;
+}
+
+.crash-controls {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.98) 0%, rgba(12, 12, 12, 0.95) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+}
+
+.crash-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.crash-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 1rem;
+    min-height: 82px;
+    color: rgba(245, 241, 230, 0.8);
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 0.75rem;
+    margin-top: 1rem;
+}
+
+.crash-result strong {
+    color: var(--casino-gold-soft);
+    font-size: 1.25rem;
+}
+
+.crash-result-win {
+    color: #22c55e !important;
+    font-size: 1.25rem;
+}
+
+.crash-result-lose {
+    color: #ef4444 !important;
+    font-size: 1.25rem;
+}
+
+/* History section */
+.crash-history {
+    margin-top: 2rem;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.98) 0%, rgba(12, 12, 12, 0.95) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+}
+
+.crash-history-title {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0 0 1rem;
+}
+
+.crash-history-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.crash-history-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.4rem 0.7rem;
+    border-radius: 0.5rem;
+    font-size: 0.82rem;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.14);
+}
+
+.crash-history-win {
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.crash-history-lose {
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.crash-history-icon {
+    font-size: 0.75rem;
+    font-weight: 900;
+}
+
+.crash-history-multiplier {
+    color: #fff;
+}
+
+.crash-history-winamount {
+    color: rgba(245, 241, 230, 0.6);
+    font-weight: 400;
+}
+
+.crash-history-crashpoint {
+    color: rgba(239, 68, 68, 0.6);
+    font-size: 0.72rem;
+    font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+    .crash-main {
+        grid-template-columns: 1fr;
+    }
+
+    .crash-multiplier-display {
+        font-size: 2.5rem;
+    }
+
+    #crash-chart {
+        height: 280px;
+    }
+
+    .crash-title {
+        font-size: 1.8rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .crash-wrapper {
+        padding: 1rem 0.5rem;
+    }
+
+    .crash-display-area,
+    .crash-controls,
+    .crash-history {
+        padding: 1rem;
+    }
+
+    .crash-multiplier-display {
+        font-size: 2rem;
+    }
+
+    #crash-chart {
+        height: 220px;
+    }
+}

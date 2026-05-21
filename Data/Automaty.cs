@@ -19,6 +19,7 @@ namespace CasinoRoyale.Data
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
         public DbSet<UzytyKodBonusowy> UzyteKodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
+        public DbSet<CrashSession> CrashSessions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +39,22 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<PlinkoGame>()
                 .Property(game => game.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.CrashPoint)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.CashoutMultiplier)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.WinAmount)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<StripePayment>()
@@ -130,21 +147,24 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<AutomatInfo>()
                 .HasMany(automat => automat.Kategorie)
                 .WithMany(kategoria => kategoria.Automaty)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AutomatyKategorie",
-                    right => right
-                        .HasOne<Kategoria>()
+                .UsingEntity<AutomatKategoria>(
+                    join => join
+                        .HasOne(automatKategoria => automatKategoria.Kategoria)
                         .WithMany()
-                        .HasForeignKey("KategoriaId")
+                        .HasForeignKey(automatKategoria => automatKategoria.KategoriaId)
                         .OnDelete(DeleteBehavior.Cascade),
-                    left => left
-                        .HasOne<AutomatInfo>()
+                    join => join
+                        .HasOne(automatKategoria => automatKategoria.Automat)
                         .WithMany()
-                        .HasForeignKey("AutomatId")
+                        .HasForeignKey(automatKategoria => automatKategoria.AutomatId)
                         .OnDelete(DeleteBehavior.Cascade),
                     join =>
                     {
-                        join.HasKey("AutomatId", "KategoriaId");
+                        join.HasKey(automatKategoria => new
+                        {
+                            automatKategoria.AutomatId,
+                            automatKategoria.KategoriaId
+                        });
                         join.ToTable("AutomatyKategorie");
                     });
         }

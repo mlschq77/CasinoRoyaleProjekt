@@ -44,6 +44,7 @@ public class Program
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<BlackjackService>();
+        builder.Services.AddScoped<CrashService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
         builder.Services.AddScoped<IBonusCodeService, BonusCodeService>();
 
@@ -83,6 +84,11 @@ public class Program
             name: "kyc",
             pattern: "kyc",
             defaults: new { controller = "Home", action = "Kyc" });
+
+        app.MapControllerRoute(
+            name: "grajodpowiedzialnie",
+            pattern: "grajodpowiedzialnie",
+            defaults: new { controller = "Home", action = "GrajOdpowiedzialnie" });
 
         app.MapControllerRoute(
             name: "default",

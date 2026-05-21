@@ -150,9 +150,21 @@ public class ProfileController : Controller
             })
             .ToListAsync();
 
+        var crashBets = await _dbContext.CrashSessions
+            .AsNoTracking()
+            .Where(session => session.UserId == userId)
+            .Select(session => new BetHistoryItemViewModel
+            {
+                GameName = "Crash",
+                CreatedAt = session.CreatedAt,
+                BetAmount = session.BetAmount
+            })
+            .ToListAsync();
+
         profile.BetHistory = blackjackBets
             .Concat(minesBets)
             .Concat(plinkoBets)
+            .Concat(crashBets)
             .OrderByDescending(item => item.CreatedAt)
             .Take(40)
             .ToList();

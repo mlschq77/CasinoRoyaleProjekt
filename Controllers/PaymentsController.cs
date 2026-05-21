@@ -179,14 +179,15 @@ public class PaymentsController : Controller
                 return RedirectToAction(nameof(Deposit), new { message = "Ta platnosc byla juz zaksiegowana." });
             }
 
-        _dbContext.StripePayments.Add(new StripePayment
+        var stripePayment = new StripePayment
             {
                 UserId = userId.Value,
                 SessionId = session.Id,
                 Amount = paidAmount,
                 Currency = session.Currency ?? Currency,
                 CreatedAt = DateTime.UtcNow
-        });
+        };
+            _dbContext.StripePayments.Add(stripePayment);
 
             await _dbContext.SaveChangesAsync();
 
