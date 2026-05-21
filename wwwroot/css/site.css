@@ -47,6 +47,9 @@ body.casino-body {
   background: rgba(7, 7, 7, 0.82);
   border-bottom: 1px solid var(--casino-border);
   backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 1050; /* Zapewnia, że menu jest nad hero section */
 }
 
 .casino-brand,
@@ -60,11 +63,114 @@ body.casino-body {
 .casino-nav-link {
   color: rgba(245, 241, 230, 0.82);
   font-weight: 500;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.casino-nav-link:hover,
-.casino-footer-link:hover {
+.casino-nav-link:hover {
   color: var(--casino-gold-soft);
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+@media (min-width: 992px) {
+    .casino-navbar .container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Centrowanie tylko gdy jest wystarczająco dużo miejsca (powyżej 1200px) */
+    @media (min-width: 1200px) {
+        .casino-navbar .navbar-nav {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0 !important;
+        }
+    }
+
+    /* Dla średnich ekranów (992px - 1199px) używamy naturalnego układu flex */
+    @media (max-width: 1199.98px) {
+        .casino-navbar .navbar-nav {
+            margin-left: 2rem !important;
+            margin-right: auto !important;
+            margin-bottom: 0 !important;
+        }
+    }
+}
+
+@media (max-width: 991.98px) {
+    .casino-navbar .navbar-nav {
+        text-align: center;
+        width: 100%;
+        padding: 1rem 0;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--casino-border);
+        margin-bottom: 1rem !important;
+    }
+    
+    .casino-navbar .navbar-collapse {
+        background: var(--casino-black-soft);
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 1rem;
+        border: 1px solid var(--casino-border);
+    }
+}
+
+.casino-balance-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.casino-balance-menu:hover .casino-user-badge {
+    border-color: var(--casino-gold-soft);
+    background: rgba(212, 175, 55, 0.12);
+    cursor: default;
+}
+
+.casino-balance-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-top: 15px; /* Mostek */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    z-index: 1100;
+    min-width: 190px;
+}
+
+.casino-balance-dropdown-content {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.99) 0%, rgba(12, 12, 12, 0.98) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.casino-balance-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+}
+
+.casino-balance-menu:hover .casino-balance-dropdown,
+.casino-balance-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+.casino-nav-divider {
+  border-top: 1px solid var(--casino-border);
 }
 
 .casino-user-badge {
@@ -186,6 +292,11 @@ body.casino-body {
 
 .casino-footer-link {
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.casino-footer-link:hover {
+  color: var(--casino-gold-soft);
 }
 
 @media (max-width: 991.98px) {

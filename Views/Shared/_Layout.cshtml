@@ -28,12 +28,24 @@
                     <a class="nav-link casino-nav-link" asp-controller="Home" asp-action="Promocje">Promocje</a>
                 </li>
             </ul>
-            <div class="d-flex flex-column flex-lg-row align-items-center gap-2">
+            <div class="d-flex flex-column flex-lg-row align-items-center gap-2 ms-lg-auto">
                 @if (User.Identity?.IsAuthenticated == true)
                 {
-                    <span class="casino-user-badge">
-                        <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
-                    </span>
+                    <div class="casino-balance-menu">
+                        <span class="casino-user-badge">
+                            <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
+                        </span>
+                        <div class="casino-balance-dropdown">
+                            <div class="casino-balance-dropdown-content">
+                                <a class="btn casino-btn-primary w-100 mb-2" asp-controller="Payments" asp-action="Deposit">
+                                    <i class="fa-solid fa-plus me-1"></i>Doładuj
+                                </a>
+                                <a class="btn btn-outline-light casino-btn-secondary w-100" asp-controller="Payments" asp-action="Withdraw">
+                                    <i class="fa-solid fa-money-bill-transfer me-1"></i>Wypłać
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                     <a class="casino-user-badge casino-profile-link" asp-controller="Profile" asp-action="Index">
                         <i class="fa-solid fa-user-circle me-2"></i>@User.Identity.Name
                     </a>
@@ -43,12 +55,6 @@
                             <i class="fa-solid fa-shield-halved me-1"></i>Admin
                         </a>
                     }
-                    <a class="btn casino-btn-primary" asp-controller="Payments" asp-action="Deposit">
-                        <i class="fa-solid fa-plus me-1"></i>Doładuj
-                    </a>
-                    <a class="btn btn-outline-light casino-btn-secondary" asp-controller="Payments" asp-action="Withdraw">
-                        <i class="fa-solid fa-money-bill-transfer me-1"></i>Wypłać
-                    </a>
                     <form asp-action="Wylogowanie" asp-controller="Auth" method="post" class="m-0">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="btn btn-outline-light casino-btn-secondary">
@@ -61,7 +67,6 @@
                     <a class="btn btn-outline-light casino-btn-secondary" asp-controller="Auth" asp-action="Logowanie">Logowanie</a>
                     <a class="btn casino-btn-primary" asp-controller="Auth" asp-action="Rejestracja">Rejestracja</a>
                 }
-            </div>
             </div>
         </div>
     </div>
@@ -77,6 +82,7 @@
                 <a asp-controller="Home" asp-action="Regulamin" class="casino-footer-link">Regulamin</a>
             <a asp-controller="Home" asp-action="ProvablyFair" class="casino-footer-link">Provably Fair</a>
             <a asp-controller="Home" asp-action="Kyc" class="casino-footer-link">KYC</a>
+            <a asp-controller="Home" asp-action="GrajOdpowiedzialnie" class="casino-footer-link">Graj odpowiedzialnie</a>
         </div>
     </div>
 </footer>

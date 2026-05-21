@@ -36,6 +36,7 @@
                 <label asp-for="KodBonusowy" class="casino-label"></label>
                 <input asp-for="KodBonusowy" class="casino-input" maxlength="64" placeholder="Wpisz kod bonusowy" autocomplete="off" />
                 <span asp-validation-for="KodBonusowy" class="casino-validation"></span>
+                <span id="kodBonusowyLiveValidation" class="casino-validation"></span>
             </div>
 
             <div class="d-flex flex-wrap gap-2">
@@ -53,4 +54,70 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    <script>
+        (() => {
+            const codeInput = document.getElementById("KodBonusowy");
+            const amountInput = document.getElementById("amount");
+            const validationMessage = document.getElementById("kodBonusowyLiveValidation");
+            const submitButton = document.querySelector("button[type='submit']");
+            const stripeDisabled = submitButton?.disabled ?? false;
+            const validationUrl = "@Url.Action("ValidateBonusCode", "Payments")";
+            let validationTimer;
+
+            const setSubmitDisabled = (disabled) => {
+                if (submitButton) {
+                    submitButton.disabled = stripeDisabled || disabled;
+                }
+            };
+
+            const setMessage = (message, isValid) => {
+                validationMessage.textContent = message;
+                validationMessage.className = isValid
+                    ? "casino-validation text-success"
+                    : "casino-validation";
+            };
+
+            const validateBonusCode = async () => {
+                const kodBonusowy = codeInput.value.trim();
+                if (!kodBonusowy) {
+                    setMessage("", true);
+                    setSubmitDisabled(false);
+                    return;
+                }
+
+                const params = new URLSearchParams({
+                    kodBonusowy,
+                    amount: amountInput.value || "0"
+                });
+
+                try {
+                    const response = await fetch(`${validationUrl}?${params}`, {
+                        headers: { "Accept": "application/json" }
+                    });
+
+                    if (!response.ok) {
+                        setMessage("Nie mozna teraz sprawdzic kodu.", false);
+                        setSubmitDisabled(true);
+                        return;
+                    }
+
+                    const result = await response.json();
+                    setMessage(result.message || "", result.isValid);
+                    setSubmitDisabled(!result.isValid);
+                } catch {
+                    setMessage("Nie mozna teraz sprawdzic kodu.", false);
+                    setSubmitDisabled(true);
+                }
+            };
+
+            const scheduleValidation = () => {
+                window.clearTimeout(validationTimer);
+                validationTimer = window.setTimeout(validateBonusCode, 350);
+            };
+
+            codeInput?.addEventListener("input", scheduleValidation);
+            amountInput?.addEventListener("input", scheduleValidation);
+        })();
+    </script>
 }

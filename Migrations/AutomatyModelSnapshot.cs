@@ -182,6 +182,43 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("KodyBonusowe", (string)null);
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.UzytyKodBonusowy", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("KodBonusowyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SessionId")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("StripePaymentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Uzyto")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("KodBonusowyId");
+
+                    b.HasIndex("StripePaymentId");
+
+                    b.HasIndex("UserId", "KodBonusowyId")
+                        .IsUnique();
+
+                    b.ToTable("UzyteKodyBonusowe", (string)null);
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
                 {
                     b.Property<int>("Id")
@@ -391,6 +428,26 @@ namespace CasinoRoyale.Migrations
                     b.HasOne("CasinoRoyale.Models.Kategoria", null)
                         .WithMany()
                         .HasForeignKey("KategoriaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.UzytyKodBonusowy", b =>
+                {
+                    b.HasOne("CasinoRoyale.Models.KodBonusowy", null)
+                        .WithMany()
+                        .HasForeignKey("KodBonusowyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("CasinoRoyale.Models.StripePayment", null)
+                        .WithMany()
+                        .HasForeignKey("StripePaymentId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("CasinoRoyale.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

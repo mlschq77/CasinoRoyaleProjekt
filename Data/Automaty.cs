@@ -17,6 +17,7 @@ namespace CasinoRoyale.Data
         public DbSet<StripePayment> StripePayments { get; set; }
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
+        public DbSet<UzytyKodBonusowy> UzyteKodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -69,6 +70,35 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<KodBonusowy>()
                 .HasIndex(kodBonusowy => kodBonusowy.Kod)
                 .IsUnique();
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .ToTable("UzyteKodyBonusowe");
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .Property(uzytyKod => uzytyKod.SessionId)
+                .HasMaxLength(450);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasIndex(uzytyKod => new { uzytyKod.UserId, uzytyKod.KodBonusowyId })
+                .IsUnique();
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<KodBonusowy>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.KodBonusowyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<StripePayment>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.StripePaymentId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Kategoria>()
                 .ToTable("Kategorie");

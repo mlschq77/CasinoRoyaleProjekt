@@ -32,10 +32,20 @@ public class Program
                 options.Cookie.HttpOnly = true;
             });
 
+        builder.Services.Configure<RandomOrgOptions>(
+            builder.Configuration.GetSection(RandomOrgOptions.SectionName));
+        builder.Services.AddHttpClient<IRandomNumberService, RandomOrgRandomNumberService>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<RandomOrgOptions>>().Value;
+            client.BaseAddress = new Uri(options.Endpoint);
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
+
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<BlackjackService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
+        builder.Services.AddScoped<IBonusCodeService, BonusCodeService>();
 
         var app = builder.Build();
 
