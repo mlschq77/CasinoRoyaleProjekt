@@ -1,0 +1,120 @@
+@model List<CasinoRoyale.Models.KycDocument>
+@{
+    ViewData["Title"] = "Moje dokumenty KYC";
+}
+
+<div class="casino-home">
+    <section class="casino-section py-5 border-bottom border-secondary border-opacity-25">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <span class="casino-section-label">
+                        <i class="fa-solid fa-id-card"></i>Weryfikacja tożsamości
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mt-3 mb-3">Moje dokumenty KYC</h1>
+                    <p class="casino-section-text lead mb-0">
+                        Prześlij dokument tożsamości, aby potwierdzić swoją tożsamość.
+                        Akceptujemy pliki JPEG, PNG, WebP oraz PDF (max 10 MB).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="casino-section py-5">
+        <div class="container">
+            @if (TempData["KycMessage"] is string msg)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-check-circle me-2"></i>@msg
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Zamknij"></button>
+                </div>
+            }
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4">
+                    <div class="casino-info-card h-100">
+                        <h2 class="h4 text-white mb-3">Prześlij nowy dokument</h2>
+                        <p class="casino-section-text mb-3">
+                            Wybierz typ dokumentu i prześlij czytelne zdjęcie lub skan.
+                        </p>
+                        <a class="btn casino-btn-primary w-100" asp-action="Upload">
+                            <i class="fa-solid fa-upload me-2"></i>Prześlij dokument
+                        </a>
+                    </div>
+                </div>
+
+                <div class="col-lg-8">
+                    @if (Model.Count == 0)
+                    {
+                        <div class="casino-info-card text-center py-5">
+                            <i class="fa-solid fa-file-circle-plus text-gold fs-1 mb-3"></i>
+                            <p class="casino-section-text mb-0">Nie przesłałeś jeszcze żadnych dokumentów.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table casino-table">
+                                <thead>
+                                    <tr>
+                                        <th>Typ dokumentu</th>
+                                        <th>Nazwa pliku</th>
+                                        <th>Data przesłania</th>
+                                        <th>Status</th>
+                                        <th>Akcje</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var doc in Model)
+                                    {
+                                        <tr>
+                                            <td class="text-white">@(doc.DocumentType switch
+                                            {
+                                                CasinoRoyale.Models.KycDocumentType.DowodOsobisty => "Dowód osobisty",
+                                                CasinoRoyale.Models.KycDocumentType.Paszport => "Paszport",
+                                                CasinoRoyale.Models.KycDocumentType.PrawoJazdy => "Prawo jazdy",
+                                                CasinoRoyale.Models.KycDocumentType.Inny => "Inny",
+                                                _ => doc.DocumentType.ToString()
+                                            })</td>
+                                            <td class="text-white">@doc.FileName</td>
+                                            <td class="text-white">@doc.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                            <td>
+                                                @switch (doc.Status)
+                                                {
+                                                    case CasinoRoyale.Models.KycDocumentStatus.Pending:
+                                                        <span class="badge bg-warning text-dark">Oczekuje</span>
+                                                        break;
+                                                    case CasinoRoyale.Models.KycDocumentStatus.Approved:
+                                                        <span class="badge bg-success">Zatwierdzony</span>
+                                                        break;
+                                                    case CasinoRoyale.Models.KycDocumentStatus.Rejected:
+                                                        <span class="badge bg-danger">Odrzucony</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-sm btn-outline-light" asp-action="File" asp-route-id="@doc.Id" target="_blank">
+                                                    <i class="fa-solid fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        @if (doc.Status == CasinoRoyale.Models.KycDocumentStatus.Rejected && !string.IsNullOrEmpty(doc.AdminComment))
+                                        {
+                                            <tr class="table-danger">
+                                                <td colspan="5" class="text-danger small">
+                                                    <i class="fa-solid fa-circle-exclamation me-1"></i>
+                                                    <strong>Komentarz admina:</strong> @doc.AdminComment
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

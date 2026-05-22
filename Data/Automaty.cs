@@ -20,6 +20,7 @@ namespace CasinoRoyale.Data
         public DbSet<UzytyKodBonusowy> UzyteKodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
         public DbSet<CrashSession> CrashSessions { get; set; }
+        public DbSet<KycDocument> KycDocuments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

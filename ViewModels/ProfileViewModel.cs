@@ -38,6 +38,9 @@ public class ProfileViewModel
         }
     }
 
+    public string KycStatusDisplay { get; set; } = string.Empty;
+    public string KycStatusCssClass { get; set; } = string.Empty;
+
     public string Inicjaly
     {
         get

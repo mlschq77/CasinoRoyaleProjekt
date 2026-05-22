@@ -47,6 +47,7 @@ public class Program
         builder.Services.AddScoped<CrashService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
         builder.Services.AddScoped<IBonusCodeService, BonusCodeService>();
+        builder.Services.AddScoped<IKycService, KycService>();
 
         var app = builder.Build();
 
@@ -81,8 +82,13 @@ public class Program
             defaults: new { controller = "Home", action = "Regulamin" });
 
         app.MapControllerRoute(
-            name: "kyc",
-            pattern: "kyc",
+            name: "kyc-upload",
+            pattern: "kyc/{action=Index}/{id?}",
+            defaults: new { controller = "Kyc" });
+
+        app.MapControllerRoute(
+            name: "kyc-info",
+            pattern: "kyc/informacje",
             defaults: new { controller = "Home", action = "Kyc" });
 
         app.MapControllerRoute(
