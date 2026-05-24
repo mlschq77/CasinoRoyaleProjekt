@@ -1,4 +1,4 @@
-using CasinoRoyale.Data;
+﻿using CasinoRoyale.Data;
 using CasinoRoyale.Models;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -60,8 +60,6 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
-<<<<<<< Updated upstream
-=======
             gry.Add(new AutomatInfo
             {
                 Id = 3,
@@ -78,7 +76,6 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
->>>>>>> Stashed changes
         }
 
         var model = new SlotsViewModel

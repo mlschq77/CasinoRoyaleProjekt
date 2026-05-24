@@ -1,4 +1,4 @@
-using CasinoRoyale.Models;
+﻿using CasinoRoyale.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CasinoRoyale.Data
 {
@@ -18,12 +18,9 @@ namespace CasinoRoyale.Data
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
-<<<<<<< Updated upstream
-=======
         public DbSet<CrashSession> CrashSessions { get; set; }
         public DbSet<KycDocument> KycDocuments { get; set; }
         public DbSet<RouletteGame> RouletteGames { get; set; }
->>>>>>> Stashed changes
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -135,3 +132,4 @@ namespace CasinoRoyale.Data
         }
     }
 }
+
