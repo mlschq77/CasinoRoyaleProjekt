@@ -35,6 +35,11 @@ public class Program
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<BlackjackService>();
+<<<<<<< Updated upstream
+=======
+        builder.Services.AddScoped<CrashService>();
+        builder.Services.AddScoped<RouletteService>();
+>>>>>>> Stashed changes
         builder.Services.AddScoped<IBalanceService, BalanceService>();
 
         var app = builder.Build();

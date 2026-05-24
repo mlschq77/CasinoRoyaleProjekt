@@ -60,6 +60,25 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
+<<<<<<< Updated upstream
+=======
+            gry.Add(new AutomatInfo
+            {
+                Id = 3,
+                Nazwa = "Crash",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 4,
+                Nazwa = "Ruletka",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+>>>>>>> Stashed changes
         }
 
         var model = new SlotsViewModel
