@@ -61,7 +61,7 @@ public class AuthController : Controller
 			Nazwa = model.Nazwa,
 			Email = model.Email,
 			HasloHash = BCrypt.Net.BCrypt.HashPassword(model.Haslo),
-			Balance = 1000m,
+			Balance = 0m,
 			DataRejestracji = DateTime.UtcNow
 		};
 

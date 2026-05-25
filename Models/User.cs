@@ -27,7 +27,7 @@ namespace CasinoRoyale.Models
         public string Email { get; set; } = string.Empty;
         public string HasloHash { get; set; } = string.Empty;
         public bool IsAdmin { get; set; }
-        public decimal Balance { get; set; } = 1000m;
+        public decimal Balance { get; set; } = 0m;
         public DateTime DataRejestracji { get; init; } = DateTime.UtcNow;
 
         /// <summary>
