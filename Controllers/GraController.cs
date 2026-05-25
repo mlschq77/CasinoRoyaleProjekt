@@ -14,6 +14,7 @@ public class GraController : Controller
             1 => RedirectToAction("Blackjack", "Games"),
             2 => RedirectToAction("Plinko", "Games"),
             3 => RedirectToAction("Crash", "Games"),
+            4 => RedirectToAction("Roulette", "Games"),
             _ => Content($"Gra ID: {id}")
         };
     }

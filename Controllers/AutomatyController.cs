@@ -1,4 +1,4 @@
-using CasinoRoyale.Data;
+﻿using CasinoRoyale.Data;
 using CasinoRoyale.Models;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -64,6 +64,14 @@ public class AutomatyController : Controller
             {
                 Id = 3,
                 Nazwa = "Crash",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 4,
+                Nazwa = "Ruletka",
                 Provider = provider,
                 Kategorie = originalsCat
             });
