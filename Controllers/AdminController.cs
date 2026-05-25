@@ -206,7 +206,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Kyc()
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var pending = await _kycService.GetPendingDocumentsAsync();
         var all = await _kycService.GetAllDocumentsAsync();
@@ -234,7 +234,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ApproveKyc(int documentId, string? comment)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var adminId = GetAdminUserId();
 
@@ -255,7 +255,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RejectKyc(int documentId, string? comment)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var adminId = GetAdminUserId();
 
@@ -277,7 +277,7 @@ public class AdminController : Controller
     /// </summary>
     public async Task<IActionResult> KycFile(int id)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var document = await _kycService.GetDocumentByIdAsync(id);
         if (document == null)
