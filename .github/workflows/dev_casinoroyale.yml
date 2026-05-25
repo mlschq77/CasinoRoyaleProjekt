@@ -52,4 +52,4 @@ jobs:
           app-name: 'casinoroyale-app'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_07D08F72A8A34C66BAC3F0E8FC163277 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_20841EC281AC442BA5757004CC3D115D }}
