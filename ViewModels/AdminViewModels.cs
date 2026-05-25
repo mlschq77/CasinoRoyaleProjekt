@@ -23,3 +23,10 @@ public class AdminStatystykiViewModel
     public int LacznaLiczbaGier => LiczbaBlackjack + LiczbaMines + LiczbaPlinko;
     public decimal LacznaSumaWplat => SumaWplatBlackjack + SumaWplatMines + SumaWplatPlinko;
 }
+
+public class AdminKycViewModel
+{
+    public List<KycDocument> PendingDocuments { get; set; } = new();
+    public List<KycDocument> AllDocuments { get; set; } = new();
+    public Dictionary<int, string> UserEmails { get; set; } = new();
+}

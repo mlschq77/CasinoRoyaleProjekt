@@ -1,0 +1,228 @@
+@model CasinoRoyale.ViewModels.AdminKycViewModel
+@{
+    ViewData["Title"] = "KYC - Weryfikacja dokumentów";
+
+    var docTypeLabels = new Dictionary<CasinoRoyale.Models.KycDocumentType, string>
+    {
+        [CasinoRoyale.Models.KycDocumentType.DowodOsobisty] = "Dowód osobisty",
+        [CasinoRoyale.Models.KycDocumentType.Paszport] = "Paszport",
+        [CasinoRoyale.Models.KycDocumentType.PrawoJazdy] = "Prawo jazdy",
+        [CasinoRoyale.Models.KycDocumentType.Inny] = "Inny"
+    };
+
+    var docTypeIcons = new Dictionary<CasinoRoyale.Models.KycDocumentType, string>
+    {
+        [CasinoRoyale.Models.KycDocumentType.DowodOsobisty] = "fa-id-card",
+        [CasinoRoyale.Models.KycDocumentType.Paszport] = "fa-book",
+        [CasinoRoyale.Models.KycDocumentType.PrawoJazdy] = "fa-car",
+        [CasinoRoyale.Models.KycDocumentType.Inny] = "fa-file"
+    };
+}
+
+<div class="container py-5">
+
+    <div class="d-flex align-items-center mb-2 gap-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="mb-0 text-white">
+            <i class="fa-solid fa-id-card text-gold me-2"></i>Weryfikacja KYC
+        </h1>
+    </div>
+
+    @if (TempData["AdminMsg"] is string msg)
+    {
+        <div class="alert border-0 mb-4" style="background: rgba(40,167,69,0.15); color: #5cb85c;">
+            <i class="fa-solid fa-check-circle me-2"></i>@msg
+        </div>
+    }
+
+    <!-- Karta statystyk -->
+    <div class="row g-3 mb-4">
+        <div class="col-sm-4">
+            <div class="casino-card p-3 text-center">
+                <div class="fs-3 fw-bold text-warning">@Model.PendingDocuments.Count</div>
+                <div class="text-secondary small">Oczekujące</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="casino-card p-3 text-center">
+                <div class="fs-3 fw-bold text-success">@Model.AllDocuments.Count(d => d.Status == CasinoRoyale.Models.KycDocumentStatus.Approved)</div>
+                <div class="text-secondary small">Zatwierdzone</div>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <div class="casino-card p-3 text-center">
+                <div class="fs-3 fw-bold text-danger">@Model.AllDocuments.Count(d => d.Status == CasinoRoyale.Models.KycDocumentStatus.Rejected)</div>
+                <div class="text-secondary small">Odrzucone</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dokumenty oczekujące -->
+    @if (Model.PendingDocuments.Count == 0)
+    {
+        <div class="casino-card p-5 text-center mb-5">
+            <i class="fa-solid fa-check-circle fa-3x text-success mb-3"></i>
+            <p class="text-secondary mb-0">Brak dokumentów oczekujących na weryfikację.</p>
+        </div>
+    }
+    else
+    {
+        <h2 class="h5 text-white mb-3">
+            <i class="fa-solid fa-clock text-warning me-2"></i>Dokumenty oczekujące
+            <span class="badge bg-warning text-dark ms-2">@Model.PendingDocuments.Count</span>
+        </h2>
+
+        <div class="casino-card p-0 overflow-hidden mb-5">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0" style="--bs-table-bg: transparent;">
+                    <thead style="background: rgba(0,0,0,.3);">
+                        <tr class="text-secondary small">
+                            <th class="px-4 py-3">ID</th>
+                            <th class="py-3">Użytkownik</th>
+                            <th class="py-3">Typ dokumentu</th>
+                            <th class="py-3">Nazwa pliku</th>
+                            <th class="py-3">Data przesłania</th>
+                            <th class="py-3 text-center">Akcje</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doc in Model.PendingDocuments)
+                        {
+                            <tr>
+                                <td class="px-4 text-secondary">@doc.Id</td>
+                                <td class="text-white">@(Model.UserEmails.GetValueOrDefault(doc.UserId, "Nieznany"))</td>
+                                <td>
+                                    <span class="text-white">
+                                        <i class="fa-solid @docTypeIcons.GetValueOrDefault(doc.DocumentType, "fa-file") text-gold me-1"></i>
+                                        @docTypeLabels.GetValueOrDefault(doc.DocumentType, doc.DocumentType.ToString())
+                                    </span>
+                                </td>
+                                <td class="text-white small">@doc.FileName</td>
+                                <td class="text-white small">@doc.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td class="text-center">
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a class="btn btn-sm btn-outline-light" asp-action="KycFile" asp-route-id="@doc.Id" target="_blank" title="Podgląd dokumentu">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        <form method="post" asp-action="ApproveKyc" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="documentId" value="@doc.Id" />
+                                            <button type="submit" class="btn btn-sm btn-success"
+                                                    onclick="return confirm('Zatwierdzić ten dokument?')">
+                                                <i class="fa-solid fa-check"></i>
+                                            </button>
+                                        </form>
+                                        <button type="button" class="btn btn-sm btn-danger"
+                                                data-bs-toggle="modal" data-bs-target="#rejectModal-@doc.Id">
+                                            <i class="fa-solid fa-xmark"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal odrzucenia -->
+                                    <div class="modal fade" id="rejectModal-@doc.Id" tabindex="-1">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content" style="background: linear-gradient(180deg, rgba(23,23,23,0.99) 0%, rgba(12,12,12,0.98) 100%); border: 1px solid var(--casino-border);">
+                                                <form method="post" asp-action="RejectKyc">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="documentId" value="@doc.Id" />
+                                                    <div class="modal-header" style="border-color: rgba(212,175,55,0.16);">
+                                                        <h5 class="modal-title text-white">
+                                                            <i class="fa-solid fa-xmark text-danger me-2"></i>Odrzuć dokument #@doc.Id
+                                                        </h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label text-secondary small" for="comment-@doc.Id">Komentarz (opcjonalny)</label>
+                                                            <textarea name="comment" id="comment-@doc.Id" class="form-control text-white"
+                                                                      style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);"
+                                                                      rows="3" placeholder="Powód odrzucenia..."></textarea>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer" style="border-color: rgba(212,175,55,0.16);">
+                                                        <button type="button" class="btn btn-secondary" style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.15);" data-bs-dismiss="modal">Anuluj</button>
+                                                        <button type="submit" class="btn btn-danger">Odrzuć</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    <!-- Historia wszystkich dokumentów -->
+    <h2 class="h5 text-white mb-3">
+        <i class="fa-solid fa-clock-rotate-left text-gold me-2"></i>Historia wszystkich dokumentów
+        <span class="badge bg-secondary ms-2">@Model.AllDocuments.Count</span>
+    </h2>
+
+    @if (Model.AllDocuments.Count == 0)
+    {
+        <div class="casino-card p-5 text-center">
+            <i class="fa-solid fa-folder-open fa-3x text-secondary mb-3"></i>
+            <p class="text-secondary mb-0">Brak dokumentów.</p>
+        </div>
+    }
+    else
+    {
+        <div class="casino-card p-0 overflow-hidden">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover mb-0" style="--bs-table-bg: transparent;">
+                    <thead style="background: rgba(0,0,0,.3);">
+                        <tr class="text-secondary small">
+                            <th class="px-4 py-3">ID</th>
+                            <th class="py-3">Użytkownik</th>
+                            <th class="py-3">Typ</th>
+                            <th class="py-3">Status</th>
+                            <th class="py-3">Data</th>
+                            <th class="py-3">Komentarz</th>
+                            <th class="py-3 text-center">Podgląd</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var doc in Model.AllDocuments)
+                        {
+                            <tr>
+                                <td class="px-4 text-secondary">@doc.Id</td>
+                                <td class="text-white">@(Model.UserEmails.GetValueOrDefault(doc.UserId, "Nieznany"))</td>
+                                <td>
+                                    <span class="text-white">
+                                        <i class="fa-solid @docTypeIcons.GetValueOrDefault(doc.DocumentType, "fa-file") text-gold me-1"></i>
+                                        @docTypeLabels.GetValueOrDefault(doc.DocumentType, doc.DocumentType.ToString())
+                                    </span>
+                                </td>
+                                <td>
+                                    @switch (doc.Status)
+                                    {
+                                        case CasinoRoyale.Models.KycDocumentStatus.Pending:
+                                            <span class="badge bg-warning text-dark"><i class="fa-solid fa-hourglass-half me-1"></i>Oczekuje</span>
+                                            break;
+                                        case CasinoRoyale.Models.KycDocumentStatus.Approved:
+                                            <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>Zatwierdzony</span>
+                                            break;
+                                        case CasinoRoyale.Models.KycDocumentStatus.Rejected:
+                                            <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i>Odrzucony</span>
+                                            break;
+                                    }
+                                </td>
+                                <td class="text-white small">@doc.UploadedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                                <td class="text-secondary small" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@(doc.AdminComment ?? "—")</td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-outline-light" asp-action="KycFile" asp-route-id="@doc.Id" target="_blank" title="Podgląd dokumentu">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>

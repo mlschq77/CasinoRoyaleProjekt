@@ -1,0 +1,62 @@
+@{
+    ViewData["Title"] = "Prześlij dokument";
+}
+
+<div class="casino-home">
+    <section class="casino-section py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+                    <div class="casino-info-card">
+                        <h1 class="h3 text-white mb-4">
+                            <i class="fa-solid fa-upload text-gold me-2"></i>Prześlij dokument tożsamości
+                        </h1>
+
+                        <form method="post" enctype="multipart/form-data">
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-4">
+                                <label class="form-label text-white" for="documentType">Typ dokumentu</label>
+                                <select name="documentType" id="documentType" class="form-select casino-input" required>
+                                    <option value="">— Wybierz typ dokumentu —</option>
+                                    <option value="DowodOsobisty">Dowód osobisty</option>
+                                    <option value="Paszport">Paszport</option>
+                                    <option value="PrawoJazdy">Prawo jazdy</option>
+                                    <option value="Inny">Inny dokument</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-4">
+                                <label class="form-label text-white" for="file">Plik</label>
+                                <input type="file" name="file" id="file" class="form-control casino-input"
+                                       accept=".jpg,.jpeg,.png,.webp,.pdf" required />
+                                <div class="form-text text-secondary">
+                                    Akceptujemy: JPEG, PNG, WebP, PDF. Maksymalny rozmiar: 10 MB.
+                                </div>
+                            </div>
+
+                            @if (!ViewData.ModelState.IsValid)
+                            {
+                                <div class="alert alert-danger">
+                                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                                    {
+                                        <p class="mb-0">@error.ErrorMessage</p>
+                                    }
+                                </div>
+                            }
+
+                            <div class="d-flex gap-3">
+                                <button type="submit" class="btn casino-btn-primary flex-grow-1">
+                                    <i class="fa-solid fa-cloud-arrow-up me-2"></i>Prześlij
+                                </button>
+                                <a class="btn btn-outline-light casino-btn-secondary" asp-action="Index">
+                                    <i class="fa-solid fa-arrow-left me-2"></i>Powrót
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>

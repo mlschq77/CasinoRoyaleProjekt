@@ -10,6 +10,8 @@ services:
       Stripe__PublishableKey: ${STRIPE_PUBLISHABLE_KEY:-pk_test_51TUcQdPPVxf1VniAnvyDLV9S99afdzxNdjZvOJAF1lQwZ14xDisuRFgRJCBxKvHmE4sK06u4Fa8TyEfdmszZRNiJ00IenKxDa3}
     ports:
       - "8080:8080"
+    volumes:
+      - kyc-data:/app/App_Data/kyc
     depends_on:
       db:
         condition: service_healthy
@@ -32,3 +34,4 @@ services:
 
 volumes:
   sqlserver-data:
+  kyc-data:

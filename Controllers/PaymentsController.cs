@@ -18,12 +18,18 @@ public class PaymentsController : Controller
     private const string FallbackTestSecretKey = "sk_test_51TUcQdPPVxf1VniAZ8rqcE1bysvsqwhfayIUIiLSFYtx71ynbRZH7hNZhSjoILfYDTWRt3cFypO38LS6I3Ksgb3J002cMQc8s5";
     private readonly Automaty _dbContext;
     private readonly IBalanceService _balanceService;
+    private readonly IBonusCodeService _bonusCodeService;
     private readonly IConfiguration _configuration;
 
-    public PaymentsController(Automaty dbContext, IBalanceService balanceService, IConfiguration configuration)
+    public PaymentsController(
+        Automaty dbContext,
+        IBalanceService balanceService,
+        IBonusCodeService bonusCodeService,
+        IConfiguration configuration)
     {
         _dbContext = dbContext;
         _balanceService = balanceService;
+        _bonusCodeService = bonusCodeService;
         _configuration = configuration;
     }
 
@@ -34,6 +40,27 @@ public class PaymentsController : Controller
         {
             Message = message,
             StripeConfigured = IsStripeConfigured()
+        });
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> ValidateBonusCode(string? kodBonusowy, decimal amount)
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var validation = await _bonusCodeService.ValidateAsync(userId.Value, kodBonusowy, amount);
+        if (validation.Error != null)
+            return Json(new { isValid = false, message = validation.Error });
+
+        if (validation.KodBonusowy == null)
+            return Json(new { isValid = true, message = string.Empty });
+
+        return Json(new
+        {
+            isValid = true,
+            message = $"Kod poprawny. Szacowany bonus: {validation.BonusAmount:0.00} PLN."
         });
     }
 
@@ -56,27 +83,10 @@ public class PaymentsController : Controller
         var normalizedBonusCode = model.KodBonusowy?.Trim();
         if (!string.IsNullOrWhiteSpace(normalizedBonusCode))
         {
-            var kodBonusowy = await _dbContext.KodyBonusowe
-                .AsNoTracking()
-                .FirstOrDefaultAsync(kod => kod.Kod.ToLower() == normalizedBonusCode.ToLower());
-
-            if (kodBonusowy == null)
+            var validation = await _bonusCodeService.ValidateAsync(userId.Value, normalizedBonusCode, model.Amount);
+            if (validation.Error != null)
             {
-                ModelState.AddModelError(nameof(DepositViewModel.KodBonusowy), "Podany kod bonusowy nie istnieje.");
-                return View(nameof(Deposit), model);
-            }
-
-            if (kodBonusowy.WaznyDo.HasValue && kodBonusowy.WaznyDo.Value < DateTime.UtcNow)
-            {
-                ModelState.AddModelError(nameof(DepositViewModel.KodBonusowy), "Podany kod bonusowy stracil waznosc.");
-                return View(nameof(Deposit), model);
-            }
-
-            if (model.Amount < kodBonusowy.MinimalnaWplata)
-            {
-                ModelState.AddModelError(
-                    nameof(DepositViewModel.KodBonusowy),
-                    $"Ten kod wymaga minimalnej wplaty {kodBonusowy.MinimalnaWplata:0.00} PLN.");
+                ModelState.AddModelError(nameof(DepositViewModel.KodBonusowy), validation.Error);
                 return View(nameof(Deposit), model);
             }
 
@@ -156,45 +166,54 @@ public class PaymentsController : Controller
         if (paidAmount <= 0)
             return RedirectToAction(nameof(Deposit), new { message = "Nieprawidlowa kwota platnosci." });
 
-        var alreadyProcessed = await _dbContext.StripePayments.AnyAsync(payment => payment.SessionId == session.Id);
-        if (alreadyProcessed)
-            return RedirectToAction(nameof(Deposit), new { message = "Ta platnosc byla juz zaksiegowana." });
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
 
-        decimal bonusAmount = 0m;
-        if (session.Metadata.TryGetValue("kodBonusowy", out var kodString))
+        return await strategy.ExecuteAsync(async () =>
         {
-            var kodBonusowy = await _dbContext.KodyBonusowe
-                .AsNoTracking()
-                .FirstOrDefaultAsync(k => k.Kod.ToLower() == kodString.ToLower());
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 
-            if (kodBonusowy != null && (!kodBonusowy.WaznyDo.HasValue || kodBonusowy.WaznyDo.Value >= DateTime.UtcNow))
+            var alreadyProcessed = await _dbContext.StripePayments.AnyAsync(payment => payment.SessionId == session.Id);
+            if (alreadyProcessed)
             {
-                bonusAmount = (paidAmount * (kodBonusowy.BonusProcentowy / 100m)) + kodBonusowy.BonusKwotowy;
+                await transaction.RollbackAsync();
+                return RedirectToAction(nameof(Deposit), new { message = "Ta platnosc byla juz zaksiegowana." });
             }
-        }
 
-        _dbContext.StripePayments.Add(new StripePayment
-        {
-            UserId = userId.Value,
-            SessionId = session.Id,
-            Amount = paidAmount,
-            Currency = session.Currency ?? Currency,
-            CreatedAt = DateTime.UtcNow
+        var stripePayment = new StripePayment
+            {
+                UserId = userId.Value,
+                SessionId = session.Id,
+                Amount = paidAmount,
+                Currency = session.Currency ?? Currency,
+                CreatedAt = DateTime.UtcNow
+        };
+            _dbContext.StripePayments.Add(stripePayment);
+
+            await _dbContext.SaveChangesAsync();
+
+            session.Metadata.TryGetValue("kodBonusowy", out var kodString);
+            var bonusResult = await _bonusCodeService.ApplyAsync(userId.Value, kodString, paidAmount, stripePayment);
+            var bonusAmount = bonusResult.BonusAmount;
+
+            var finalAmountToAdd = paidAmount + bonusAmount;
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, finalAmountToAdd);
+
+            if (!payoutResult.Success)
+            {
+                await transaction.RollbackAsync();
+                return RedirectToAction(nameof(Deposit), new { message = payoutResult.Error });
+            }
+
+            await transaction.CommitAsync();
+
+            var successMessage = bonusAmount > 0
+                ? $"Zasilenie {paidAmount:0.00} PLN udane! Otrzymujesz {bonusAmount:0.00} PLN bonusu. Lacznie dodano {finalAmountToAdd:0.00} PLN."
+                : bonusResult.AlreadyUsed
+                    ? $"Doladowano balans o {paidAmount:0.00} PLN. Kod bonusowy byl juz wykorzystany, wiec bonus nie zostal naliczony."
+                    : $"Doladowano balans o {paidAmount:0.00} PLN.";
+
+            return RedirectToAction(nameof(Deposit), new { message = successMessage });
         });
-
-        await _dbContext.SaveChangesAsync();
-
-        var finalAmountToAdd = paidAmount + bonusAmount;
-        var payoutResult = await _balanceService.PayoutAsync(userId.Value, finalAmountToAdd);
-
-        if (!payoutResult.Success)
-            return RedirectToAction(nameof(Deposit), new { message = payoutResult.Error });
-
-        var successMessage = bonusAmount > 0
-            ? $"Zasilenie {paidAmount:0.00} PLN udane! Otrzymujesz {bonusAmount:0.00} PLN bonusu. Lacznie dodano {finalAmountToAdd:0.00} PLN."
-            : $"Doladowano balans o {paidAmount:0.00} PLN.";
-
-        return RedirectToAction(nameof(Deposit), new { message = successMessage });
     }
 
     [HttpGet]
@@ -293,4 +312,5 @@ public class PaymentsController : Controller
         var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out var userId) ? userId : null;
     }
+
 }

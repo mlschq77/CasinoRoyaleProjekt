@@ -32,12 +32,23 @@ public class Program
                 options.Cookie.HttpOnly = true;
             });
 
+        builder.Services.Configure<RandomOrgOptions>(
+            builder.Configuration.GetSection(RandomOrgOptions.SectionName));
+        builder.Services.AddHttpClient<IRandomNumberService, RandomOrgRandomNumberService>((serviceProvider, client) =>
+        {
+            var options = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<RandomOrgOptions>>().Value;
+            client.BaseAddress = new Uri(options.Endpoint);
+            client.Timeout = TimeSpan.FromSeconds(10);
+        });
+
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<BlackjackService>();
         builder.Services.AddScoped<CrashService>();
         builder.Services.AddScoped<RouletteService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
+        builder.Services.AddScoped<IBonusCodeService, BonusCodeService>();
+        builder.Services.AddScoped<IKycService, KycService>();
 
         var app = builder.Build();
 
@@ -72,9 +83,19 @@ public class Program
             defaults: new { controller = "Home", action = "Regulamin" });
 
         app.MapControllerRoute(
-            name: "kyc",
-            pattern: "kyc",
+            name: "kyc-upload",
+            pattern: "kyc/{action=Index}/{id?}",
+            defaults: new { controller = "Kyc" });
+
+        app.MapControllerRoute(
+            name: "kyc-info",
+            pattern: "kyc/informacje",
             defaults: new { controller = "Home", action = "Kyc" });
+
+        app.MapControllerRoute(
+            name: "grajodpowiedzialnie",
+            pattern: "grajodpowiedzialnie",
+            defaults: new { controller = "Home", action = "GrajOdpowiedzialnie" });
 
         app.MapControllerRoute(
             name: "default",

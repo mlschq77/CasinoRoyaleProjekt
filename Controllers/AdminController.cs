@@ -1,5 +1,6 @@
 using CasinoRoyale.Data;
 using CasinoRoyale.Models;
+using CasinoRoyale.Services;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,10 +13,12 @@ namespace CasinoRoyale.Controllers;
 public class AdminController : Controller
 {
     private readonly Automaty _db;
+    private readonly IKycService _kycService;
 
-    public AdminController(Automaty db)
+    public AdminController(Automaty db, IKycService kycService)
     {
         _db = db;
+        _kycService = kycService;
     }
 
     private int? GetCurrentUserId()
@@ -199,7 +202,101 @@ public class AdminController : Controller
         return RedirectToAction(nameof(KodyBonusowe));
     }
 
-    // ─── STATYSTYKI GIE ─────────────────────────────────────────────────────
+    // ─── KYC ────────────────────────────────────────────────────────────────
+
+    public async Task<IActionResult> Kyc()
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var pending = await _kycService.GetPendingDocumentsAsync();
+        var all = await _kycService.GetAllDocumentsAsync();
+
+        var userIds = pending.Concat(all)
+            .Select(d => d.UserId)
+            .Distinct()
+            .ToList();
+
+        var userEmails = await _db.Users
+            .Where(u => userIds.Contains(u.Id))
+            .ToDictionaryAsync(u => u.Id, u => $"{u.Email} ({u.Nazwa})");
+
+        var vm = new AdminKycViewModel
+        {
+            PendingDocuments = pending,
+            AllDocuments = all,
+            UserEmails = userEmails
+        };
+
+        return View(vm);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ApproveKyc(int documentId, string? comment)
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var adminId = GetAdminUserId();
+
+        try
+        {
+            await _kycService.ApproveDocumentAsync(documentId, adminId, comment);
+            TempData["AdminMsg"] = "Dokument zostal zatwierdzony.";
+        }
+        catch (Exception ex)
+        {
+            TempData["AdminMsg"] = $"Blad: {ex.Message}";
+        }
+
+        return RedirectToAction(nameof(Kyc));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RejectKyc(int documentId, string? comment)
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var adminId = GetAdminUserId();
+
+        try
+        {
+            await _kycService.RejectDocumentAsync(documentId, adminId, comment);
+            TempData["AdminMsg"] = "Dokument zostal odrzucony.";
+        }
+        catch (Exception ex)
+        {
+            TempData["AdminMsg"] = $"Blad: {ex.Message}";
+        }
+
+        return RedirectToAction(nameof(Kyc));
+    }
+
+    /// <summary>
+    /// Podgląd pliku dokumentu (dla admina).
+    /// </summary>
+    public async Task<IActionResult> KycFile(int id)
+    {
+        if (!IsAdmin()) return Forbid();
+
+        var document = await _kycService.GetDocumentByIdAsync(id);
+        if (document == null)
+            return NotFound();
+
+        var path = _kycService.GetStoragePath(document);
+        if (!System.IO.File.Exists(path))
+            return NotFound();
+
+        return PhysicalFile(path, document.ContentType, document.FileName);
+    }
+
+    private int GetAdminUserId()
+    {
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : 0;
+    }
+
+    // ─── STATYSTYKI GIER ─────────────────────────────────────────────────────
 
     public async Task<IActionResult> Statystyki()
     {

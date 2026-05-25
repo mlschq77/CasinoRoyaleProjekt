@@ -1,4 +1,6 @@
 using CasinoRoyale.Data;
+using CasinoRoyale.Models;
+using CasinoRoyale.Services;
 using CasinoRoyale.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -13,10 +15,12 @@ namespace CasinoRoyale.Controllers;
 public class ProfileController : Controller
 {
     private readonly Automaty _dbContext;
+    private readonly IKycService _kycService;
 
-    public ProfileController(Automaty dbContext)
+    public ProfileController(Automaty dbContext, IKycService kycService)
     {
         _dbContext = dbContext;
+        _kycService = kycService;
     }
 
     public async Task<IActionResult> Index()
@@ -55,37 +59,82 @@ public class ProfileController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        user.Imie = (model.Imie ?? string.Empty).Trim();
-        user.Nazwisko = (model.Nazwisko ?? string.Empty).Trim();
+        var newImie = (model.Imie ?? string.Empty).Trim();
+        var newNazwisko = (model.Nazwisko ?? string.Empty).Trim();
+
+        // Jeśli zmieniło się imię lub nazwisko — resetujemy KYC
+        var daneOsoboweSieZmienily =
+            !string.Equals(user.Imie, newImie, StringComparison.Ordinal) ||
+            !string.Equals(user.Nazwisko, newNazwisko, StringComparison.Ordinal);
+
+        user.Imie = newImie;
+        user.Nazwisko = newNazwisko;
         user.Nazwa = newName;
         user.Email = (model.Email ?? string.Empty).Trim();
 
         await _dbContext.SaveChangesAsync();
-        await RefreshUserCookieAsync(user);
 
-        TempData["ProfileMessage"] = "Dane profilu zapisane.";
+        if (daneOsoboweSieZmienily && user.KycStatus != UserKycStatus.NotSubmitted)
+        {
+            await _kycService.ResetKycStatusAsync(user.Id);
+            TempData["ProfileMessage"] = "Dane profilu zapisane. Zmiana imienia lub nazwiska spowodowala zresetowanie weryfikacji KYC — zaladuj ponownie dokumenty.";
+        }
+        else
+        {
+            TempData["ProfileMessage"] = "Dane profilu zapisane.";
+        }
+
+        await RefreshUserCookieAsync(user);
 
         return RedirectToAction(nameof(Index));
     }
 
     private async Task<ProfileViewModel?> BuildProfileViewModel(int userId)
     {
-        var profile = await _dbContext.Users
+        var userData = await _dbContext.Users
             .AsNoTracking()
             .Where(user => user.Id == userId)
-            .Select(user => new ProfileViewModel
+            .Select(user => new
             {
-                Id = user.Id,
-                Imie = user.Imie,
-                Nazwisko = user.Nazwisko,
-                Nazwa = user.Nazwa,
-                Email = user.Email,
-                Balance = user.Balance,
-                DataRejestracji = user.DataRejestracji
+                user.Id,
+                user.Imie,
+                user.Nazwisko,
+                user.Nazwa,
+                user.Email,
+                user.Balance,
+                user.DataRejestracji,
+                user.KycStatus
             })
             .FirstOrDefaultAsync();
 
-        if (profile == null) return null;
+        if (userData == null) return null;
+
+        var profile = new ProfileViewModel
+        {
+            Id = userData.Id,
+            Imie = userData.Imie,
+            Nazwisko = userData.Nazwisko,
+            Nazwa = userData.Nazwa,
+            Email = userData.Email,
+            Balance = userData.Balance,
+            DataRejestracji = userData.DataRejestracji,
+            KycStatusDisplay = userData.KycStatus switch
+            {
+                CasinoRoyale.Models.UserKycStatus.NotSubmitted => "Nie przesłano",
+                CasinoRoyale.Models.UserKycStatus.Pending => "Oczekuje na weryfikację",
+                CasinoRoyale.Models.UserKycStatus.Approved => "Zweryfikowany",
+                CasinoRoyale.Models.UserKycStatus.Rejected => "Odrzucony",
+                _ => "Nieznany"
+            },
+            KycStatusCssClass = userData.KycStatus switch
+            {
+                CasinoRoyale.Models.UserKycStatus.NotSubmitted => "text-secondary",
+                CasinoRoyale.Models.UserKycStatus.Pending => "text-warning",
+                CasinoRoyale.Models.UserKycStatus.Approved => "text-success",
+                CasinoRoyale.Models.UserKycStatus.Rejected => "text-danger",
+                _ => "text-secondary"
+            }
+        };
 
         var payments = await _dbContext.StripePayments
             .AsNoTracking()
@@ -150,9 +199,21 @@ public class ProfileController : Controller
             })
             .ToListAsync();
 
+        var crashBets = await _dbContext.CrashSessions
+            .AsNoTracking()
+            .Where(session => session.UserId == userId)
+            .Select(session => new BetHistoryItemViewModel
+            {
+                GameName = "Crash",
+                CreatedAt = session.CreatedAt,
+                BetAmount = session.BetAmount
+            })
+            .ToListAsync();
+
         profile.BetHistory = blackjackBets
             .Concat(minesBets)
             .Concat(plinkoBets)
+            .Concat(crashBets)
             .OrderByDescending(item => item.CreatedAt)
             .Take(40)
             .ToList();

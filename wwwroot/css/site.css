@@ -47,6 +47,9 @@ body.casino-body {
   background: rgba(7, 7, 7, 0.82);
   border-bottom: 1px solid var(--casino-border);
   backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 1050; /* Zapewnia, że menu jest nad hero section */
 }
 
 .casino-brand,
@@ -60,11 +63,114 @@ body.casino-body {
 .casino-nav-link {
   color: rgba(245, 241, 230, 0.82);
   font-weight: 500;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 999px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.casino-nav-link:hover,
-.casino-footer-link:hover {
+.casino-nav-link:hover {
   color: var(--casino-gold-soft);
+  background: rgba(212, 175, 55, 0.08);
+  border-color: rgba(212, 175, 55, 0.2);
+}
+
+@media (min-width: 992px) {
+    .casino-navbar .container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Centrowanie tylko gdy jest wystarczająco dużo miejsca (powyżej 1200px) */
+    @media (min-width: 1200px) {
+        .casino-navbar .navbar-nav {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0 !important;
+        }
+    }
+
+    /* Dla średnich ekranów (992px - 1199px) używamy naturalnego układu flex */
+    @media (max-width: 1199.98px) {
+        .casino-navbar .navbar-nav {
+            margin-left: 2rem !important;
+            margin-right: auto !important;
+            margin-bottom: 0 !important;
+        }
+    }
+}
+
+@media (max-width: 991.98px) {
+    .casino-navbar .navbar-nav {
+        text-align: center;
+        width: 100%;
+        padding: 1rem 0;
+        gap: 0.5rem;
+        border-bottom: 1px solid var(--casino-border);
+        margin-bottom: 1rem !important;
+    }
+    
+    .casino-navbar .navbar-collapse {
+        background: var(--casino-black-soft);
+        margin-top: 1rem;
+        padding: 1rem;
+        border-radius: 1rem;
+        border: 1px solid var(--casino-border);
+    }
+}
+
+.casino-balance-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.casino-balance-menu:hover .casino-user-badge {
+    border-color: var(--casino-gold-soft);
+    background: rgba(212, 175, 55, 0.12);
+    cursor: default;
+}
+
+.casino-balance-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding-top: 15px; /* Mostek */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+    z-index: 1100;
+    min-width: 190px;
+}
+
+.casino-balance-dropdown-content {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.99) 0%, rgba(12, 12, 12, 0.98) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1rem;
+    padding: 1rem;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.casino-balance-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 20px;
+}
+
+.casino-balance-menu:hover .casino-balance-dropdown,
+.casino-balance-dropdown:hover {
+    opacity: 1;
+    visibility: visible;
+}
+
+.casino-nav-divider {
+  border-top: 1px solid var(--casino-border);
 }
 
 .casino-user-badge {
@@ -174,6 +280,19 @@ body.casino-body {
   border-color: rgba(243, 214, 122, 0.45);
 }
 
+.casino-btn-wrap {
+    padding: 0.3em;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(212, 175, 55, 0.10);
+    border-radius: calc(1.5rem + 0.35rem);
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.casino-btn-wrap:hover {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(212, 175, 55, 0.20);
+}
+
 .casino-check-list li {
   margin-bottom: 1rem;
   color: rgba(245, 241, 230, 0.82);
@@ -186,6 +305,11 @@ body.casino-body {
 
 .casino-footer-link {
   text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.casino-footer-link:hover {
+  color: var(--casino-gold-soft);
 }
 
 @media (max-width: 991.98px) {
@@ -247,13 +371,36 @@ body.casino-body {
     outline: none;
 }
 
-    .casino-input::placeholder {
+/* Select (dropdown) - nadpisuje domyślne białe tło z Bootstrap form-select */
+.casino-input.form-select {
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background-color: rgba(18, 18, 18, 0.95);
+    color: var(--casino-ivory);
+    cursor: pointer;
+}
+
+    .casino-input.form-select option {
+        background-color: #1a1a1a;
+        color: var(--casino-ivory);
+        padding: 0.5rem;
+    }
+
+    .casino-input.form-select:focus {
+        background-color: rgba(18, 18, 18, 0.98);
+    }
+
+    .casino-input:not(.form-select)::placeholder {
         color: rgba(245, 241, 230, 0.3);
     }
 
-    .casino-input:focus {
+    .casino-input:not(.form-select):focus {
         border-color: rgba(212, 175, 55, 0.6);
         background: rgba(255, 255, 255, 0.07);
+        box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
+    }
+
+    .casino-input.form-select:focus {
+        border-color: rgba(212, 175, 55, 0.6);
         box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
     }
 
@@ -452,7 +599,8 @@ body.casino-body {
     margin-top: 1.25rem;
 }
 
-.casino-history-modal {
+.casino-history-modal,
+.casino-confirm-modal {
     position: fixed;
     inset: 0;
     z-index: 1050;
@@ -465,9 +613,68 @@ body.casino-body {
     transition: opacity 0.2s ease;
 }
 
-.casino-history-modal.is-open {
+.casino-history-modal.is-open,
+.casino-confirm-modal.is-open {
     opacity: 1;
     pointer-events: auto;
+}
+
+.casino-confirm-panel {
+    width: min(440px, 100%);
+    padding: 2rem 2rem 1.75rem;
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.99) 0%, rgba(12, 12, 12, 0.98) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 24px 90px rgba(0, 0, 0, 0.65);
+    text-align: center;
+    transform: translateY(18px) scale(0.98);
+    transition: transform 0.22s ease;
+}
+
+.casino-confirm-modal.is-open .casino-confirm-panel {
+    transform: translateY(0) scale(1);
+}
+
+.casino-confirm-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 1rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.8rem;
+    color: #eab308;
+    border-radius: 50%;
+    background: rgba(234, 179, 8, 0.12);
+    border: 2px solid rgba(234, 179, 8, 0.35);
+}
+
+.casino-confirm-title {
+    margin: 0 0 0.75rem;
+    color: #fff;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+
+.casino-confirm-text {
+    margin: 0 0 1.5rem;
+    color: rgba(245, 241, 230, 0.78);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.casino-confirm-text strong {
+    color: var(--casino-gold-soft);
+}
+
+.casino-confirm-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+.casino-confirm-actions .btn {
+    min-width: 140px;
+    padding: 0.6rem 1.25rem;
 }
 
 .casino-history-panel {

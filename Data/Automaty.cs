@@ -17,6 +17,7 @@ namespace CasinoRoyale.Data
         public DbSet<StripePayment> StripePayments { get; set; }
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
+        public DbSet<UzytyKodBonusowy> UzyteKodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
         public DbSet<CrashSession> CrashSessions { get; set; }
         public DbSet<KycDocument> KycDocuments { get; set; }
@@ -40,6 +41,22 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<PlinkoGame>()
                 .Property(game => game.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.CrashPoint)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.CashoutMultiplier)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<CrashSession>()
+                .Property(session => session.WinAmount)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<StripePayment>()
@@ -72,6 +89,35 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<KodBonusowy>()
                 .HasIndex(kodBonusowy => kodBonusowy.Kod)
                 .IsUnique();
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .ToTable("UzyteKodyBonusowe");
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .Property(uzytyKod => uzytyKod.SessionId)
+                .HasMaxLength(450);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasIndex(uzytyKod => new { uzytyKod.UserId, uzytyKod.KodBonusowyId })
+                .IsUnique();
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<KodBonusowy>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.KodBonusowyId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<UzytyKodBonusowy>()
+                .HasOne<StripePayment>()
+                .WithMany()
+                .HasForeignKey(uzytyKod => uzytyKod.StripePaymentId)
+                .OnDelete(DeleteBehavior.SetNull);
 
             modelBuilder.Entity<Kategoria>()
                 .ToTable("Kategorie");
@@ -112,21 +158,24 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<AutomatInfo>()
                 .HasMany(automat => automat.Kategorie)
                 .WithMany(kategoria => kategoria.Automaty)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AutomatyKategorie",
-                    right => right
-                        .HasOne<Kategoria>()
+                .UsingEntity<AutomatKategoria>(
+                    join => join
+                        .HasOne(automatKategoria => automatKategoria.Kategoria)
                         .WithMany()
-                        .HasForeignKey("KategoriaId")
+                        .HasForeignKey(automatKategoria => automatKategoria.KategoriaId)
                         .OnDelete(DeleteBehavior.Cascade),
-                    left => left
-                        .HasOne<AutomatInfo>()
+                    join => join
+                        .HasOne(automatKategoria => automatKategoria.Automat)
                         .WithMany()
-                        .HasForeignKey("AutomatId")
+                        .HasForeignKey(automatKategoria => automatKategoria.AutomatId)
                         .OnDelete(DeleteBehavior.Cascade),
                     join =>
                     {
-                        join.HasKey("AutomatId", "KategoriaId");
+                        join.HasKey(automatKategoria => new
+                        {
+                            automatKategoria.AutomatId,
+                            automatKategoria.KategoriaId
+                        });
                         join.ToTable("AutomatyKategorie");
                     });
         }

@@ -43,6 +43,11 @@ public class HomeController : Controller
         return View();
     }
 
+    public IActionResult GrajOdpowiedzialnie()
+    {
+        return View();
+    }
+
     public async Task<IActionResult> Promocje()
     {
         var teraz = DateTime.UtcNow;

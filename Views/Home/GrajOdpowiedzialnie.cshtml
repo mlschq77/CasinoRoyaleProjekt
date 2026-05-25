@@ -1,0 +1,108 @@
+@{
+    ViewData["Title"] = "Graj odpowiedzialnie";
+}
+
+<div class="casino-home">
+    <section class="casino-section py-5 border-bottom border-secondary border-opacity-25">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <span class="casino-section-label">
+                        <i class="fa-solid fa-heart-pulse"></i>Bezpieczna rozrywka
+                    </span>
+                    <h1 class="display-5 fw-bold text-white mt-3 mb-3">Graj odpowiedzialnie</h1>
+                    <p class="casino-section-text lead mb-0">
+                        CasinoRoyale ma być formą rozrywki, a nie sposobem na zarabianie pieniędzy. Graj tylko za środki,
+                        które możesz przeznaczyć na zabawę, kontroluj czas spędzany w serwisie i rób przerwy, gdy gra
+                        przestaje być przyjemna.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="casino-section py-5">
+        <div class="container">
+            <div class="row g-4 justify-content-center">
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-wallet text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Ustal budżet</h2>
+                        <p class="casino-section-text mb-0">
+                            Przed rozpoczęciem gry określ maksymalną kwotę, którą możesz stracić bez wpływu na codzienne
+                            zobowiązania. Nie podnoś limitu pod wpływem emocji.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-hourglass-half text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Pilnuj czasu</h2>
+                        <p class="casino-section-text mb-0">
+                            Zaplanuj sesje z góry i regularnie sprawdzaj, ile czasu spędzasz przy grach. Przerwa pomaga
+                            zachować dystans do wyniku.
+                        </p>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="casino-info-card h-100">
+                        <i class="fa-solid fa-ban text-gold fs-2 mb-3"></i>
+                        <h2 class="h5 text-white">Nie odrabiaj strat</h2>
+                        <p class="casino-section-text mb-0">
+                            Próba szybkiego odzyskania przegranych środków zwykle zwiększa ryzyko kolejnych strat.
+                            Jeśli czujesz presję, zakończ grę.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center mt-4">
+                <div class="col-lg-10">
+                    <div class="casino-info-card">
+                        <h2 class="h4 text-white mb-4">Sygnały ostrzegawcze</h2>
+                        <ul class="casino-check-list list-unstyled mb-0">
+                            <li><i class="fa-solid fa-triangle-exclamation text-gold me-2"></i>Grasz dłużej lub za większe kwoty, niż planowałeś.</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-gold me-2"></i>Ukrywasz przed bliskimi, ile czasu albo pieniędzy przeznaczasz na grę.</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-gold me-2"></i>Grasz, żeby poprawić nastrój, odreagować stres albo odrobić straty.</li>
+                            <li><i class="fa-solid fa-triangle-exclamation text-gold me-2"></i>Hazard zaczyna kolidować z pracą, nauką, relacjami lub rachunkami.</li>
+                        </ul>
+                    </div>
+
+                    <div class="casino-info-card mt-4">
+                        <h2 class="h4 text-white mb-3">Co możesz zrobić?</h2>
+                        <ol class="casino-section-text ps-3 mb-0">
+                            <li class="mb-3">
+                                <strong class="text-white">Zrób przerwę.</strong> Zamknij grę i wróć dopiero wtedy, gdy decyzja nie wynika z emocji.
+                            </li>
+                            <li class="mb-3">
+                                <strong class="text-white">Porozmawiaj z kimś zaufanym.</strong> Zewnętrzna perspektywa pomaga szybciej zauważyć problem.
+                            </li>
+                            <li class="mb-0">
+                                <strong class="text-white">Skorzystaj z pomocy specjalisty.</strong> Jeśli gra wymyka się spod kontroli, poszukaj lokalnych
+                                organizacji wsparcia lub skontaktuj się z poradnią uzależnień.
+                            </li>
+                        </ol>
+                    </div>
+
+                    <div class="casino-profile-note mt-4 mb-0">
+                        <i class="fa-solid fa-circle-info me-2 text-gold"></i>
+                        Ta strona ma charakter informacyjny i nie zastępuje profesjonalnej pomocy. Jeśli czujesz, że tracisz
+                        kontrolę nad grą, przerwij korzystanie z serwisu i poszukaj wsparcia.
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <a class="btn casino-btn-primary btn-lg" asp-controller="Home" asp-action="Index">
+                            <i class="fa-solid fa-arrow-left me-2"></i>Strona główna
+                        </a>
+                        <a class="btn btn-outline-light casino-btn-secondary btn-lg" asp-controller="Home" asp-action="Regulamin">
+                            <i class="fa-solid fa-scale-balanced me-2"></i>Regulamin
+                        </a>
+                        <a class="btn btn-outline-light casino-btn-secondary btn-lg" asp-controller="Home" asp-action="Kyc">
+                            <i class="fa-solid fa-id-card me-2"></i>KYC
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
