@@ -131,7 +131,8 @@ public class AuthController : Controller
 			new Claim(ClaimTypes.Name, user.Nazwa),
 			new Claim(ClaimTypes.GivenName, user.Imie),
 			new Claim(ClaimTypes.Surname, user.Nazwisko),
-			new Claim(ClaimTypes.Email, user.Email), 
+			new Claim(ClaimTypes.Email, user.Email),
+			new Claim("IsAdmin", user.IsAdmin.ToString()),
 			new Claim("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
 		};
 
