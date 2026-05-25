@@ -13,6 +13,11 @@ public class GraController : Controller
             0 => RedirectToAction("Mines", "Games"),
             1 => RedirectToAction("Blackjack", "Games"),
             2 => RedirectToAction("Plinko", "Games"),
+<<<<<<< Updated upstream
+=======
+            3 => RedirectToAction("Crash", "Games"),
+            4 => RedirectToAction("Roulette", "Games"),
+>>>>>>> Stashed changes
             _ => Content($"Gra ID: {id}")
         };
     }

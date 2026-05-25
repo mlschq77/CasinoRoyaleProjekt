@@ -1,4 +1,4 @@
-using CasinoRoyale.Models;
+﻿using CasinoRoyale.Models;
 using Microsoft.EntityFrameworkCore;
 namespace CasinoRoyale.Data
 {
@@ -18,6 +18,9 @@ namespace CasinoRoyale.Data
         public DbSet<StripeWithdrawal> StripeWithdrawals { get; set; }
         public DbSet<KodBonusowy> KodyBonusowe { get; set; }
         public DbSet<BlackjackGame> BlackjackGames { get; set; }
+        public DbSet<CrashSession> CrashSessions { get; set; }
+        public DbSet<KycDocument> KycDocuments { get; set; }
+        public DbSet<RouletteGame> RouletteGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -72,6 +75,15 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<Kategoria>()
                 .ToTable("Kategorie");
+
+            modelBuilder.Entity<RouletteGame>()
+                .Property(g => g.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<RouletteGame>()
+                .Property(g => g.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
             modelBuilder.Entity<StripeWithdrawal>()
                 .Property(withdrawal => withdrawal.Amount)
                 .HasColumnType("decimal(18,2)");
@@ -120,3 +132,4 @@ namespace CasinoRoyale.Data
         }
     }
 }
+

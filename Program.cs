@@ -1,4 +1,4 @@
-using CasinoRoyale.Data;
+﻿using CasinoRoyale.Data;
 using CasinoRoyale.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +35,8 @@ public class Program
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
         builder.Services.AddScoped<BlackjackService>();
+        builder.Services.AddScoped<CrashService>();
+        builder.Services.AddScoped<RouletteService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
 
         var app = builder.Build();
@@ -104,3 +106,4 @@ public class Program
         }
     }
 }
+
