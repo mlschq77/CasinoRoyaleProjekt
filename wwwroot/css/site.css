@@ -1067,6 +1067,208 @@ body.casino-body {
     }
 }
 
+.slot-shell {
+    display: grid;
+    grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: stretch;
+}
+
+.slot-controls,
+.slot-stage {
+    background: linear-gradient(180deg, rgba(23, 23, 23, 0.98) 0%, rgba(12, 12, 12, 0.95) 100%);
+    border: 1px solid var(--casino-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.35);
+    padding: 1.5rem;
+}
+
+.slot-stage {
+    display: grid;
+    align-content: center;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.slot-quick-bets {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.slot-paytable {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(212, 175, 55, 0.18);
+    border-radius: 0.9rem;
+}
+
+.slot-paytable-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem 0.85rem;
+    align-items: center;
+}
+
+.slot-paytable-grid span {
+    color: rgba(245, 241, 230, 0.88);
+    font-size: 1.2rem;
+    letter-spacing: 0;
+}
+
+.slot-paytable-grid strong {
+    color: var(--casino-gold-soft);
+    text-align: right;
+}
+
+.slot-machine {
+    position: relative;
+    overflow: hidden;
+    min-height: 430px;
+    padding: 1.2rem;
+    border: 1px solid rgba(212, 175, 55, 0.28);
+    border-radius: 1.2rem;
+    background:
+        radial-gradient(circle at 22% 8%, rgba(239, 68, 68, 0.22), transparent 28%),
+        radial-gradient(circle at 78% 10%, rgba(34, 197, 94, 0.18), transparent 30%),
+        linear-gradient(180deg, rgba(88, 16, 28, 0.84) 0%, rgba(24, 14, 12, 0.96) 45%, rgba(9, 9, 9, 0.98) 100%);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 0 24px 80px rgba(0, 0, 0, 0.42);
+}
+
+.slot-machine-top,
+.slot-machine-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 54px;
+    padding: 0.75rem 1rem;
+    color: rgba(245, 241, 230, 0.82);
+    background: rgba(0, 0, 0, 0.32);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    border-radius: 0.9rem;
+}
+
+.slot-machine-top span {
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.slot-machine-top strong {
+    color: #1a1a1a;
+    padding: 0.4rem 0.7rem;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #f3d67a, #d4af37);
+}
+
+.slot-window {
+    position: relative;
+    margin: 1rem 0;
+    padding: 1rem;
+    overflow: hidden;
+    border: 1px solid rgba(243, 214, 122, 0.34);
+    border-radius: 1rem;
+    background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 20%, transparent 80%, rgba(0, 0, 0, 0.22)),
+        rgba(8, 8, 8, 0.82);
+}
+
+.slot-payline {
+    position: absolute;
+    left: 1rem;
+    right: 1rem;
+    top: 50%;
+    height: 3px;
+    z-index: 2;
+    border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(243, 214, 122, 0.9), transparent);
+    box-shadow: 0 0 18px rgba(243, 214, 122, 0.45);
+    pointer-events: none;
+}
+
+.slot-reels {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.slot-reel {
+    position: relative;
+    height: 126px;
+    overflow: hidden;
+    border: 1px solid rgba(212, 175, 55, 0.24);
+    border-radius: 0.85rem;
+    background: linear-gradient(180deg, #f8f1d5 0%, #fff9e6 48%, #e8d08d 100%);
+    box-shadow: inset 0 12px 24px rgba(255, 255, 255, 0.55), inset 0 -16px 22px rgba(80, 43, 6, 0.2);
+}
+
+.slot-strip {
+    will-change: transform;
+}
+
+.slot-strip span {
+    display: grid;
+    place-items: center;
+    height: 126px;
+    color: #8d1d25;
+    font-size: clamp(2.4rem, 7vw, 4.2rem);
+    font-weight: 900;
+    line-height: 1;
+    text-shadow: 0 4px 0 rgba(255, 255, 255, 0.62);
+}
+
+.slot-reel-win {
+    border-color: rgba(134, 239, 172, 0.95);
+    box-shadow: 0 0 0 2px rgba(134, 239, 172, 0.25), 0 0 30px rgba(34, 197, 94, 0.32);
+    animation: slotWinPulse 0.58s ease 2;
+}
+
+.slot-lamps {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+.slot-lamps span {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff4b8, #f3d67a 42%, #b88918 100%);
+    box-shadow: 0 0 16px rgba(243, 214, 122, 0.45);
+    animation: slotLamp 1.4s ease-in-out infinite;
+}
+
+.slot-lamps span:nth-child(2n) {
+    animation-delay: 0.35s;
+}
+
+.slot-result {
+    border-color: rgba(212, 175, 55, 0.24);
+}
+
+@keyframes slotWinPulse {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-4px) scale(1.03);
+    }
+}
+
+@keyframes slotLamp {
+    0%, 100% {
+        opacity: 0.45;
+        transform: scale(0.9);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.06);
+    }
+}
+
 @keyframes plinkoPulse {
     0%, 100% {
         scale: 1;
@@ -1078,6 +1280,10 @@ body.casino-body {
 
 @media (max-width: 991.98px) {
     .plinko-shell {
+        grid-template-columns: 1fr;
+    }
+
+    .slot-shell {
         grid-template-columns: 1fr;
     }
 
@@ -1157,9 +1363,29 @@ body.casino-body {
 
     .plinko-controls,
     .plinko-board-wrap,
+    .slot-controls,
+    .slot-stage,
     .original-game-controls,
     .original-game-stage {
         padding: 1rem;
+    }
+
+    .slot-machine {
+        min-height: 360px;
+        padding: 0.8rem;
+    }
+
+    .slot-window {
+        padding: 0.75rem;
+    }
+
+    .slot-reels {
+        gap: 0.5rem;
+    }
+
+    .slot-reel,
+    .slot-strip span {
+        height: 98px;
     }
 
     .plinko-board {

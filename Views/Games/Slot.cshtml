@@ -1,5 +1,95 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
 @{
+    ViewData["Title"] = "Owocowy Slot";
+}
+
+<div class="container py-5">
+    <section class="slot-shell">
+        <div class="slot-controls">
+            <span class="casino-section-label">
+                <i class="fa-solid fa-clover"></i>CasinoRoyale Originals
+            </span>
+            <h1 class="text-white mt-3 mb-2">Owocowy Slot</h1>
+            <p class="casino-section-text mb-4">
+                Klasyczne trzy bebny, owocowe symbole i szybkie rozliczenie kazdego spinu.
+            </p>
+
+            <label class="casino-label" for="slot-bet">Stawka</label>
+            <div class="casino-input-wrapper mb-3">
+                <i class="fa-solid fa-coins casino-input-icon"></i>
+                <input id="slot-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            <div class="slot-quick-bets mb-3" aria-label="Szybkie stawki">
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" data-bet="25">25</button>
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" data-bet="100">100</button>
+                <button type="button" class="btn btn-outline-light casino-btn-secondary" data-bet="500">500</button>
+            </div>
+
+            <div class="original-stats mb-3">
+                <span>Najwyzsza wygrana <strong>25.00x</strong></span>
+                <span>Para <strong>0.50x / 1.50x</strong></span>
+            </div>
+
+            <button id="slot-spin" class="btn casino-btn-primary w-100">
+                <i class="fa-solid fa-play me-2"></i>Zakręć
+            </button>
+
+            <div class="slot-paytable mt-4">
+                <h2 class="h6 text-white mb-3">Tabela wyplat</h2>
+                <div class="slot-paytable-grid">
+                    <span>🍒🍒🍒</span><strong>4.00x</strong>
+                    <span>🍋🍋🍋</span><strong>5.00x</strong>
+                    <span>🍇🍇🍇</span><strong>7.50x</strong>
+                    <span>🍉🍉🍉</span><strong>10.00x</strong>
+                    <span>🔔🔔🔔</span><strong>16.00x</strong>
+                    <span>777</span><strong>25.00x</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="slot-stage">
+            <div class="slot-machine" aria-label="Maszyna slotowa">
+                <div class="slot-machine-top">
+                    <span>Fruit Royale</span>
+                    <strong id="slot-jackpot">25.00x</strong>
+                </div>
+
+                <div class="slot-window">
+                    <div class="slot-payline" aria-hidden="true"></div>
+                    <div class="slot-reels">
+                        <div class="slot-reel" data-reel="0">
+                            <div class="slot-strip">
+                                <span>🍒</span><span>🍋</span><span>🍇</span><span>🍉</span><span>🔔</span><span>7</span>
+                            </div>
+                        </div>
+                        <div class="slot-reel" data-reel="1">
+                            <div class="slot-strip">
+                                <span>🍉</span><span>🔔</span><span>🍒</span><span>7</span><span>🍋</span><span>🍇</span>
+                            </div>
+                        </div>
+                        <div class="slot-reel" data-reel="2">
+                            <div class="slot-strip">
+                                <span>🍇</span><span>🍒</span><span>🍉</span><span>🍋</span><span>7</span><span>🔔</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slot-machine-bottom">
+                    <div class="slot-lamps" aria-hidden="true">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="original-result slot-result" aria-live="polite">
+                <span id="slot-status">Gotowy do gry</span>
+                <strong id="slot-win">-</strong>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/slot.js" asp-append-version="true"></script>
 }

@@ -19,13 +19,15 @@ public class AdminStatystykiViewModel
     public int LiczbaPlinko { get; set; }
     public int LiczbaDice { get; set; }
     public int LiczbaKeno { get; set; }
+    public int LiczbaSlot { get; set; }
     public decimal SumaWplatBlackjack { get; set; }
     public decimal SumaWplatMines { get; set; }
     public decimal SumaWplatPlinko { get; set; }
     public decimal SumaWplatDice { get; set; }
     public decimal SumaWplatKeno { get; set; }
-    public int LacznaLiczbaGier => LiczbaBlackjack + LiczbaMines + LiczbaPlinko + LiczbaDice + LiczbaKeno;
-    public decimal LacznaSumaWplat => SumaWplatBlackjack + SumaWplatMines + SumaWplatPlinko + SumaWplatDice + SumaWplatKeno;
+    public decimal SumaWplatSlot { get; set; }
+    public int LacznaLiczbaGier => LiczbaBlackjack + LiczbaMines + LiczbaPlinko + LiczbaDice + LiczbaKeno + LiczbaSlot;
+    public decimal LacznaSumaWplat => SumaWplatBlackjack + SumaWplatMines + SumaWplatPlinko + SumaWplatDice + SumaWplatKeno + SumaWplatSlot;
 }
 
 public class AdminKycViewModel
