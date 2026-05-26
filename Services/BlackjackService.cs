@@ -104,13 +104,7 @@ namespace CasinoRoyale.Services
                     existingActive.IsActive = false;
                     existingActive.Result = "abandoned";
                     existingActive.FinishedAt = DateTime.UtcNow;
-                }
-
-                var betResult = await _balanceService.PlaceBetAsync(userId, bet);
-                if (!betResult.Success)
-                    return (false, betResult.Error ?? "Blad platnosci.", (BlackjackGame?)null, betResult.Balance);
-
-                var deck = CreateShuffledDeck();
+                }                    var deck = CreateShuffledDeck();
 
                 var playerCard1 = DealCard(deck);
                 var dealerCard1 = DealCard(deck);
@@ -135,6 +129,16 @@ namespace CasinoRoyale.Services
 
                 _db.BlackjackGames.Add(game);
                 await _db.SaveChangesAsync();
+
+                // Zapisz grę PRZED PlaceBet — potrzebujemy game.Id do sessionKey
+                var sessionKey = "bj:" + game.Id;
+                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey);
+                if (!betResult.Success)
+                {
+                    await tx.RollbackAsync();
+                    return (false, betResult.Error ?? "Blad platnosci.", (BlackjackGame?)null, betResult.Balance);
+                }
+
                 await tx.CommitAsync();
 
                 return (true, "", game, betResult.Balance);
@@ -225,7 +229,8 @@ namespace CasinoRoyale.Services
             {
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount);
+                var sessionKey = "bj:" + game.Id;
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na double.", (BlackjackGame?)null, betResult.Balance);
 
@@ -266,7 +271,8 @@ namespace CasinoRoyale.Services
             {
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount);
+                var sessionKey = "bj:" + game.Id;
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na split.", (BlackjackGame?)null, betResult.Balance);
 
@@ -378,7 +384,8 @@ namespace CasinoRoyale.Services
             decimal finalBalance;
             if (totalWin > 0)
             {
-                var payoutResult = await _balanceService.PayoutAsync(game.UserId, totalWin);
+                var sessionKey = "bj:" + game.Id;
+                var payoutResult = await _balanceService.PayoutAsync(game.UserId, totalWin, sessionKey);
                 finalBalance = payoutResult.Balance;
             }
             else

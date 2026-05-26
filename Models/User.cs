@@ -26,7 +26,13 @@ namespace CasinoRoyale.Models
         [Display(Name = "E-mail")]
         public string Email { get; set; } = string.Empty;
         public string HasloHash { get; set; } = string.Empty;
-        public decimal Balance { get; set; } = 1000m;
+
+        /// <summary>Balans rzeczywisty (wyp�acalne �rodki).</summary>
+        public decimal BalanceReal { get; set; } = 1000m;
+
+        /// <summary>Balans bonusowy (niewyp�acalny, wymaga obrotu).</summary>
+        public decimal BalanceBonus { get; set; }
+
         public DateTime DataRejestracji { get; init; } = DateTime.UtcNow;
 
         /// <summary>

@@ -4,18 +4,35 @@ public class BalanceResult
 {
     public bool Success { get; init; }
     public decimal Balance { get; init; }
+
+    /// <summary>Balans rzeczywisty po operacji.</summary>
+    public decimal BalanceReal { get; init; }
+
+    /// <summary>Balans bonusowy po operacji.</summary>
+    public decimal BalanceBonus { get; init; }
+
+    public decimal TotalBalance => BalanceReal + BalanceBonus;
+
     public string? Error { get; init; }
 
-    public static BalanceResult Ok(decimal balance) => new()
+    /// <summary>Ile z zakładu zostało pobrane z bonusu (tylko dla PlaceBet).</summary>
+    public decimal AmountFromBonus { get; init; }
+
+    public static BalanceResult Ok(decimal balanceReal, decimal balanceBonus = 0, decimal amountFromBonus = 0) => new()
     {
         Success = true,
-        Balance = balance
+        Balance = balanceReal + balanceBonus,
+        BalanceReal = balanceReal,
+        BalanceBonus = balanceBonus,
+        AmountFromBonus = amountFromBonus
     };
 
-    public static BalanceResult Failed(string error, decimal balance = 0) => new()
+    public static BalanceResult Failed(string error, decimal balanceReal = 0, decimal balanceBonus = 0) => new()
     {
         Success = false,
-        Balance = balance,
+        Balance = balanceReal + balanceBonus,
+        BalanceReal = balanceReal,
+        BalanceBonus = balanceBonus,
         Error = error
     };
 }

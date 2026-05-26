@@ -4,6 +4,7 @@ using CasinoRoyale.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasinoRoyale.Migrations
 {
     [DbContext(typeof(Automaty))]
-    partial class AutomatyModelSnapshot : ModelSnapshot
+    [Migration("20260524155528_PodzialBalansu")]
+    partial class PodzialBalansu
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -78,45 +81,6 @@ namespace CasinoRoyale.Migrations
                         .IsUnique();
 
                     b.ToTable("AutomatProviderzy", (string)null);
-                });
-
-            modelBuilder.Entity("CasinoRoyale.Models.BetRecord", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("AmountFromBonus")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("BonusDeductions")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SessionKey")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<bool>("Settled")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "SessionKey", "Settled");
-
-                    b.ToTable("BetRecords");
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.BlackjackGame", b =>
@@ -264,7 +228,7 @@ namespace CasinoRoyale.Migrations
                     b.Property<DateTime>("Utworzono")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal>("WageringMultiplier")
+                    b.Property<decimal?>("WageringMultiplier")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("WaznyDo")

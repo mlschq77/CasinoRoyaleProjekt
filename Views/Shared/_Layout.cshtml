@@ -32,8 +32,9 @@
                 @if (User.Identity?.IsAuthenticated == true)
                 {
                     <div class="casino-balance-menu">
-                        <span class="casino-user-badge">
+                        <span class="casino-user-badge" id="balance-display-container">
                             <i class="fa-solid fa-coins me-2"></i><span id="balance-display">@User.FindFirst("Balance")?.Value</span>
+                            <span id="balance-bonus-display" class="ms-1 badge bg-warning text-dark small d-none"></span>
                         </span>
                         <div class="casino-balance-dropdown">
                             <div class="casino-balance-dropdown-content">

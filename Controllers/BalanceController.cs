@@ -24,11 +24,20 @@ public class BalanceController : ControllerBase
         if (userId == null)
             return Unauthorized();
 
-        var balance = await _balanceService.GetBalanceAsync(userId.Value);
-        if (balance == null)
+        var info = await _balanceService.GetBalanceInfoAsync(userId.Value);
+        if (info == null)
             return NotFound(new { error = "Nie znaleziono uzytkownika." });
 
-        return Ok(new { balance });
+        return Ok(new
+        {
+            balance = info.TotalBalance,
+            balanceReal = info.BalanceReal,
+            balanceBonus = info.BalanceBonus,
+            hasActiveBonus = info.HasActiveBonus,
+            wageringProgress = info.WageringProgress,
+            wageringRequired = info.WageringRequired,
+            expiresAt = info.ExpiresAt
+        });
     }
 
     private int? GetCurrentUserId()

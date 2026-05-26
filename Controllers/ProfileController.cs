@@ -16,11 +16,13 @@ public class ProfileController : Controller
 {
     private readonly Automaty _dbContext;
     private readonly IKycService _kycService;
+    private readonly IBalanceService _balanceService;
 
-    public ProfileController(Automaty dbContext, IKycService kycService)
+    public ProfileController(Automaty dbContext, IKycService kycService, IBalanceService balanceService)
     {
         _dbContext = dbContext;
         _kycService = kycService;
+        _balanceService = balanceService;
     }
 
     public async Task<IActionResult> Index()
@@ -89,6 +91,43 @@ public class ProfileController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    public async Task<IActionResult> Bonuses()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var balanceInfo = await _balanceService.GetBalanceInfoAsync(userId.Value);
+
+        var activeBonuses = await (
+            from ub in _dbContext.UzyteKodyBonusowe
+            join kb in _dbContext.KodyBonusowe on ub.KodBonusowyId equals kb.Id
+            where ub.UserId == userId.Value && ub.Status == BonusStatus.Active
+            select new ActiveBonusViewModel
+            {
+                CodeName = kb.Kod,
+                BonusAmount = ub.BonusAmount,
+                RemainingAmount = ub.RemainingAmount,
+                WageringProgress = ub.WageringProgress,
+                WageringRequired = ub.WageringRequired,
+                ExpiresAt = ub.ExpiresAt,
+                Status = ub.Status
+            }
+        ).ToListAsync();
+
+        var vm = new ProfileBonusesViewModel
+        {
+            BalanceReal = balanceInfo?.BalanceReal ?? 0,
+            BalanceBonus = balanceInfo?.BalanceBonus ?? 0,
+            TotalWageringProgress = balanceInfo?.WageringProgress ?? 0,
+            TotalWageringRequired = balanceInfo?.WageringRequired ?? 0,
+            EarliestExpiry = balanceInfo?.ExpiresAt,
+            Bonuses = activeBonuses
+        };
+
+        return View(vm);
+    }
+
     private async Task<ProfileViewModel?> BuildProfileViewModel(int userId)
     {
         var userData = await _dbContext.Users
@@ -101,7 +140,8 @@ public class ProfileController : Controller
                 user.Nazwisko,
                 user.Nazwa,
                 user.Email,
-                user.Balance,
+                user.BalanceReal,
+                user.BalanceBonus,
                 user.DataRejestracji,
                 user.KycStatus
             })
@@ -116,7 +156,8 @@ public class ProfileController : Controller
             Nazwisko = userData.Nazwisko,
             Nazwa = userData.Nazwa,
             Email = userData.Email,
-            Balance = userData.Balance,
+            Balance = userData.BalanceReal,
+            BalanceBonus = userData.BalanceBonus,
             DataRejestracji = userData.DataRejestracji,
             KycStatusDisplay = userData.KycStatus switch
             {
@@ -236,7 +277,7 @@ public class ProfileController : Controller
             new(ClaimTypes.GivenName, user.Imie),
             new(ClaimTypes.Surname, user.Nazwisko),
             new(ClaimTypes.Email, user.Email),
-            new("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+            new("Balance", user.BalanceReal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

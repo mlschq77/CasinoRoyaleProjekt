@@ -1,0 +1,149 @@
+@model CasinoRoyale.ViewModels.ProfileBonusesViewModel
+
+@{
+    ViewData["Title"] = "Bonusy i obrot";
+}
+
+<div class="casino-home">
+    <main class="casino-section py-5">
+        <div class="container">
+            <div class="d-flex align-items-center gap-3 mb-4">
+                <a asp-action="Index" class="btn btn-outline-secondary btn-sm casino-btn-secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <span class="casino-section-label mb-0">
+                    <i class="fa-solid fa-gift"></i>Bonusy i obrot
+                </span>
+            </div>
+
+            <h1 class="display-5 fw-bold text-white mt-2 mb-2">Twoje bonusy</h1>
+            <p class="casino-section-text mb-0">
+                Sprawdz status aktywnych bonusow i postep wymaganego obrotu (wageringu).
+            </p>
+
+            @if (!Model.HasActiveBonuses)
+            {
+                <div class="casino-profile-card mt-4 text-center py-5">
+                    <i class="fa-solid fa-gift fa-3x" style="color: rgba(245,241,230,0.2);"></i>
+                    <p class="text-secondary mt-3 mb-0 fs-5">Nie masz aktywnych bonusow.</p>
+                    <p class="text-secondary mt-2">
+                        <a asp-controller="Home" asp-action="Promocje" class="casino-link">Sprawdz promocje</a>
+                        aby odebrac kod bonusowy.
+                    </p>
+                </div>
+            }
+            else
+            {
+                <!-- Podsumowanie -->
+                <div class="row g-3 mt-2 mb-4">
+                    <div class="col-md-4">
+                        <div class="casino-profile-card text-center">
+                            <span class="text-secondary small text-uppercase" style="letter-spacing: 0.08em;">Saldo bonusowe</span>
+                            <strong class="d-block text-warning fs-3 mt-2">@Model.BalanceBonus.ToString("0.00") PLN</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="casino-profile-card text-center">
+                            <span class="text-secondary small text-uppercase" style="letter-spacing: 0.08em;">Saldo rzeczywiste</span>
+                            <strong class="d-block text-white fs-3 mt-2">@Model.BalanceReal.ToString("0.00") PLN</strong>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="casino-profile-card text-center">
+                            <span class="text-secondary small text-uppercase" style="letter-spacing: 0.08em;">Wygasa</span>
+                            <strong class="d-block text-white fs-3 mt-2">
+                                @(Model.EarliestExpiry.HasValue
+                                    ? Model.EarliestExpiry.Value.ToLocalTime().ToString("dd.MM.yyyy")
+                                    : "—")
+                            </strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Laczny postep wageringu -->
+                <div class="casino-profile-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="text-secondary small text-uppercase" style="letter-spacing: 0.08em;">Laczny postep obrotu</span>
+                        <span class="fw-bold @(Model.IsWageringMet ? "text-success" : "text-warning")">
+                            @Model.TotalWageringProgress.ToString("0.00") / @Model.TotalWageringRequired.ToString("0.00") PLN
+                        </span>
+                    </div>
+                    <div class="progress" style="height: 10px; background: rgba(255,255,255,0.08); border-radius: 999px;">
+                        <div class="progress-bar @(Model.IsWageringMet ? "bg-success" : "bg-warning")"
+                             role="progressbar"
+                             style="width: @Math.Min(Model.TotalWageringPercent, 100)%"
+                             aria-valuenow="@Model.TotalWageringPercent"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div class="text-end mt-1">
+                        <small class="text-secondary">@Model.TotalWageringPercent%</small>
+                    </div>
+                    @if (Model.IsWageringMet)
+                    {
+                        <div class="alert border-0 mt-3 mb-0 py-2" style="background: rgba(42,167,69,0.12); color: #c6f6d5;">
+                            <i class="fa-solid fa-check-circle me-2"></i>Obrot spelniomy! Srodki bonusowe zostana przeniesione na saldo rzeczywiste przy najblizszej wyplacie.
+                        </div>
+                    }
+                </div>
+
+                <!-- Lista bonusow -->
+                <div class="casino-profile-card p-0 overflow-hidden">
+                    <div class="px-4 pt-4 pb-2">
+                        <h5 class="text-white mb-0">
+                            <i class="fa-solid fa-list me-2 text-gold"></i>Aktywne bonusy
+                        </h5>
+                    </div>
+                    @foreach (var bonus in Model.Bonuses)
+                    {
+                        <div class="px-4 py-3" style="border-top: 1px solid rgba(212,175,55,0.12);">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <span class="badge fs-6 fw-bold text-dark me-2" style="background: var(--casino-gold, #c9a227); letter-spacing: 1px;">
+                                        @bonus.CodeName
+                                    </span>
+                                    <span class="badge @(bonus.StatusCssClass)" style="background: rgba(255,255,255,0.05); border: 1px solid currentColor;">
+                                        @bonus.StatusDisplay
+                                    </span>
+                                </div>
+                                <small class="text-secondary text-end" style="flex-shrink: 0;">
+                                    <i class="fa-solid fa-clock me-1"></i>Wygasa: @bonus.ExpiryDisplay
+                                </small>
+                            </div>
+
+                            <div class="row g-2 mb-2 small">
+                                <div class="col-6 col-md-3">
+                                    <span class="text-secondary">Przyznano:</span>
+                                    <strong class="text-white ms-1">@bonus.BonusAmount.ToString("0.00") PLN</strong>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <span class="text-secondary">Pozostalo:</span>
+                                    <strong class="text-warning ms-1">@bonus.RemainingAmount.ToString("0.00") PLN</strong>
+                                </div>
+                                <div class="col-6 col-md-3">
+                                    <span class="text-secondary">Obrot:</span>
+                                    <strong class="text-white ms-1">@bonus.WageringProgress.ToString("0.00") / @bonus.WageringRequired.ToString("0.00")</strong>
+                                </div>
+                                <div class="col-6 col-md-3 text-md-end">
+                                    <span class="text-secondary">Postep:</span>
+                                    <strong class="@(bonus.WageringPercent >= 100 ? "text-success" : "text-warning") ms-1">@bonus.WageringPercent%</strong>
+                                </div>
+                            </div>
+
+                            <div class="progress" style="height: 8px; background: rgba(255,255,255,0.08); border-radius: 999px;">
+                                <div class="progress-bar @bonus.ProgressBarCssClass"
+                                     role="progressbar"
+                                     style="width: @Math.Min(bonus.WageringPercent, 100)%"
+                                     aria-valuenow="@bonus.WageringPercent"
+                                     aria-valuemin="0"
+                                     aria-valuemax="100">
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </main>
+</div>

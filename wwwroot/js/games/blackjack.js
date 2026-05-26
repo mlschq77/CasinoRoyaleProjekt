@@ -36,6 +36,7 @@ async function fetchBalance() {
     if (res.ok) {
         const data = await res.json();
         setBalance(data.balance);
+        updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
     }
 }
 
@@ -206,7 +207,13 @@ function ensureDoubleChoices() {
     $('btn-double-facedown').addEventListener('click', () => doDouble(true));
 }
 
-function renderGameState(gameState, balance, options = {}) {
+function renderGameState(gameState, balance, balanceBonus, options = {}) {
+    // Obsługa starego wywołania: renderGameState(state, balance, options)
+    if (typeof balanceBonus === 'object' && balanceBonus !== null && !Array.isArray(balanceBonus)) {
+        options = balanceBonus;
+        balanceBonus = undefined;
+    }
+
     state.game = gameState;
 
     renderCards('dealer-cards', gameState.dealerHand);
@@ -230,13 +237,19 @@ function renderGameState(gameState, balance, options = {}) {
     if (!gameState.isActive) {
         if (!options.suppressResult) showResult(gameState);
         showNewGameButton();
-        if (balance !== undefined && balance !== null) setBalance(balance);
+        if (balance !== undefined && balance !== null) {
+            setBalance(balance);
+            updateBalanceDisplay({ balance, balanceBonus });
+        }
         return;
     }
 
     clearResult();
 
-    if (balance !== undefined && balance !== null) setBalance(balance);
+    if (balance !== undefined && balance !== null) {
+        setBalance(balance);
+        updateBalanceDisplay({ balance, balanceBonus });
+    }
 
     $('btn-double').style.display = gameState.canDouble ? 'inline-flex' : 'none';
     $('btn-split').style.display = gameState.canSplit ? 'inline-flex' : 'none';
@@ -362,16 +375,16 @@ function buildDealerPreview(finalState) {
     return preview;
 }
 
-async function renderDealerResolution(finalState, balance) {
+async function renderDealerResolution(finalState, balance, balanceBonus) {
     const baseState = buildDealerPreview(finalState);
-    renderGameState(baseState, undefined, { suppressResult: true });
+    renderGameState(baseState, undefined, undefined, { suppressResult: true });
     await wait(TIMING.actionPause);
 
     const revealedState = JSON.parse(JSON.stringify(baseState));
     const revealedCount = Math.max(baseState.dealerHand.length, Math.min(2, finalState.dealerHand.length));
     revealedState.dealerHand = finalState.dealerHand.slice(0, revealedCount);
     revealedState.dealerValue = calculateVisibleHandValue(revealedState.dealerHand);
-    renderGameState(revealedState, undefined, { suppressResult: true });
+    renderGameState(revealedState, undefined, undefined, { suppressResult: true });
     await wait(TIMING.revealDealer);
 
     for (let i = revealedState.dealerHand.length + 1; i <= finalState.dealerHand.length; i++) {
@@ -380,21 +393,21 @@ async function renderDealerResolution(finalState, balance) {
         step.dealerValue = calculateVisibleHandValue(step.dealerHand);
         step.isActive = true;
         step.isPlayerTurn = false;
-        renderGameState(step, undefined, { suppressResult: true });
+        renderGameState(step, undefined, undefined, { suppressResult: true });
         await wait(TIMING.dealerCard);
     }
 
     await wait(TIMING.resultPause);
-    renderGameState(finalState, balance);
+    renderGameState(finalState, balance, balanceBonus);
 }
 
 async function renderActionResponse(data) {
     if (data.state && !data.state.isActive) {
-        await renderDealerResolution(data.state, data.balance);
+        await renderDealerResolution(data.state, data.balance, data.balanceBonus);
         return;
     }
 
-    renderGameState(data.state, data.balance);
+    renderGameState(data.state, data.balance, data.balanceBonus);
 }
 
 async function startGame() {
@@ -409,7 +422,7 @@ async function startGame() {
         const data = await apiPost('start', { bet: state.bet });
         state.gameId = data.state.gameId;
         showActionButtons();
-        renderGameState(data.state, data.balance);
+        renderGameState(data.state, data.balance, data.balanceBonus);
     } catch (e) {
         alert(e.message);
     } finally {
@@ -468,12 +481,12 @@ async function doDouble(faceDown) {
                 suppressResult: true
             });
             await wait(TIMING.revealDealer);
-            await renderDealerResolution(data.state, data.balance);
+            await renderDealerResolution(data.state, data.balance, data.balanceBonus);
         } else {
             const preview = buildDealerPreview(data.state);
-            renderGameState(preview, undefined, { revealMainLast: true, suppressResult: true });
+            renderGameState(preview, undefined, undefined, { revealMainLast: true, suppressResult: true });
             await wait(TIMING.doublePeek);
-            await renderDealerResolution(data.state, data.balance);
+            await renderDealerResolution(data.state, data.balance, data.balanceBonus);
         }
     } catch (e) {
         alert(e.message);

@@ -103,7 +103,7 @@
                         <tr>
                             <td class="text-white">@user.Imie @user.Nazwisko <span class="text-secondary">(@user.Nazwa)</span></td>
                             <td class="text-secondary">@user.Email</td>
-                            <td class="text-gold">@user.Balance.ToString("F2") PLN</td>
+                            <td class="text-gold">@((user.BalanceReal + user.BalanceBonus).ToString("F2")) PLN</td>
                             <td class="text-secondary">@user.DataRejestracji.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</td>
                         </tr>
                     }

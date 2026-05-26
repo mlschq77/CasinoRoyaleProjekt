@@ -11,13 +11,6 @@ const riskInput = document.getElementById("plinko-risk");
 const statusText = document.getElementById("plinko-status");
 const winText = document.getElementById("plinko-win");
 
-function updateBalance(balance) {
-    const balanceDisplay = document.getElementById("balance-display");
-    if (!balanceDisplay || balance === undefined || balance === null) return;
-
-    balanceDisplay.innerText = Number(balance).toFixed(2);
-}
-
 async function parseResponse(res) {
     const text = await res.text();
     let data = null;
@@ -134,7 +127,7 @@ async function playPlinko() {
         });
         const data = await parseResponse(res);
 
-        updateBalance(data.balance);
+        updateBalanceDisplay(data);
         await animateDrop(data.path, data.landingSlot);
 
         const multiplier = Number(data.multiplier).toFixed(2);

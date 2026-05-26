@@ -25,6 +25,7 @@ public class ProfileViewModel
     [Display(Name = "E-mail")]
     public string Email { get; set; } = string.Empty;
     public decimal Balance { get; set; }
+    public decimal BalanceBonus { get; set; }
     public DateTime DataRejestracji { get; set; }
     public List<TransactionHistoryItemViewModel> TransactionHistory { get; set; } = new();
     public List<BetHistoryItemViewModel> BetHistory { get; set; } = new();

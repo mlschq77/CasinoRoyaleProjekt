@@ -37,7 +37,7 @@ public class AdminController : Controller
         var vm = new AdminDashboardViewModel
         {
             TotalUsers      = await _db.Users.CountAsync(),
-            TotalBalance    = await _db.Users.SumAsync(u => u.Balance),
+            TotalBalance    = await _db.Users.SumAsync(u => u.BalanceReal + u.BalanceBonus),
             TotalDeposits   = await _db.StripePayments.SumAsync(p => (decimal?)p.Amount) ?? 0,
             TotalWithdrawals = await _db.StripeWithdrawals.SumAsync(w => (decimal?)w.Amount) ?? 0,
             RecentUsers     = await _db.Users
@@ -84,10 +84,11 @@ public class AdminController : Controller
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
 
-        user.Balance = Math.Max(0, newBalance);
+        user.BalanceReal = Math.Max(0, newBalance);
+        user.BalanceBonus = 0;
         await _db.SaveChangesAsync();
 
-        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {user.Balance:F2} PLN.";
+        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {user.BalanceReal:F2} PLN.";
         return RedirectToAction(nameof(Uzytkownicy));
     }
 

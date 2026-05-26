@@ -69,9 +69,16 @@
                         <strong>@Model.Nazwa</strong>
                     </div>
                     <div class="casino-profile-stat">
-                        <span>Aktualne saldo</span>
+                        <span>Saldo rzeczywiste</span>
                         <strong>@Model.Balance.ToString("0.00") PLN</strong>
                     </div>
+                    @if (Model.BalanceBonus > 0)
+                    {
+                        <div class="casino-profile-stat">
+                            <span>Saldo bonusowe</span>
+                            <strong class="text-warning">@Model.BalanceBonus.ToString("0.00") PLN</strong>
+                        </div>
+                    }
                     <div class="casino-profile-stat">
                         <span>Status konta</span>
                         <strong>Aktywne</strong>
@@ -91,6 +98,12 @@
                     </div>
 
                     <div class="casino-profile-actions">
+                        @if (Model.BalanceBonus > 0)
+                        {
+                            <a asp-action="Bonuses" class="btn casino-btn-primary btn w-100">
+                                <i class="fa-solid fa-gift me-1"></i>Bonusy i obrot
+                            </a>
+                        }
                         <button class="casino-btn-secondary btn" type="button" data-history-open="transactions">
                             <i class="fa-solid fa-receipt me-1"></i>Historia transakcji
                         </button>

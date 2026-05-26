@@ -63,14 +63,29 @@ public class BonusCodeService : IBonusCodeService
             };
         }
 
-        _dbContext.UzyteKodyBonusowe.Add(new UzytyKodBonusowy
+        var bonusCode = validation.KodBonusowy;
+        var bonusAmount = validation.BonusAmount;
+
+        var wageringRequired =  bonusAmount * bonusCode.WageringMultiplier;
+
+        var expiresAt = DateTime.UtcNow.AddDays(7);
+
+        var bonusEntry = new UzytyKodBonusowy
         {
             UserId = userId,
-            KodBonusowyId = validation.KodBonusowy.Id,
+            KodBonusowyId = bonusCode.Id,
             StripePaymentId = stripePayment.Id,
             SessionId = stripePayment.SessionId,
-            Uzyto = DateTime.UtcNow
-        });
+            Uzyto = DateTime.UtcNow,
+            BonusAmount = bonusAmount,
+            RemainingAmount = bonusAmount,
+            WageringRequired = wageringRequired,
+            WageringProgress = 0,
+            ExpiresAt = expiresAt,
+            Status = BonusStatus.Active
+        };
+
+        _dbContext.UzyteKodyBonusowe.Add(bonusEntry);
 
         try
         {
@@ -84,7 +99,9 @@ public class BonusCodeService : IBonusCodeService
 
         return new BonusCodeApplicationResult
         {
-            BonusAmount = validation.BonusAmount
+            BonusAmount = bonusAmount,
+            WageringRequired = wageringRequired,
+            ExpiresAt = expiresAt
         };
     }
 

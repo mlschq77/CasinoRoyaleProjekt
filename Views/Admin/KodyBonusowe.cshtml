@@ -44,6 +44,12 @@
                            style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);" />
                 </div>
                 <div class="col-sm-6 col-lg-2">
+                    <label class="form-label text-secondary small">Mnoznik wageringu</label>
+                    <input type="number" name="WageringMultiplier" value="20" min="0" step="1" class="form-control text-white"
+                           style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);"
+                           placeholder="Domyslnie 20" />
+                </div>
+                <div class="col-sm-6 col-lg-2">
                     <label class="form-label text-secondary small">Wazny do (opcjonalnie)</label>
                     <input type="datetime-local" name="WaznyDo" class="form-control text-white"
                            style="background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1); color-scheme: dark;" />
@@ -67,6 +73,7 @@
                         <th class="py-3">Min. wplata</th>
                         <th class="py-3">Bonus %</th>
                         <th class="py-3">Bonus kwotowy</th>
+                        <th class="py-3">Wagering</th>
                         <th class="py-3">Wazny do</th>
                         <th class="py-3">Status</th>
                         <th class="py-3 text-center">Akcje</th>
@@ -76,7 +83,7 @@
                     @if (!Model.Any())
                     {
                         <tr>
-                            <td colspan="7" class="text-center text-secondary py-5">Brak kodow bonusowych</td>
+                            <td colspan="8" class="text-center text-secondary py-5">Brak kodow bonusowych</td>
                         </tr>
                     }
                     @foreach (var kod in Model)
@@ -89,6 +96,7 @@
                             <td class="text-white">@kod.MinimalnaWplata.ToString("F2") PLN</td>
                             <td class="text-white">@(kod.BonusProcentowy > 0 ? $"{kod.BonusProcentowy:F0}%" : "—")</td>
                             <td class="text-white">@(kod.BonusKwotowy > 0 ? $"{kod.BonusKwotowy:F2} PLN" : "—")</td>
+                            <td class="text-white">@(kod.WageringMultiplier > 0 ? $"x{kod.WageringMultiplier:F0}" : "—")</td>
                             <td class="text-secondary small">@(kod.WaznyDo.HasValue ? kod.WaznyDo.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm") : "Bezterminowo")</td>
                             <td>
                                 @if (aktywny)

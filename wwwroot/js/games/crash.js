@@ -22,13 +22,6 @@ let state = {
 
 function $(id) { return document.getElementById(id); }
 
-function updateBalance(balance) {
-    const el = document.getElementById("balance-display");
-    if (el && balance !== undefined && balance !== null) {
-        el.innerText = Number(balance).toFixed(2);
-    }
-}
-
 async function parseResponse(res) {
     const text = await res.text();
     let data = null;
@@ -158,7 +151,7 @@ async function startGame() {
         state.autoCashoutMultiplier = autoCashout;
         state.chartData = [{ time: 0, multiplier: 1.0 }];
 
-        updateBalance(data.balance);
+        updateBalanceDisplay(data);
         showStatus('Gra trwa...');
         $('crash-win').textContent = '';
 
@@ -252,14 +245,16 @@ async function cashout() {
             showStatus(`Wygrałeś! Wypłacono przy ${Number(data.multiplier).toFixed(2)}x (crash przy ${Number(data.crashPoint).toFixed(2)}x)`);
             $('crash-win').textContent = `+${Number(data.winAmount).toFixed(2)} PLN`;
             $('crash-win').className = 'crash-result-win';
-            updateBalance(data.balance);
+            updateBalanceDisplay(data);
             addToHistory(Number(data.winAmount).toFixed(2), Number(data.multiplier).toFixed(2), true, Number(data.crashPoint).toFixed(2));
         } else {
             showStatus(`Crash! Wykres załamał się przy ${Number(data.crashPoint).toFixed(2)}x`);
             $('crash-win').textContent = 'Przegrana';
             $('crash-win').className = 'crash-result-lose';
             showCrashEffect();
-            if (data.balance !== undefined) updateBalance(data.balance);
+            if (data.balance !== undefined) {
+                updateBalanceDisplay(data);
+            }
             addToHistory('CRASH', Number(data.crashPoint).toFixed(2), false);
         }
 
@@ -327,7 +322,7 @@ async function fetchBalance() {
         const res = await fetch('/api/balance');
         if (res.ok) {
             const data = await res.json();
-            updateBalance(data.balance);
+            updateBalanceDisplay(data);
         }
     } catch (err) { /* ignore */ }
 }
