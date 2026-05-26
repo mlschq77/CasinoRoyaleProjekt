@@ -77,5 +77,37 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-4">
+            <div class="casino-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <i class="fa-solid fa-dice fa-xl text-gold"></i>
+                    <h5 class="text-white mb-0">Dice</h5>
+                </div>
+                <div class="mb-3">
+                    <div class="text-secondary small mb-1">Liczba gier</div>
+                    <div class="fs-4 fw-bold text-white">@Model.LiczbaDice.ToString("N0")</div>
+                </div>
+                <div>
+                    <div class="text-secondary small mb-1">Suma zakladow</div>
+                    <div class="fs-4 fw-bold text-gold">@Model.SumaWplatDice.ToString("F2") PLN</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="casino-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-4">
+                    <i class="fa-solid fa-table-cells fa-xl text-gold"></i>
+                    <h5 class="text-white mb-0">Keno</h5>
+                </div>
+                <div class="mb-3">
+                    <div class="text-secondary small mb-1">Liczba gier</div>
+                    <div class="fs-4 fw-bold text-white">@Model.LiczbaKeno.ToString("N0")</div>
+                </div>
+                <div>
+                    <div class="text-secondary small mb-1">Suma zakladow</div>
+                    <div class="fs-4 fw-bold text-gold">@Model.SumaWplatKeno.ToString("F2") PLN</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>

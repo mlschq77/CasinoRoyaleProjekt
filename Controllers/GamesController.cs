@@ -35,4 +35,14 @@ public class GamesController : Controller
     {
         return View();
     }
+
+    public IActionResult Dice()
+    {
+        return View();
+    }
+
+    public IActionResult Keno()
+    {
+        return View();
+    }
 }
