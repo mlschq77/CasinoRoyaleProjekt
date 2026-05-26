@@ -76,6 +76,22 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
+            gry.Add(new AutomatInfo
+            {
+                Id = 5,
+                Nazwa = "Dice",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 6,
+                Nazwa = "Keno",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
         }
 
         var model = new SlotsViewModel
