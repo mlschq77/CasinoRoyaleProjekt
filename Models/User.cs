@@ -26,7 +26,7 @@ namespace CasinoRoyale.Models
         [Display(Name = "E-mail")]
         public string Email { get; set; } = string.Empty;
         public string HasloHash { get; set; } = string.Empty;
-        public bool IsAdmin { get; set; };
+        public bool IsAdmin { get; set; }
         public DateTime DataRejestracji { get; init; } = DateTime.UtcNow;
         public UserKycStatus KycStatus { get; set; } = UserKycStatus.NotSubmitted;
         public Wallet Wallet { get; set; } = null!;
