@@ -24,6 +24,8 @@ namespace CasinoRoyale.Data
         public DbSet<RouletteGame> RouletteGames { get; set; }
         public DbSet<BetRecord> BetRecords { get; set; }
         public DbSet<Wallet> Wallets { get; set; }
+        public DbSet<DiceGame> DiceGames { get; set; }
+        public DbSet<KenoGame> KenoGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -171,6 +173,30 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<RouletteGame>()
                 .Property(g => g.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<DiceGame>()
+                .Property(game => game.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<DiceGame>()
+                .Property(game => game.Multiplier)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<DiceGame>()
+                .Property(game => game.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<KenoGame>()
+                .Property(game => game.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<KenoGame>()
+                .Property(game => game.Multiplier)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<KenoGame>()
+                .Property(game => game.WinAmount)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<StripeWithdrawal>()

@@ -1,0 +1,29 @@
+name: Migracje bazy danych Azure
+
+on:
+  push:
+    branches:
+      - dev
+
+jobs:
+  migrate:
+    name: Zastosuj migracje EF Core
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Pobierz kod z repozytorium
+        uses: actions/checkout@v4
+
+      - name: Skonfiguruj .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Zainstaluj narzędzie EF Core
+        run: dotnet tool install --global dotnet-ef
+
+      - name: Przywróć zależności
+        run: dotnet restore
+
+      - name: Zastosuj migracje
+        run: dotnet ef database update --connection "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"

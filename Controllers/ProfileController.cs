@@ -272,10 +272,34 @@ public class ProfileController : Controller
             })
             .ToListAsync();
 
+        var diceBets = await _dbContext.DiceGames
+            .AsNoTracking()
+            .Where(game => game.UserId == userId)
+            .Select(game => new BetHistoryItemViewModel
+            {
+                GameName = "Dice",
+                CreatedAt = game.CreatedAt,
+                BetAmount = game.BetAmount
+            })
+            .ToListAsync();
+
+        var kenoBets = await _dbContext.KenoGames
+            .AsNoTracking()
+            .Where(game => game.UserId == userId)
+            .Select(game => new BetHistoryItemViewModel
+            {
+                GameName = "Keno",
+                CreatedAt = game.CreatedAt,
+                BetAmount = game.BetAmount
+            })
+            .ToListAsync();
+
         profile.BetHistory = blackjackBets
             .Concat(minesBets)
             .Concat(plinkoBets)
             .Concat(crashBets)
+            .Concat(diceBets)
+            .Concat(kenoBets)
             .OrderByDescending(item => item.CreatedAt)
             .Take(40)
             .ToList();

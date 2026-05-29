@@ -211,7 +211,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Kyc()
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var pending = await _kycService.GetPendingDocumentsAsync();
         var all = await _kycService.GetAllDocumentsAsync();
@@ -239,7 +239,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> ApproveKyc(int documentId, string? comment)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var adminId = GetAdminUserId();
 
@@ -260,7 +260,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RejectKyc(int documentId, string? comment)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var adminId = GetAdminUserId();
 
@@ -282,7 +282,7 @@ public class AdminController : Controller
     /// </summary>
     public async Task<IActionResult> KycFile(int id)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var document = await _kycService.GetDocumentByIdAsync(id);
         if (document == null)
@@ -312,10 +312,14 @@ public class AdminController : Controller
             LiczbaBlackjack = await _db.BlackjackGames.CountAsync(),
             LiczbaMines     = await _db.MinesGames.CountAsync(),
             LiczbaPlinko    = await _db.PlinkoGames.CountAsync(),
+            LiczbaDice      = await _db.DiceGames.CountAsync(),
+            LiczbaKeno      = await _db.KenoGames.CountAsync(),
             SumaWplatBlackjack = await _db.BlackjackGames
                 .SumAsync(g => (decimal?)(g.BetAmount + g.SplitBetAmount)) ?? 0,
             SumaWplatMines  = await _db.MinesGames.SumAsync(g => (decimal?)g.BetAmount) ?? 0,
             SumaWplatPlinko = await _db.PlinkoGames.SumAsync(g => (decimal?)g.BetAmount) ?? 0,
+            SumaWplatDice   = await _db.DiceGames.SumAsync(g => (decimal?)g.BetAmount) ?? 0,
+            SumaWplatKeno   = await _db.KenoGames.SumAsync(g => (decimal?)g.BetAmount) ?? 0,
         };
 
         return View(vm);

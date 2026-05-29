@@ -64,7 +64,7 @@ public class AuthController : Controller
 			DataRejestracji = DateTime.UtcNow,
 			Wallet = new Wallet
 			{
-				BalanceReal = 1000m
+				BalanceReal = 0m
 			}
 		};
 

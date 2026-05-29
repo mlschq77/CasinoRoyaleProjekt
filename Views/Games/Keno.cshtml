@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Keno";
+}
+
+<div class="container py-5">
+    <section class="original-game-shell keno-shell">
+        <div class="original-game-controls">
+            <span class="casino-section-label">
+                <i class="fa-solid fa-table-cells"></i>CasinoRoyale Originals
+            </span>
+            <h1 class="text-white mt-3 mb-2">Keno</h1>
+            <p class="casino-section-text mb-4">
+                Zaznacz od 1 do 10 liczb. Losowanie wybierze 10 liczb z puli 1-40.
+            </p>
+
+            <label class="casino-label" for="keno-bet">Stawka</label>
+            <div class="casino-input-wrapper mb-3">
+                <i class="fa-solid fa-coins casino-input-icon"></i>
+                <input id="keno-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            <div class="original-stats mb-3">
+                <span>Wybrane <strong id="keno-picked">0/10</strong></span>
+                <span>Trafienia <strong id="keno-hits">-</strong></span>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button id="keno-draw" class="btn casino-btn-primary">
+                    <i class="fa-solid fa-play me-2"></i>Losuj
+                </button>
+                <button id="keno-clear" type="button" class="btn btn-outline-light casino-btn-secondary">
+                    <i class="fa-solid fa-rotate-left me-2"></i>Wyczysc
+                </button>
+            </div>
+
+            <div class="original-result mt-4" aria-live="polite">
+                <span id="keno-status">Wybierz liczby</span>
+                <strong id="keno-win">-</strong>
+            </div>
+        </div>
+
+        <div class="original-game-stage">
+            <div id="keno-grid" class="keno-grid" aria-label="Plansza Keno"></div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/keno.js" asp-append-version="true"></script>
+}

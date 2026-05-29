@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "Dice";
+}
+
+<div class="container py-5">
+    <section class="original-game-shell">
+        <div class="original-game-controls">
+            <span class="casino-section-label">
+                <i class="fa-solid fa-dice"></i>CasinoRoyale Originals
+            </span>
+            <h1 class="text-white mt-3 mb-2">Dice</h1>
+            <p class="casino-section-text mb-4">
+                Ustaw prog, wybierz czy wynik ma byc powyzej albo ponizej i rzucc koscmi.
+            </p>
+
+            <label class="casino-label" for="dice-bet">Stawka</label>
+            <div class="casino-input-wrapper mb-3">
+                <i class="fa-solid fa-coins casino-input-icon"></i>
+                <input id="dice-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            <label class="casino-label" for="dice-target">Prog</label>
+            <div class="dice-range-row mb-3">
+                <input id="dice-target" type="range" min="2" max="98" value="50" />
+                <strong id="dice-target-value">50</strong>
+            </div>
+
+            <div class="dice-mode-grid mb-3">
+                <button type="button" class="btn casino-btn-primary dice-mode" data-mode="over">Over</button>
+                <button type="button" class="btn btn-outline-light casino-btn-secondary dice-mode" data-mode="under">Under</button>
+            </div>
+
+            <div class="original-stats mb-3">
+                <span>Szansa <strong id="dice-chance">50%</strong></span>
+                <span>Mnoznik <strong id="dice-multiplier">1.98x</strong></span>
+            </div>
+
+            <button id="dice-roll" class="btn casino-btn-primary w-100">
+                <i class="fa-solid fa-play me-2"></i>Rzuc
+            </button>
+        </div>
+
+        <div class="original-game-stage">
+            <div class="dice-meter">
+                <div id="dice-marker" class="dice-marker">?</div>
+            </div>
+            <div class="original-result" aria-live="polite">
+                <span id="dice-status">Gotowy do gry</span>
+                <strong id="dice-win">-</strong>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/dice.js" asp-append-version="true"></script>
+}
