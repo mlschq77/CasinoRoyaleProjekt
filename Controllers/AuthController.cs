@@ -61,8 +61,11 @@ public class AuthController : Controller
 			Nazwa = model.Nazwa,
 			Email = model.Email,
 			HasloHash = BCrypt.Net.BCrypt.HashPassword(model.Haslo),
-			BalanceReal = 1000m,
-			DataRejestracji = DateTime.UtcNow
+			DataRejestracji = DateTime.UtcNow,
+			Wallet = new Wallet
+			{
+				BalanceReal = 1000m
+			}
 		};
 
 		_db.Users.Add(user);
@@ -95,6 +98,7 @@ public class AuthController : Controller
 			return View(model);
 
 		var user = await _db.Users
+			.Include(u => u.Wallet)
 			.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
 
 		if (user == null || !BCrypt.Net.BCrypt.Verify(model.Haslo, user.HasloHash))
@@ -132,7 +136,7 @@ public class AuthController : Controller
 			new Claim(ClaimTypes.GivenName, user.Imie),
 			new Claim(ClaimTypes.Surname, user.Nazwisko),
 			new Claim(ClaimTypes.Email, user.Email), 
-			new Claim("Balance", user.BalanceReal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+			new Claim("Balance", (user.Wallet?.BalanceReal ?? 1000m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
 		};
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

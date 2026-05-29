@@ -37,10 +37,11 @@ public class AdminController : Controller
         var vm = new AdminDashboardViewModel
         {
             TotalUsers      = await _db.Users.CountAsync(),
-            TotalBalance    = await _db.Users.SumAsync(u => u.BalanceReal + u.BalanceBonus),
+            TotalBalance    = await _db.Wallets.SumAsync(w => w.BalanceReal + w.BalanceBonus),
             TotalDeposits   = await _db.StripePayments.SumAsync(p => (decimal?)p.Amount) ?? 0,
             TotalWithdrawals = await _db.StripeWithdrawals.SumAsync(w => (decimal?)w.Amount) ?? 0,
             RecentUsers     = await _db.Users
+                                .Include(u => u.Wallet)
                                 .OrderByDescending(u => u.DataRejestracji)
                                 .Take(5)
                                 .ToListAsync(),
@@ -58,7 +59,7 @@ public class AdminController : Controller
     {
         if (!IsAdmin()) return Forbid();
 
-        var query = _db.Users.AsQueryable();
+        var query = _db.Users.Include(u => u.Wallet).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -84,11 +85,14 @@ public class AdminController : Controller
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
 
-        user.BalanceReal = Math.Max(0, newBalance);
-        user.BalanceBonus = 0;
+        var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+        if (wallet == null) return NotFound();
+
+        wallet.BalanceReal = Math.Max(0, newBalance);
+        wallet.BalanceBonus = 0;
         await _db.SaveChangesAsync();
 
-        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {user.BalanceReal:F2} PLN.";
+        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {wallet.BalanceReal:F2} PLN.";
         return RedirectToAction(nameof(Uzytkownicy));
     }
 

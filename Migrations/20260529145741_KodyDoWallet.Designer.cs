@@ -4,6 +4,7 @@ using CasinoRoyale.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CasinoRoyale.Migrations
 {
     [DbContext(typeof(Automaty))]
-    partial class AutomatyModelSnapshot : ModelSnapshot
+    [Migration("20260529145741_KodyDoWallet")]
+    partial class KodyDoWallet
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -519,13 +522,25 @@ namespace CasinoRoyale.Migrations
                     b.Property<decimal>("BonusAmount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<DateTime?>("ExpiredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<int>("KodBonusowyId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("RemainingAmount")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("SessionId")
                         .IsRequired()
                         .HasMaxLength(450)
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<int?>("StripePaymentId")
                         .HasColumnType("int");
@@ -535,6 +550,12 @@ namespace CasinoRoyale.Migrations
 
                     b.Property<DateTime>("Uzyto")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("WageringProgress")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("WageringRequired")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

@@ -16,9 +16,9 @@ namespace CasinoRoyale.Models
         [Display(Name = "Nazwisko")]
         public string Nazwisko { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Nazwa u�ytkownika jest wymagana.")]
-        [StringLength(50, MinimumLength = 3, ErrorMessage = "Nazwa musi mie� od 3 do 50 znak�w.")]
-        [Display(Name = "Nazwa u�ytkownika")]
+        [Required(ErrorMessage = "Nazwa użytkownika jest wymagana.")]
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Nazwa musi mieć od 3 do 50 znaków.")]
+        [Display(Name = "Nazwa użytkownika")]
         public string Nazwa { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Adres e-mail jest wymagany.")]
@@ -27,17 +27,8 @@ namespace CasinoRoyale.Models
         public string Email { get; set; } = string.Empty;
         public string HasloHash { get; set; } = string.Empty;
 
-        /// <summary>Balans rzeczywisty (wyp�acalne �rodki).</summary>
-        public decimal BalanceReal { get; set; } = 1000m;
-
-        /// <summary>Balans bonusowy (niewyp�acalny, wymaga obrotu).</summary>
-        public decimal BalanceBonus { get; set; }
-
         public DateTime DataRejestracji { get; init; } = DateTime.UtcNow;
-
-        /// <summary>
-        /// Status weryfikacji KYC użytkownika.
-        /// </summary>
         public UserKycStatus KycStatus { get; set; } = UserKycStatus.NotSubmitted;
+        public Wallet Wallet { get; set; } = null!;
     }
 }

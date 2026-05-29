@@ -77,18 +77,25 @@ public class BonusCodeService : IBonusCodeService
             StripePaymentId = stripePayment.Id,
             SessionId = stripePayment.SessionId,
             Uzyto = DateTime.UtcNow,
-            BonusAmount = bonusAmount,
-            RemainingAmount = bonusAmount,
-            WageringRequired = wageringRequired,
-            WageringProgress = 0,
-            ExpiresAt = expiresAt,
-            Status = BonusStatus.Active
+            BonusAmount = bonusAmount
         };
 
         _dbContext.UzyteKodyBonusowe.Add(bonusEntry);
 
         try
         {
+            await _dbContext.SaveChangesAsync();
+
+            var wallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+            if (wallet != null)
+            {
+                wallet.ActiveBonusId = bonusEntry.Id;
+                wallet.BalanceBonus = bonusAmount;
+                wallet.WageringRequired = wageringRequired;
+                wallet.WageringProgress = 0;
+                wallet.BonusExpiresAt = expiresAt;
+            }
+
             await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateException)
@@ -103,6 +110,64 @@ public class BonusCodeService : IBonusCodeService
             WageringRequired = wageringRequired,
             ExpiresAt = expiresAt
         };
+    }
+
+    public async Task TrackWageringProgressAsync(Wallet wallet, decimal amountFromBonus)
+    {
+        if (wallet.WageringProgress == null || wallet.WageringRequired == null)
+            return;
+
+        wallet.WageringProgress += amountFromBonus;
+
+        if (wallet.WageringProgress < wallet.WageringRequired)
+            return;
+
+        ClearActiveBonus(wallet);
+        ConvertBonusToReal(wallet);
+    }
+
+    public void ClearActiveBonus(Wallet wallet)
+    {
+        wallet.ActiveBonusId = null;
+        wallet.WageringRequired = null;
+        wallet.WageringProgress = null;
+        wallet.BonusExpiresAt = null;
+    }
+
+    public void ConvertBonusToReal(Wallet wallet)
+    {
+        if (wallet.BalanceBonus <= 0) return;
+        wallet.BalanceReal += wallet.BalanceBonus;
+        wallet.BalanceBonus = 0;
+    }
+
+    public async Task ExpireActiveBonusIfNeededAsync(Wallet wallet)
+    {
+        if (wallet.ActiveBonusId == null || wallet.BonusExpiresAt == null)
+            return;
+
+        if (wallet.BonusExpiresAt >= DateTime.UtcNow)
+            return;
+
+        wallet.BalanceBonus = 0;
+        ClearActiveBonus(wallet);
+    }
+
+    public async Task CancelActiveBonusAsync(Wallet wallet)
+    {
+        if (wallet.ActiveBonusId == null) return;
+
+        if (wallet.WageringProgress != null && wallet.WageringRequired != null
+            && wallet.WageringProgress >= wallet.WageringRequired)
+        {
+            ConvertBonusToReal(wallet);
+        }
+        else
+        {
+            wallet.BalanceBonus = 0;
+        }
+
+        ClearActiveBonus(wallet);
     }
 
     private static BonusCodeValidationResult Failed(string error, bool alreadyUsed = false)

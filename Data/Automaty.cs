@@ -22,19 +22,41 @@ namespace CasinoRoyale.Data
         public DbSet<CrashSession> CrashSessions { get; set; }
         public DbSet<KycDocument> KycDocuments { get; set; }
         public DbSet<BetRecord> BetRecords { get; set; }
+        public DbSet<Wallet> Wallets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ── User ──────────────────────────────────────────
-            modelBuilder.Entity<User>()
-                .Property(user => user.BalanceReal)
+            // ── Wallet ─────────────────────────────────────────
+            modelBuilder.Entity<Wallet>()
+                .ToTable("Wallets");
+
+            modelBuilder.Entity<Wallet>()
+                .Property(w => w.BalanceReal)
                 .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<User>()
-                .Property(user => user.BalanceBonus)
+            modelBuilder.Entity<Wallet>()
+                .Property(w => w.BalanceBonus)
                 .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Wallet>()
+                .HasOne(w => w.User)
+                .WithOne(u => u.Wallet)
+                .HasForeignKey<Wallet>(w => w.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Wallet>()
+                .Property(w => w.WageringRequired)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Wallet>()
+                .Property(w => w.WageringProgress)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<Wallet>()
+                .HasIndex(w => w.UserId)
+                .IsUnique();
 
             // ── MinesGame ─────────────────────────────────────
             modelBuilder.Entity<MinesGame>()
@@ -114,18 +136,6 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<UzytyKodBonusowy>()
                 .Property(b => b.BonusAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<UzytyKodBonusowy>()
-                .Property(b => b.RemainingAmount)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<UzytyKodBonusowy>()
-                .Property(b => b.WageringRequired)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<UzytyKodBonusowy>()
-                .Property(b => b.WageringProgress)
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<UzytyKodBonusowy>()

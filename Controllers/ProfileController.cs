@@ -47,7 +47,9 @@ public class ProfileController : Controller
         if (userId == null)
             return Unauthorized();
 
-        var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId.Value);
+        var user = await _dbContext.Users
+            .Include(u => u.Wallet)
+            .FirstOrDefaultAsync(user => user.Id == userId.Value);
         if (user == null)
             return NotFound();
 
@@ -99,21 +101,39 @@ public class ProfileController : Controller
 
         var balanceInfo = await _balanceService.GetBalanceInfoAsync(userId.Value);
 
-        var activeBonuses = await (
-            from ub in _dbContext.UzyteKodyBonusowe
-            join kb in _dbContext.KodyBonusowe on ub.KodBonusowyId equals kb.Id
-            where ub.UserId == userId.Value && ub.Status == BonusStatus.Active
-            select new ActiveBonusViewModel
+        // Pobierz szczegóły aktywnego bonusu (jeśli istnieje)
+        var wallet = await _dbContext.Wallets
+            .Where(w => w.UserId == userId.Value)
+            .FirstOrDefaultAsync();
+
+        List<ActiveBonusViewModel> activeBonuses = new();
+
+        if (wallet?.ActiveBonusId != null)
+        {
+            var bonusData = await (
+                from ub in _dbContext.UzyteKodyBonusowe
+                join kb in _dbContext.KodyBonusowe on ub.KodBonusowyId equals kb.Id
+                where ub.Id == wallet.ActiveBonusId
+                select new
+                {
+                    ub.BonusAmount,
+                    CodeName = kb.Kod
+                }
+            ).FirstOrDefaultAsync();
+
+            if (bonusData != null)
             {
-                CodeName = kb.Kod,
-                BonusAmount = ub.BonusAmount,
-                RemainingAmount = ub.RemainingAmount,
-                WageringProgress = ub.WageringProgress,
-                WageringRequired = ub.WageringRequired,
-                ExpiresAt = ub.ExpiresAt,
-                Status = ub.Status
+                activeBonuses.Add(new ActiveBonusViewModel
+                {
+                    CodeName = bonusData.CodeName,
+                    BonusAmount = bonusData.BonusAmount,
+                    RemainingAmount = wallet.BalanceBonus,
+                    WageringProgress = wallet.WageringProgress ?? 0,
+                    WageringRequired = wallet.WageringRequired ?? 0,
+                    ExpiresAt = wallet.BonusExpiresAt
+                });
             }
-        ).ToListAsync();
+        }
 
         var vm = new ProfileBonusesViewModel
         {
@@ -132,6 +152,7 @@ public class ProfileController : Controller
     {
         var userData = await _dbContext.Users
             .AsNoTracking()
+            .Include(u => u.Wallet)
             .Where(user => user.Id == userId)
             .Select(user => new
             {
@@ -140,8 +161,8 @@ public class ProfileController : Controller
                 user.Nazwisko,
                 user.Nazwa,
                 user.Email,
-                user.BalanceReal,
-                user.BalanceBonus,
+                BalanceReal = user.Wallet != null ? user.Wallet.BalanceReal : 0m,
+                BalanceBonus = user.Wallet != null ? user.Wallet.BalanceBonus : 0m,
                 user.DataRejestracji,
                 user.KycStatus
             })
@@ -277,7 +298,7 @@ public class ProfileController : Controller
             new(ClaimTypes.GivenName, user.Imie),
             new(ClaimTypes.Surname, user.Nazwisko),
             new(ClaimTypes.Email, user.Email),
-            new("Balance", user.BalanceReal.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+            new("Balance", (user.Wallet?.BalanceReal ?? 1000m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
