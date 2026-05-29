@@ -30,4 +30,9 @@ public class GamesController : Controller
     {
         return View();
     }
+
+    public IActionResult Roulette()
+    {
+        return View();
+    }
 }

@@ -298,7 +298,8 @@ public class ProfileController : Controller
             new(ClaimTypes.GivenName, user.Imie),
             new(ClaimTypes.Surname, user.Nazwisko),
             new(ClaimTypes.Email, user.Email),
-            new("Balance", (user.Wallet?.BalanceReal ?? 1000m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+            new("IsAdmin", user.IsAdmin.ToString()),
+            new("Balance", (user.Wallet?.BalanceReal ?? 0m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

@@ -135,9 +135,10 @@ public class AuthController : Controller
 			new Claim(ClaimTypes.Name, user.Nazwa),
 			new Claim(ClaimTypes.GivenName, user.Imie),
 			new Claim(ClaimTypes.Surname, user.Nazwisko),
-			new Claim(ClaimTypes.Email, user.Email), 
-			new Claim("Balance", (user.Wallet?.BalanceReal ?? 1000m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
-		};
+			new Claim(ClaimTypes.Email, user.Email),
+			new Claim("IsAdmin", user.IsAdmin.ToString()),
+			new Claim("Balance", (user.Wallet?.BalanceReal ?? 0m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+        };
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 		var principal = new ClaimsPrincipal(identity);

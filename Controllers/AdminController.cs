@@ -21,18 +21,25 @@ public class AdminController : Controller
         _kycService = kycService;
     }
 
-    // Sprawdza czy zalogowany uzytkownik to admin
-    private bool IsAdmin()
+    private int? GetCurrentUserId()
     {
-        var email = User.FindFirstValue(ClaimTypes.Email);
-        return email?.ToLower() == "admin@admin.pl";
+        var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return int.TryParse(value, out var userId) ? userId : null;
+    }
+
+    private async Task<bool> IsAdminAsync()
+    {
+        var userId = GetCurrentUserId();
+        return userId.HasValue && await _db.Users
+            .AsNoTracking()
+            .AnyAsync(user => user.Id == userId.Value && user.IsAdmin);
     }
 
     // ─── DASHBOARD ───────────────────────────────────────────────────────────
 
     public async Task<IActionResult> Index()
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var vm = new AdminDashboardViewModel
         {
@@ -57,7 +64,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Uzytkownicy(string? search)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var query = _db.Users.Include(u => u.Wallet).AsQueryable();
 
@@ -80,7 +87,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EdytujSaldo(int userId, decimal newBalance)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
@@ -98,17 +105,41 @@ public class AdminController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> UsunUzytkownika(int userId)
+    public async Task<IActionResult> UstawAdmina(int userId, bool isAdmin)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
+
+        var currentUserId = GetCurrentUserId();
+        if (currentUserId == userId && !isAdmin)
+        {
+            TempData["AdminMsg"] = "Nie mozesz odebrac uprawnien administratora samemu sobie.";
+            return RedirectToAction(nameof(Uzytkownicy));
+        }
 
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
 
-        // Nie mozna usunac samego admina
-        if (user.Email.ToLower() == "admin@admin.pl")
+        user.IsAdmin = isAdmin;
+        await _db.SaveChangesAsync();
+
+        TempData["AdminMsg"] = isAdmin
+            ? $"Uzytkownik {user.Email} otrzymal uprawnienia administratora."
+            : $"Uzytkownikowi {user.Email} odebrano uprawnienia administratora.";
+
+        return RedirectToAction(nameof(Uzytkownicy));
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UsunUzytkownika(int userId)
+    {
+        if (!await IsAdminAsync()) return Forbid();
+
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null) return NotFound();
+
+        if (user.IsAdmin)
         {
-            TempData["AdminMsg"] = "Nie mozna usunac konta admina.";
+            TempData["AdminMsg"] = "Nie mozna usunac konta administratora.";
             return RedirectToAction(nameof(Uzytkownicy));
         }
 
@@ -123,7 +154,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> KodyBonusowe()
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var kody = await _db.KodyBonusowe
             .OrderByDescending(k => k.Utworzono)
@@ -136,7 +167,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DodajKod(KodBonusowy model)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         if (string.IsNullOrWhiteSpace(model.Kod))
         {
@@ -164,7 +195,7 @@ public class AdminController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UsunKod(int id)
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var kod = await _db.KodyBonusowe.FindAsync(id);
         if (kod == null) return NotFound();
@@ -274,7 +305,7 @@ public class AdminController : Controller
 
     public async Task<IActionResult> Statystyki()
     {
-        if (!IsAdmin()) return Forbid();
+        if (!await IsAdminAsync()) return Forbid();
 
         var vm = new AdminStatystykiViewModel
         {

@@ -39,6 +39,7 @@
                         <th class="py-3">E-mail</th>
                         <th class="py-3">Saldo</th>
                         <th class="py-3">Rejestracja</th>
+                        <th class="py-3 text-center">Rola</th>
                         <th class="py-3 text-center">Akcje</th>
                     </tr>
                 </thead>
@@ -67,7 +68,23 @@
                             </td>
                             <td class="text-secondary small">@user.DataRejestracji.ToLocalTime().ToString("dd.MM.yyyy")</td>
                             <td class="text-center">
-                                @if (user.Email.ToLower() != "admin@admin.pl")
+                                <form asp-action="UstawAdmina" method="post" class="d-inline-flex align-items-center justify-content-center gap-2">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="userId" value="@user.Id" />
+                                    @if (user.IsAdmin)
+                                    {
+                                        <input type="checkbox" name="isAdmin" value="true" checked class="form-check-input m-0" onchange="this.form.submit()" title="Administrator" />
+                                        <span class="badge bg-warning text-dark">Admin</span>
+                                    }
+                                    else
+                                    {
+                                        <input type="checkbox" name="isAdmin" value="true" class="form-check-input m-0" onchange="this.form.submit()" title="Administrator" />
+                                    }
+                                    <input type="hidden" name="isAdmin" value="false" />
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                @if (!user.IsAdmin)
                                 {
                                     <form asp-action="UsunUzytkownika" method="post" onsubmit="return confirm('Na pewno usunac uzytkownika @user.Email?')">
                                         @Html.AntiForgeryToken()
@@ -76,10 +93,6 @@
                                             <i class="fa-solid fa-trash"></i>
                                         </button>
                                     </form>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-warning text-dark">Admin</span>
                                 }
                             </td>
                         </tr>
