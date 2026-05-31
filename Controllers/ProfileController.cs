@@ -304,6 +304,29 @@ public class ProfileController : Controller
             .Take(40)
             .ToList();
 
+        var loginRaw = await _dbContext.LoginHistories
+            .AsNoTracking()
+            .Where(h => h.UserId == userId)
+            .OrderByDescending(h => h.LoggedAt)
+            .Take(30)
+            .ToListAsync();
+
+        profile.LoginHistory = loginRaw.Select(h => new LoginHistoryItemViewModel
+        {
+            EventType = h.EventType,
+            EventTypeDisplay = h.EventType switch
+            {
+                "login" => "Logowanie",
+                "logout" => "Wylogowanie",
+                "failed_login" => "Nieudane logowanie",
+                _ => h.EventType
+            },
+            IpAddress = h.IpAddress,
+            UserAgent = h.UserAgent,
+            Successful = h.Successful,
+            LoggedAt = h.LoggedAt
+        }).ToList();
+
         return profile;
     }
 

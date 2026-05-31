@@ -29,6 +29,7 @@ public class ProfileViewModel
     public DateTime DataRejestracji { get; set; }
     public List<TransactionHistoryItemViewModel> TransactionHistory { get; set; } = new();
     public List<BetHistoryItemViewModel> BetHistory { get; set; } = new();
+    public List<LoginHistoryItemViewModel> LoginHistory { get; set; } = new();
 
     public string PelneImie
     {
@@ -70,4 +71,14 @@ public class BetHistoryItemViewModel
     public string GameName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public decimal BetAmount { get; set; }
+}
+
+public class LoginHistoryItemViewModel
+{
+    public string EventType { get; set; } = string.Empty;
+    public string EventTypeDisplay { get; set; } = string.Empty;
+    public string IpAddress { get; set; } = string.Empty;
+    public string UserAgent { get; set; } = string.Empty;
+    public bool Successful { get; set; }
+    public DateTime LoggedAt { get; set; }
 }

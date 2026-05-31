@@ -71,6 +71,7 @@ public class AuthController : Controller
 		_db.Users.Add(user);
 		await _db.SaveChangesAsync();
 
+		await ZapiszLogowanie(user.Id, true, "login");
 		await ZalogujUzytkownika(user, false);
 
 		return RedirectToAction("Index", "Home");
@@ -103,10 +104,12 @@ public class AuthController : Controller
 
 		if (user == null || !BCrypt.Net.BCrypt.Verify(model.Haslo, user.HasloHash))
 		{
+			await ZapiszLogowanie(user?.Id ?? 0, false, "failed_login");
 			ModelState.AddModelError(string.Empty, "Nieprawidłowy e-mail lub hasło.");
 			return View(model);
 		}
 
+		await ZapiszLogowanie(user.Id, true, "login");
 		await ZalogujUzytkownika(user, model.ZapamiętajMnie);
 
 		if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -121,6 +124,12 @@ public class AuthController : Controller
 	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> Wylogowanie()
 	{
+		var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		if (int.TryParse(userIdValue, out var userId))
+		{
+			await ZapiszLogowanie(userId, true, "logout");
+		}
+
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 		return RedirectToAction("Index", "Home");
 	}
@@ -155,5 +164,22 @@ public class AuthController : Controller
 			CookieAuthenticationDefaults.AuthenticationScheme,
 			principal,
 			authProperties);
+	}
+
+	// ── HISTORIA LOGOWAŃ ────────────────────────────────
+
+	private async Task ZapiszLogowanie(int userId, bool sukces, string eventType = "login")
+	{
+		_db.LoginHistories.Add(new LoginHistory
+		{
+			UserId = userId,
+			IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+			UserAgent = Request.Headers["User-Agent"].ToString(),
+			Successful = sukces,
+			EventType = eventType,
+			LoggedAt = DateTime.UtcNow
+		});
+
+		await _db.SaveChangesAsync();
 	}
 }

@@ -1,0 +1,99 @@
+@model List<CasinoRoyale.Models.LoginHistory>
+@{
+    ViewData["Title"] = "Historia logowań";
+    var userName = ViewBag.UserName as string;
+    var userEmail = ViewBag.UserEmail as string;
+    var userId = ViewBag.UserId as int?;
+}
+
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-2 gap-3">
+        <a asp-action="Uzytkownicy" class="btn btn-outline-secondary btn-sm"><i class="fa-solid fa-arrow-left"></i></a>
+        <h1 class="mb-0 text-white">Historia logowań</h1>
+    </div>
+
+    <div class="mb-4">
+        <div class="text-white fw-semibold fs-5">@userName</div>
+        <div class="text-secondary">@userEmail</div>
+        <div class="text-secondary small">Łącznie wpisów: @Model.Count</div>
+    </div>
+
+    @if (TempData["AdminMsg"] != null)
+    {
+        <div class="alert border-0 mt-3" style="background: rgba(40,167,69,0.15); color: #5cb85c;">
+            <i class="fa-solid fa-check-circle me-2"></i>@TempData["AdminMsg"]
+        </div>
+    }
+
+    <div class="casino-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="--bs-table-bg: transparent;">
+                <thead style="background: rgba(0,0,0,.3);">
+                    <tr class="text-secondary small">
+                        <th class="px-4 py-3">#</th>
+                        <th class="py-3">Zdarzenie</th>
+                        <th class="py-3">Status</th>
+                        <th class="py-3">IP</th>
+                        <th class="py-3">User-Agent</th>
+                        <th class="py-3">Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        var index = 1;
+                        foreach (var entry in Model)
+                        {
+                            <tr>
+                                <td class="px-4 text-secondary">@index</td>
+                                <td>
+                                    @switch (entry.EventType)
+                                    {
+                                        case "login":
+                                            <span class="text-success"><i class="fa-solid fa-right-to-bracket me-1"></i>Logowanie</span>
+                                            break;
+                                        case "logout":
+                                            <span class="text-secondary"><i class="fa-solid fa-arrow-right-from-bracket me-1"></i>Wylogowanie</span>
+                                            break;
+                                        case "failed_login":
+                                            <span class="text-danger"><i class="fa-solid fa-xmark-circle me-1"></i>Nieudane logowanie</span>
+                                            break;
+                                        default:
+                                            <span>@entry.EventType</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    @if (entry.Successful)
+                                    {
+                                        <span class="badge bg-success">Sukces</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Nieudane</span>
+                                    }
+                                </td>
+                                <td class="text-secondary small">
+                                    <code>@entry.IpAddress</code>
+                                </td>
+                                <td class="text-secondary small" style="max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@entry.UserAgent">
+                                    @entry.UserAgent
+                                </td>
+                                <td class="text-secondary small" title="@entry.LoggedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss")">
+                                    @entry.LoggedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                </td>
+                            </tr>
+                            index++;
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center text-secondary py-4">Brak historii logowań dla tego użytkownika.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

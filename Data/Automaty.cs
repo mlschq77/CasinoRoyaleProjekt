@@ -26,6 +26,7 @@ namespace CasinoRoyale.Data
         public DbSet<Wallet> Wallets { get; set; }
         public DbSet<DiceGame> DiceGames { get; set; }
         public DbSet<KenoGame> KenoGames { get; set; }
+        public DbSet<LoginHistory> LoginHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -238,6 +239,26 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<BetRecord>()
                 .HasIndex(r => new { r.UserId, r.SessionKey, r.Settled });
+
+            // ── LoginHistory ────────────────────────────────
+            modelBuilder.Entity<LoginHistory>()
+                .ToTable("LoginHistories");
+
+            modelBuilder.Entity<LoginHistory>()
+                .Property(h => h.IpAddress)
+                .HasMaxLength(45);
+
+            modelBuilder.Entity<LoginHistory>()
+                .Property(h => h.UserAgent)
+                .HasMaxLength(500);
+
+            modelBuilder.Entity<LoginHistory>()
+                .Property(h => h.EventType)
+                .HasMaxLength(20);
+
+            modelBuilder.Entity<LoginHistory>()
+                .HasIndex(h => new { h.UserId, h.LoggedAt });
+
 
             // ── AutomatInfo ───────────────────────────────────
             modelBuilder.Entity<AutomatInfo>()

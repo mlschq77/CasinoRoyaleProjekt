@@ -110,6 +110,9 @@
                         <button class="casino-btn-secondary btn" type="button" data-history-open="bets">
                             <i class="fa-solid fa-coins me-1"></i>Historia zakladow
                         </button>
+                        <button class="casino-btn-secondary btn" type="button" data-history-open="logins">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i>Historia logowan
+                        </button>
                     </div>
                 </aside>
             </div>
@@ -187,6 +190,48 @@
             else
             {
                 <div class="casino-history-empty">Brak zakladow.</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="casino-history-modal" id="logins-modal" aria-hidden="true">
+    <div class="casino-history-panel">
+        <button class="casino-history-close" type="button" data-history-close>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2>Historia logowan</h2>
+        <div class="casino-history-list">
+            @if (Model.LoginHistory.Any())
+            {
+                foreach (var item in Model.LoginHistory)
+                {
+                    <div class="casino-history-row">
+                        <span>
+                            @if (item.EventType == "login")
+                            {
+                                <i class="fa-solid fa-check-circle text-success me-1"></i>
+                            }
+                            else if (item.EventType == "failed_login")
+                            {
+                                <i class="fa-solid fa-xmark-circle text-danger me-1"></i>
+                            }
+                            else if (item.EventType == "logout")
+                            {
+                                <i class="fa-solid fa-arrow-right-from-bracket text-secondary me-1"></i>
+                            }
+                            @item.EventTypeDisplay
+                        </span>
+                        <span class="text-secondary small" title="IP: @item.IpAddress">
+                            @item.IpAddress
+                        </span>
+                        <time title="@item.UserAgent">@item.LoggedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="casino-history-empty">Brak historii logowan.</div>
             }
         </div>
     </div>

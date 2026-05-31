@@ -408,6 +408,26 @@ body.casino-body {
         border-color: rgba(220, 80, 80, 0.65);
     }
 
+.casino-login-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.casino-login-link:hover {
+    color: var(--casino-gold-soft);
+}
+
+.casino-login-link:active {
+    color: var(--casino-gold);
+}
+
+.text-muted-no-link {
+    color: rgba(245, 241, 230, 0.45);
+    cursor: default;
+}
+
 .casino-validation {
     display: block;
     margin-top: 0.35rem;
