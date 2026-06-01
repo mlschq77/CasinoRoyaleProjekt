@@ -16,11 +16,13 @@ public class ProfileController : Controller
 {
     private readonly Automaty _dbContext;
     private readonly IKycService _kycService;
+    private readonly IBalanceService _balanceService;
 
-    public ProfileController(Automaty dbContext, IKycService kycService)
+    public ProfileController(Automaty dbContext, IKycService kycService, IBalanceService balanceService)
     {
         _dbContext = dbContext;
         _kycService = kycService;
+        _balanceService = balanceService;
     }
 
     public async Task<IActionResult> Index()
@@ -45,7 +47,9 @@ public class ProfileController : Controller
         if (userId == null)
             return Unauthorized();
 
-        var user = await _dbContext.Users.FirstOrDefaultAsync(user => user.Id == userId.Value);
+        var user = await _dbContext.Users
+            .Include(u => u.Wallet)
+            .FirstOrDefaultAsync(user => user.Id == userId.Value);
         if (user == null)
             return NotFound();
 
@@ -89,10 +93,66 @@ public class ProfileController : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    public async Task<IActionResult> Bonuses()
+    {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var balanceInfo = await _balanceService.GetBalanceInfoAsync(userId.Value);
+
+        // Pobierz szczegóły aktywnego bonusu (jeśli istnieje)
+        var wallet = await _dbContext.Wallets
+            .Where(w => w.UserId == userId.Value)
+            .FirstOrDefaultAsync();
+
+        List<ActiveBonusViewModel> activeBonuses = new();
+
+        if (wallet?.ActiveBonusId != null)
+        {
+            var bonusData = await (
+                from ub in _dbContext.UzyteKodyBonusowe
+                join kb in _dbContext.KodyBonusowe on ub.KodBonusowyId equals kb.Id
+                where ub.Id == wallet.ActiveBonusId
+                select new
+                {
+                    ub.BonusAmount,
+                    CodeName = kb.Kod
+                }
+            ).FirstOrDefaultAsync();
+
+            if (bonusData != null)
+            {
+                activeBonuses.Add(new ActiveBonusViewModel
+                {
+                    CodeName = bonusData.CodeName,
+                    BonusAmount = bonusData.BonusAmount,
+                    RemainingAmount = wallet.BalanceBonus,
+                    WageringProgress = wallet.WageringProgress ?? 0,
+                    WageringRequired = wallet.WageringRequired ?? 0,
+                    ExpiresAt = wallet.BonusExpiresAt
+                });
+            }
+        }
+
+        var vm = new ProfileBonusesViewModel
+        {
+            BalanceReal = balanceInfo?.BalanceReal ?? 0,
+            BalanceBonus = balanceInfo?.BalanceBonus ?? 0,
+            TotalWageringProgress = balanceInfo?.WageringProgress ?? 0,
+            TotalWageringRequired = balanceInfo?.WageringRequired ?? 0,
+            EarliestExpiry = balanceInfo?.ExpiresAt,
+            Bonuses = activeBonuses
+        };
+
+        return View(vm);
+    }
+
     private async Task<ProfileViewModel?> BuildProfileViewModel(int userId)
     {
         var userData = await _dbContext.Users
             .AsNoTracking()
+            .Include(u => u.Wallet)
             .Where(user => user.Id == userId)
             .Select(user => new
             {
@@ -101,7 +161,8 @@ public class ProfileController : Controller
                 user.Nazwisko,
                 user.Nazwa,
                 user.Email,
-                user.Balance,
+                BalanceReal = user.Wallet != null ? user.Wallet.BalanceReal : 0m,
+                BalanceBonus = user.Wallet != null ? user.Wallet.BalanceBonus : 0m,
                 user.DataRejestracji,
                 user.KycStatus
             })
@@ -116,7 +177,8 @@ public class ProfileController : Controller
             Nazwisko = userData.Nazwisko,
             Nazwa = userData.Nazwa,
             Email = userData.Email,
-            Balance = userData.Balance,
+            Balance = userData.BalanceReal,
+            BalanceBonus = userData.BalanceBonus,
             DataRejestracji = userData.DataRejestracji,
             KycStatusDisplay = userData.KycStatus switch
             {
@@ -242,6 +304,29 @@ public class ProfileController : Controller
             .Take(40)
             .ToList();
 
+        var loginRaw = await _dbContext.LoginHistories
+            .AsNoTracking()
+            .Where(h => h.UserId == userId)
+            .OrderByDescending(h => h.LoggedAt)
+            .Take(30)
+            .ToListAsync();
+
+        profile.LoginHistory = loginRaw.Select(h => new LoginHistoryItemViewModel
+        {
+            EventType = h.EventType,
+            EventTypeDisplay = h.EventType switch
+            {
+                "login" => "Logowanie",
+                "logout" => "Wylogowanie",
+                "failed_login" => "Nieudane logowanie",
+                _ => h.EventType
+            },
+            IpAddress = h.IpAddress,
+            UserAgent = h.UserAgent,
+            Successful = h.Successful,
+            LoggedAt = h.LoggedAt
+        }).ToList();
+
         return profile;
     }
 
@@ -261,7 +346,7 @@ public class ProfileController : Controller
             new(ClaimTypes.Surname, user.Nazwisko),
             new(ClaimTypes.Email, user.Email),
             new("IsAdmin", user.IsAdmin.ToString()),
-            new("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+            new("Balance", (user.Wallet?.BalanceReal ?? 0m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
         };
 
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

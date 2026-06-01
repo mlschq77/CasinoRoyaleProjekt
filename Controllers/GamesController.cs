@@ -45,4 +45,9 @@ public class GamesController : Controller
     {
         return View();
     }
+
+    public IActionResult Baccarat()
+    {
+        return View();
+    }
 }

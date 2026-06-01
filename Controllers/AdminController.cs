@@ -44,10 +44,11 @@ public class AdminController : Controller
         var vm = new AdminDashboardViewModel
         {
             TotalUsers      = await _db.Users.CountAsync(),
-            TotalBalance    = await _db.Users.SumAsync(u => u.Balance),
+            TotalBalance    = await _db.Wallets.SumAsync(w => w.BalanceReal),
             TotalDeposits   = await _db.StripePayments.SumAsync(p => (decimal?)p.Amount) ?? 0,
             TotalWithdrawals = await _db.StripeWithdrawals.SumAsync(w => (decimal?)w.Amount) ?? 0,
             RecentUsers     = await _db.Users
+                                .Include(u => u.Wallet)
                                 .OrderByDescending(u => u.DataRejestracji)
                                 .Take(5)
                                 .ToListAsync(),
@@ -65,7 +66,7 @@ public class AdminController : Controller
     {
         if (!await IsAdminAsync()) return Forbid();
 
-        var query = _db.Users.AsQueryable();
+        var query = _db.Users.Include(u => u.Wallet).AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -78,6 +79,20 @@ public class AdminController : Controller
         }
 
         var users = await query.OrderByDescending(u => u.DataRejestracji).ToListAsync();
+
+        // Pobierz ostatnie udane logowanie dla każdego użytkownika
+        var userIds = users.Select(u => u.Id).ToList();
+        var ostatnieLogowania = await _db.LoginHistories
+            .Where(h => userIds.Contains(h.UserId) && h.EventType == "login" && h.Successful)
+            .GroupBy(h => h.UserId)
+            .Select(g => new
+            {
+                UserId = g.Key,
+                OstatnieLogowanie = g.Max(h => h.LoggedAt)
+            })
+            .ToDictionaryAsync(x => x.UserId, x => x.OstatnieLogowanie);
+
+        ViewBag.OstatnieLogowania = ostatnieLogowania;
         ViewBag.Search = search;
         return View(users);
     }
@@ -91,10 +106,14 @@ public class AdminController : Controller
         var user = await _db.Users.FindAsync(userId);
         if (user == null) return NotFound();
 
-        user.Balance = Math.Max(0, newBalance);
+        var wallet = await _db.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
+        if (wallet == null) return NotFound();
+
+        wallet.BalanceReal = Math.Max(0, newBalance);
+        wallet.BalanceBonus = 0;
         await _db.SaveChangesAsync();
 
-        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {user.Balance:F2} PLN.";
+        TempData["AdminMsg"] = $"Saldo uzytkownika {user.Email} zaktualizowane na {wallet.BalanceReal:F2} PLN.";
         return RedirectToAction(nameof(Uzytkownicy));
     }
 
@@ -294,6 +313,30 @@ public class AdminController : Controller
     {
         var value = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return int.TryParse(value, out var userId) ? userId : 0;
+    }
+
+    // ─── HISTORIA LOGOWAŃ ────────────────────────────────────────────────────
+
+    public async Task<IActionResult> LoginHistory(int userId)
+    {
+        if (!await IsAdminAsync()) return Forbid();
+
+        var user = await _db.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null) return NotFound();
+
+        var logins = await _db.LoginHistories
+            .AsNoTracking()
+            .Where(h => h.UserId == userId)
+            .OrderByDescending(h => h.LoggedAt)
+            .ToListAsync();
+
+        ViewBag.UserName = $"{user.Imie} {user.Nazwisko} (@{user.Nazwa})";
+        ViewBag.UserEmail = user.Email;
+        ViewBag.UserId = userId;
+        return View(logins);
     }
 
     // ─── STATYSTYKI GIER ─────────────────────────────────────────────────────

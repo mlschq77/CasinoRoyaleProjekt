@@ -44,10 +44,6 @@ namespace CasinoRoyale.Controllers
                 {
                     await using var transaction = await _context.Database.BeginTransactionAsync();
 
-                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet);
-                    if (!betResult.Success)
-                        return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
-
                     var crashPoint = _service.GenerateCrashPoint();
 
                     var session = new CrashSession
@@ -61,6 +57,15 @@ namespace CasinoRoyale.Controllers
 
                     _context.CrashSessions.Add(session);
                     await _context.SaveChangesAsync();
+
+                    var sessionKey = "csh:" + session.Id;
+                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+                    if (!betResult.Success)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
+                    }
+
                     await transaction.CommitAsync();
 
                     // NIGDY nie wysyłamy crashPoint do klienta!
@@ -69,7 +74,8 @@ namespace CasinoRoyale.Controllers
                         success = true,
                         sessionId = session.Id,
                         startTime = session.StartTime,
-                        balance = betResult.Balance
+                        balance = betResult.Balance,
+                        balanceBonus = betResult.BalanceBonus
                     });
                 }, null, CancellationToken.None);
             }
@@ -137,7 +143,8 @@ namespace CasinoRoyale.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    var payoutResult = await _balanceService.PayoutAsync(userId.Value, winAmount);
+                    var sessionKey = "csh:" + session.Id;
+                    var payoutResult = await _balanceService.PayoutAsync(userId.Value, winAmount, sessionKey);
                     if (!payoutResult.Success)
                         return BadRequest(new { error = payoutResult.Error });
 
@@ -150,7 +157,8 @@ namespace CasinoRoyale.Controllers
                         multiplier = effectiveMultiplier,
                         winAmount,
                         crashPoint = session.CrashPoint,
-                        balance = payoutResult.Balance
+                        balance = payoutResult.Balance,
+                        balanceBonus = payoutResult.BalanceBonus
                     });
                 }
                 else if (clientMultiplier.HasValue
@@ -168,7 +176,8 @@ namespace CasinoRoyale.Controllers
 
                     await _context.SaveChangesAsync();
 
-                    var payoutResult = await _balanceService.PayoutAsync(userId.Value, winAmount);
+                    var sessionKey = "csh:" + session.Id;
+                    var payoutResult = await _balanceService.PayoutAsync(userId.Value, winAmount, sessionKey);
                     if (!payoutResult.Success)
                         return BadRequest(new { error = payoutResult.Error });
 
@@ -181,7 +190,8 @@ namespace CasinoRoyale.Controllers
                         multiplier = effectiveMultiplier,
                         winAmount,
                         crashPoint = session.CrashPoint,
-                        balance = payoutResult.Balance
+                        balance = payoutResult.Balance,
+                        balanceBonus = payoutResult.BalanceBonus
                     });
                 }
                 else

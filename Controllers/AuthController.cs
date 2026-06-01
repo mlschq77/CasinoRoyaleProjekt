@@ -61,13 +61,17 @@ public class AuthController : Controller
 			Nazwa = model.Nazwa,
 			Email = model.Email,
 			HasloHash = BCrypt.Net.BCrypt.HashPassword(model.Haslo),
-			Balance = 0m,
-			DataRejestracji = DateTime.UtcNow
+			DataRejestracji = DateTime.UtcNow,
+			Wallet = new Wallet
+			{
+				BalanceReal = 0m
+			}
 		};
 
 		_db.Users.Add(user);
 		await _db.SaveChangesAsync();
 
+		await ZapiszLogowanie(user.Id, true, "login");
 		await ZalogujUzytkownika(user, false);
 
 		return RedirectToAction("Index", "Home");
@@ -95,14 +99,17 @@ public class AuthController : Controller
 			return View(model);
 
 		var user = await _db.Users
+			.Include(u => u.Wallet)
 			.FirstOrDefaultAsync(u => u.Email.ToLower() == model.Email.ToLower());
 
 		if (user == null || !BCrypt.Net.BCrypt.Verify(model.Haslo, user.HasloHash))
 		{
+			await ZapiszLogowanie(user?.Id ?? 0, false, "failed_login");
 			ModelState.AddModelError(string.Empty, "Nieprawidłowy e-mail lub hasło.");
 			return View(model);
 		}
 
+		await ZapiszLogowanie(user.Id, true, "login");
 		await ZalogujUzytkownika(user, model.ZapamiętajMnie);
 
 		if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
@@ -117,6 +124,12 @@ public class AuthController : Controller
 	[ValidateAntiForgeryToken]
 	public async Task<IActionResult> Wylogowanie()
 	{
+		var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
+		if (int.TryParse(userIdValue, out var userId))
+		{
+			await ZapiszLogowanie(userId, true, "logout");
+		}
+
 		await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 		return RedirectToAction("Index", "Home");
 	}
@@ -133,8 +146,8 @@ public class AuthController : Controller
 			new Claim(ClaimTypes.Surname, user.Nazwisko),
 			new Claim(ClaimTypes.Email, user.Email),
 			new Claim("IsAdmin", user.IsAdmin.ToString()),
-			new Claim("Balance", user.Balance.ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
-		};
+			new Claim("Balance", (user.Wallet?.BalanceReal ?? 0m).ToString("0.00", System.Globalization.CultureInfo.InvariantCulture))
+        };
 
 		var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 		var principal = new ClaimsPrincipal(identity);
@@ -151,5 +164,22 @@ public class AuthController : Controller
 			CookieAuthenticationDefaults.AuthenticationScheme,
 			principal,
 			authProperties);
+	}
+
+	// ── HISTORIA LOGOWAŃ ────────────────────────────────
+
+	private async Task ZapiszLogowanie(int userId, bool sukces, string eventType = "login")
+	{
+		_db.LoginHistories.Add(new LoginHistory
+		{
+			UserId = userId,
+			IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+			UserAgent = Request.Headers["User-Agent"].ToString(),
+			Successful = sukces,
+			EventType = eventType,
+			LoggedAt = DateTime.UtcNow
+		});
+
+		await _db.SaveChangesAsync();
 	}
 }

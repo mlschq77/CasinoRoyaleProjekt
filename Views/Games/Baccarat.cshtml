@@ -1,0 +1,95 @@
+@{
+    ViewData["Title"] = "Baccarat";
+}
+
+<link rel="stylesheet" href="~/css/baccarat.css" asp-append-version="true" />
+
+<div class="bac-wrapper">
+    <div class="bac-table">
+
+        <div class="bac-header">
+            <h2 class="bac-title"><i class="fa-solid fa-diamond me-2"></i>Baccarat</h2>
+            <div class="bac-balance-info">
+                <span class="bac-balance-label">Saldo:</span>
+                <span class="bac-balance-value" id="bac-balance">—</span>
+            </div>
+        </div>
+
+        <div class="bac-bet-type-select" id="bet-type-area">
+            <span class="bac-bet-label">Zakład na:</span>
+            <div class="bac-bet-options">
+                <button class="bac-bet-option bac-bet-player active" data-bet="player">
+                    <span class="bac-bet-name">Gracz</span>
+                    <span class="bac-bet-pays">1:1</span>
+                </button>
+                <button class="bac-bet-option bac-bet-banker" data-bet="banker">
+                    <span class="bac-bet-name">Bankier</span>
+                    <span class="bac-bet-pays">0.95:1</span>
+                </button>
+                <button class="bac-bet-option bac-bet-tie" data-bet="tie">
+                    <span class="bac-bet-name">Remis</span>
+                    <span class="bac-bet-pays">8:1</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="bac-hands">
+            <div class="bac-hand-zone bac-banker-zone">
+                <div class="bac-zone-label">
+                    <span class="bac-zone-name">Bankier</span>
+                    <span class="bac-hand-value" id="banker-value"></span>
+                </div>
+                <div class="bac-cards" id="banker-cards"></div>
+            </div>
+
+            <div class="bac-result-banner" id="bac-result-banner"></div>
+
+            <div class="bac-hand-zone bac-player-zone">
+                <div class="bac-zone-label">
+                    <span class="bac-zone-name">Gracz</span>
+                    <span class="bac-hand-value" id="player-value"></span>
+                </div>
+                <div class="bac-cards" id="player-cards"></div>
+            </div>
+        </div>
+
+        <div class="bac-controls">
+            <div class="bac-bet-area" id="bet-area">
+                <div class="bac-bet-chips">
+                    <button class="bac-chip" data-value="10">10</button>
+                    <button class="bac-chip" data-value="25">25</button>
+                    <button class="bac-chip" data-value="50">50</button>
+                    <button class="bac-chip" data-value="100">100</button>
+                    <button class="bac-chip" data-value="250">250</button>
+                    <button class="bac-chip" data-value="500">500</button>
+                </div>
+                <div class="bac-bet-row">
+                    <div class="bac-bet-display">
+                        Zakład: <span id="bet-display">0</span>
+                        <button class="bac-clear-btn" id="clear-bet-btn">Wyczyść</button>
+                    </div>
+                    <button class="casino-btn-primary btn bac-deal-btn" id="deal-btn">
+                        <i class="fa-solid fa-play me-1"></i>Rozdaj
+                    </button>
+                </div>
+            </div>
+
+            <div class="bac-action-area" id="action-area" style="display:none">
+                <button class="casino-btn-primary btn bac-action-btn" id="btn-new-game">
+                    <i class="fa-solid fa-rotate me-1"></i>Nowa gra
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="bac-history-track" id="bac-history-track">
+        <div class="bac-history-label">Ostatnie wyniki:</div>
+        <div class="bac-history-dots" id="bac-history-dots"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/baccarat.js" asp-append-version="true"></script>
+}

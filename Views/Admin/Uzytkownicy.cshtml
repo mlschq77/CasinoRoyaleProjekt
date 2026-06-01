@@ -39,6 +39,7 @@
                         <th class="py-3">E-mail</th>
                         <th class="py-3">Saldo</th>
                         <th class="py-3">Rejestracja</th>
+                        <th class="py-3">Ostatnio online</th>
                         <th class="py-3 text-center">Rola</th>
                         <th class="py-3 text-center">Akcje</th>
                     </tr>
@@ -58,7 +59,7 @@
                                 <form asp-action="EdytujSaldo" method="post" class="d-flex gap-1 align-items-center">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="userId" value="@user.Id" />
-                                    <input type="number" name="newBalance" value="@user.Balance.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)"
+                                    <input type="number" name="newBalance" value="@((user.Wallet?.BalanceReal ?? 0).ToString("F2", System.Globalization.CultureInfo.InvariantCulture))"
                                            step="0.01" min="0" class="form-control form-control-sm text-white"
                                            style="width:110px; background: rgba(255,255,255,.05); border-color: rgba(255,255,255,.1);" />
                                     <button type="submit" class="btn btn-sm btn-outline-warning" title="Zapisz saldo">
@@ -67,6 +68,23 @@
                                 </form>
                             </td>
                             <td class="text-secondary small">@user.DataRejestracji.ToLocalTime().ToString("dd.MM.yyyy")</td>
+                            <td class="text-secondary small">
+                                @{
+                                    var ostatnie = ViewBag.OstatnieLogowania as Dictionary<int, DateTime>;
+                                    if (ostatnie != null && ostatnie.TryGetValue(user.Id, out var lastLogin))
+                                    {
+                                        <a asp-action="LoginHistory" asp-route-userId="@user.Id" title="Historia logowań" class="casino-login-link">
+                                            <span title="@lastLogin.ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss")">
+                                                @lastLogin.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+                                            </span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Brak</span>
+                                    }
+                                }
+                            </td>
                             <td class="text-center">
                                 <form asp-action="UstawAdmina" method="post" class="d-inline-flex align-items-center justify-content-center gap-2">
                                     @Html.AntiForgeryToken()

@@ -8,4 +8,6 @@ public class UzytyKodBonusowy
     public int? StripePaymentId { get; set; }
     public string SessionId { get; set; } = string.Empty;
     public DateTime Uzyto { get; set; } = DateTime.UtcNow;
+    public decimal BonusAmount { get; set; }
 }
+

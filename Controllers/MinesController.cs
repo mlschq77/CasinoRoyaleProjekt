@@ -45,10 +45,6 @@ namespace CasinoRoyale.Controllers
                 {
                     await using var transaction = await _context.Database.BeginTransactionAsync();
 
-                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet);
-                    if (!betResult.Success)
-                        return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
-
                     var mines = _service.GenerateMines(mineCount);
 
                     var game = new MinesGame
@@ -62,9 +58,18 @@ namespace CasinoRoyale.Controllers
 
                     _context.MinesGames.Add(game);
                     await _context.SaveChangesAsync();
+
+                    var sessionKey = "min:" + game.Id;
+                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+                    if (!betResult.Success)
+                    {
+                        await transaction.RollbackAsync();
+                        return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
+                    }
+
                     await transaction.CommitAsync();
 
-                    return Ok(new { id = game.Id, balance = betResult.Balance });
+                    return Ok(new { id = game.Id, balance = betResult.Balance, balanceBonus = betResult.BalanceBonus });
                 }, null, CancellationToken.None);
             }
             catch (Exception ex)
@@ -139,13 +144,17 @@ namespace CasinoRoyale.Controllers
                 game.IsActive = false;
                 await _context.SaveChangesAsync();
 
-                var payoutResult = await _balanceService.PayoutAsync(userId.Value, win);
+                var sessionKey = "min:" + game.Id;
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, win, sessionKey);
                 if (!payoutResult.Success)
+                {
+                    await transaction.RollbackAsync();
                     return BadRequest(new { error = payoutResult.Error });
+                }
 
                 await transaction.CommitAsync();
 
-                return Ok(new { win, multiplier, balance = payoutResult.Balance });
+                return Ok(new { win, multiplier, balance = payoutResult.Balance, balanceBonus = payoutResult.BalanceBonus });
             }, null, CancellationToken.None);
         }
 

@@ -1,13 +1,11 @@
-// Crash Game - Main JavaScript
 const GROWTH_RATE = 0.06;
-const POLL_INTERVAL = 250; // ms - polling co 250ms dla lepszej responsywności
-const DISPLAY_DELAY = 0.20; // sekund - opóźnienie wyświetlanego mnożnika względem serwera,
-                           // aby auto-wypłata nigdy nie zadziałała po faktycznym crashu
-
+const POLL_INTERVAL = 250; 
+const DISPLAY_DELAY = 0.20; 
+                           
 let state = {
     gameId: null,
     startTime: null,
-    clientStartTime: null, // kliencki timer - startuje gdy gra zaczyna się na ekranie
+    clientStartTime: null,
     isPlaying: false,
     hasCrashed: false,
     autoCashoutMultiplier: null,
@@ -21,13 +19,6 @@ let state = {
 };
 
 function $(id) { return document.getElementById(id); }
-
-function updateBalance(balance) {
-    const el = document.getElementById("balance-display");
-    if (el && balance !== undefined && balance !== null) {
-        el.innerText = Number(balance).toFixed(2);
-    }
-}
 
 async function parseResponse(res) {
     const text = await res.text();
@@ -59,7 +50,6 @@ function drawChart() {
     const w = state.chartWidth;
     const h = state.chartHeight;
 
-    // Clear
     ctx.clearRect(0, 0, w, h);
 
     // Background
@@ -117,11 +107,9 @@ function showCrashEffect() {
     if (!displayArea) return;
 
     displayArea.classList.remove('crash-crash-effect');
-    // Force reflow
     void displayArea.offsetWidth;
     displayArea.classList.add('crash-crash-effect');
 
-    // Remove class after animation
     setTimeout(() => displayArea.classList.remove('crash-crash-effect'), 800);
 }
 
@@ -151,18 +139,17 @@ async function startGame() {
         }
 
         state.gameId = data.sessionId;
-        state.startTime = new Date(data.startTime); // czas serwera do walidacji
-        state.clientStartTime = new Date(); // własny timer - od tego momentu liczymy czas na ekranie
+        state.startTime = new Date(data.startTime);
+        state.clientStartTime = new Date(); 
         state.isPlaying = true;
         state.hasCrashed = false;
         state.autoCashoutMultiplier = autoCashout;
         state.chartData = [{ time: 0, multiplier: 1.0 }];
 
-        updateBalance(data.balance);
+        updateBalanceDisplay(data);
         showStatus('Gra trwa...');
         $('crash-win').textContent = '';
 
-        // Update canvas size
         const container = state.chartCanvas?.parentElement;
         if (container && state.chartCanvas) {
             const rect = container.getBoundingClientRect();
@@ -193,10 +180,7 @@ function animateMultiplier() {
     const now = new Date();
     const timeElapsedSeconds = (now - state.clientStartTime) / 1000;
 
-    // Opóźniamy wyświetlany mnożnik o DISPLAY_DELAY sekund względem serwera.
-    // Dzięki temu mnożnik na ekranie gracza jest zawsze nieco "z tyłu" za rzeczywistym
-    // stanem na serwerze. Jeśli serwer zcrashuje przy 1.19x, klient będzie wtedy
-    // pokazywał ~1.17x — auto-wypłata na 1.20x nie zdąży się odpalić.
+    
     const displaySeconds = Math.max(0, timeElapsedSeconds - DISPLAY_DELAY);
     const multiplier = calculateMultiplier(displaySeconds);
 
@@ -224,7 +208,6 @@ function animateMultiplier() {
     // Draw chart
     drawChart();
 
-    // Auto cashout check — tylko jeśli gra jeszcze nie wybuchła
     if (state.autoCashoutMultiplier && multiplier >= state.autoCashoutMultiplier && !state.hasCrashed) {
         cashout();
         return;
@@ -236,7 +219,6 @@ function animateMultiplier() {
 async function cashout() {
     if (!state.isPlaying || !state.gameId) return;
 
-    // Zapisz mnożnik wyświetlany w momencie kliknięcia
     const display = $('multiplierDisplay');
     const clientMultiplier = display ? parseFloat(display.textContent) || null : null;
 
@@ -252,14 +234,16 @@ async function cashout() {
             showStatus(`Wygrałeś! Wypłacono przy ${Number(data.multiplier).toFixed(2)}x (crash przy ${Number(data.crashPoint).toFixed(2)}x)`);
             $('crash-win').textContent = `+${Number(data.winAmount).toFixed(2)} PLN`;
             $('crash-win').className = 'crash-result-win';
-            updateBalance(data.balance);
+            updateBalanceDisplay(data);
             addToHistory(Number(data.winAmount).toFixed(2), Number(data.multiplier).toFixed(2), true, Number(data.crashPoint).toFixed(2));
         } else {
             showStatus(`Crash! Wykres załamał się przy ${Number(data.crashPoint).toFixed(2)}x`);
             $('crash-win').textContent = 'Przegrana';
             $('crash-win').className = 'crash-result-lose';
             showCrashEffect();
-            if (data.balance !== undefined) updateBalance(data.balance);
+            if (data.balance !== undefined) {
+                updateBalanceDisplay(data);
+            }
             addToHistory('CRASH', Number(data.crashPoint).toFixed(2), false);
         }
 
@@ -305,8 +289,7 @@ async function checkStatus() {
 }
 
 function stopGame() {
-    // Reload balance after game ends
-    fetchBalance();
+    refreshBalance();
     setButtonsDisabled(false, true);
 }
 
@@ -320,16 +303,6 @@ function setButtonsDisabled(startDisabled, cashoutDisabled) {
 function showStatus(msg) {
     const el = $('crash-status');
     if (el) el.textContent = msg;
-}
-
-async function fetchBalance() {
-    try {
-        const res = await fetch('/api/balance');
-        if (res.ok) {
-            const data = await res.json();
-            updateBalance(data.balance);
-        }
-    } catch (err) { /* ignore */ }
 }
 
 // --- History ---
@@ -352,7 +325,6 @@ function addToHistory(win, multiplier, won, crashPoint) {
 
     list.insertBefore(item, list.firstChild);
 
-    // Limit history to 20 items
     while (list.children.length > 20) {
         list.removeChild(list.lastChild);
     }
@@ -373,6 +345,6 @@ window.addEventListener('resize', () => {
 // --- Init ---
 document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
-    fetchBalance();
-    drawChart(); // Draw empty chart
+    refreshBalance();
+    drawChart();
 });

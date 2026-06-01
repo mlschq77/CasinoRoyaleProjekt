@@ -42,7 +42,8 @@ public class PlinkoController : ControllerBase
         {
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet);
+            var sessionKey = "pln:" + Guid.NewGuid().ToString("N");
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
@@ -56,7 +57,7 @@ public class PlinkoController : ControllerBase
             });
             await _context.SaveChangesAsync();
 
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win, sessionKey);
 
             if (!payoutResult.Success)
                 return BadRequest(new { error = payoutResult.Error });
@@ -70,7 +71,8 @@ public class PlinkoController : ControllerBase
                 landingSlot = result.LandingSlot,
                 multiplier = result.Multiplier,
                 win = result.Win,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }
