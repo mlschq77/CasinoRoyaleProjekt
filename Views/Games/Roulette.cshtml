@@ -21,13 +21,41 @@
             </span>
             <h1 class="text-white mt-3 mb-2">Ruletka</h1>
             <p class="casino-section-text mb-4">
-                Postaw na dowolną kombinację numerów, kolorów i grup — zakręć kołem.
+                Pełna europejska ruletka: splity, narożniki, Voisins, Tiers, Orphelins.
             </p>
 
-            <label class="casino-label" for="roulette-bet">Stawka za zakład</label>
-            <div class="casino-input-wrapper mb-3">
+            <label class="casino-label" for="roulette-bet">Stawka (za żeton)</label>
+            <div class="casino-input-wrapper mb-2">
                 <i class="fa-solid fa-coins casino-input-icon"></i>
                 <input id="roulette-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            @* Szybkie żetony *@
+            <div class="roulette-chips-row mb-3">
+                <button class="roulette-quick-chip" data-amount="10">10</button>
+                <button class="roulette-quick-chip" data-amount="50">50</button>
+                <button class="roulette-quick-chip" data-amount="100">100</button>
+                <button class="roulette-quick-chip" data-amount="500">500</button>
+                <button class="roulette-quick-chip" data-amount="1000">1K</button>
+            </div>
+
+            @* Zakłady seryjne *@
+            <div class="mb-3">
+                <span class="casino-label d-block mb-2">Zakłady seryjne</span>
+                <div class="roulette-series-btns">
+                    <button class="roulette-series-btn voisins" id="btn-voisins">
+                        <span class="series-name">Voisins du Zéro</span>
+                        <span class="series-chips">9 żetonów · 17 numerów</span>
+                    </button>
+                    <button class="roulette-series-btn tiers" id="btn-tiers">
+                        <span class="series-name">Tiers du Cylindre</span>
+                        <span class="series-chips">6 żetonów · 12 numerów</span>
+                    </button>
+                    <button class="roulette-series-btn orphelins" id="btn-orphelins">
+                        <span class="series-name">Orphelins</span>
+                        <span class="series-chips">5 żetonów · 8 numerów</span>
+                    </button>
+                </div>
             </div>
 
             @* Koszyk zakładów *@
@@ -58,74 +86,85 @@
 
         @* Stół ruletki *@
         <div class="roulette-board-wrap">
-            <table class="roulette-table" id="roulette-table">
-                <tbody>
-                    <tr>
-                        <td class="roulette-zero" colspan="12" data-bet="number" data-value="0">0</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td class="roulette-num black" data-bet="number" data-value="3">3</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="6">6</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="9">9</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="12">12</td>
-                        <td class="roulette-num black" data-bet="number" data-value="15">15</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="18">18</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="21">21</td>
-                        <td class="roulette-num black" data-bet="number" data-value="24">24</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="27">27</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="30">30</td>
-                        <td class="roulette-num black" data-bet="number" data-value="33">33</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="36">36</td>
-                        <td class="roulette-col-btn"   data-bet="column3">2:1</td>
-                    </tr>
-                    <tr>
-                        <td class="roulette-num black" data-bet="number" data-value="2">2</td>
-                        <td class="roulette-num black" data-bet="number" data-value="5">5</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="8">8</td>
-                        <td class="roulette-num black" data-bet="number" data-value="11">11</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="14">14</td>
-                        <td class="roulette-num black" data-bet="number" data-value="17">17</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="20">20</td>
-                        <td class="roulette-num black" data-bet="number" data-value="23">23</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="26">26</td>
-                        <td class="roulette-num black" data-bet="number" data-value="29">29</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="32">32</td>
-                        <td class="roulette-num black" data-bet="number" data-value="35">35</td>
-                        <td class="roulette-col-btn"   data-bet="column2">2:1</td>
-                    </tr>
-                    <tr>
-                        <td class="roulette-num red"   data-bet="number" data-value="1">1</td>
-                        <td class="roulette-num black" data-bet="number" data-value="4">4</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="7">7</td>
-                        <td class="roulette-num black" data-bet="number" data-value="10">10</td>
-                        <td class="roulette-num black" data-bet="number" data-value="13">13</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="16">16</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="19">19</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="22">22</td>
-                        <td class="roulette-num black" data-bet="number" data-value="25">25</td>
-                        <td class="roulette-num black" data-bet="number" data-value="28">28</td>
-                        <td class="roulette-num black" data-bet="number" data-value="31">31</td>
-                        <td class="roulette-num red"   data-bet="number" data-value="34">34</td>
-                        <td class="roulette-col-btn"   data-bet="column1">2:1</td>
-                    </tr>
-                    <tr>
-                        <td colspan="4"  class="roulette-outside-btn" data-bet="dozen1">1 do 12</td>
-                        <td colspan="4"  class="roulette-outside-btn" data-bet="dozen2">13 do 24</td>
-                        <td colspan="4"  class="roulette-outside-btn" data-bet="dozen3">25 do 36</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" class="roulette-outside-btn"              data-bet="low">1–18</td>
-                        <td colspan="2" class="roulette-outside-btn"              data-bet="even">Parzyste</td>
-                        <td colspan="2" class="roulette-outside-btn roulette-red"   data-bet="red">Czerwone</td>
-                        <td colspan="2" class="roulette-outside-btn roulette-black" data-bet="black">Czarne</td>
-                        <td colspan="2" class="roulette-outside-btn"              data-bet="odd">Nieparzyste</td>
-                        <td colspan="2" class="roulette-outside-btn"              data-bet="high">19–36</td>
-                        <td></td>
-                    </tr>
-                </tbody>
-            </table>
+            @* Legenda markerów *@
+            <div class="roulette-marker-legend mb-2">
+                <span><span class="legend-dot split-dot"></span>Split ×18</span>
+                <span><span class="legend-dot corner-dot"></span>Narożnik ×9</span>
+                <span><span class="legend-dot street-dot"></span>Street ×12</span>
+                <span><span class="legend-dot sixline-dot"></span>Six-line ×6</span>
+            </div>
+            @* Kontener tabeli — position:relative dla markerów JS *@
+            <div class="roulette-table-container" id="roulette-table-container">
+                <table class="roulette-table" id="roulette-table">
+                    <tbody>
+                        @* Trzy rzędy numerów; zero jako rowspan=3 po lewej *@
+                        <tr>
+                            <td class="roulette-zero" rowspan="3" data-bet="number" data-value="0">0</td>
+                            <td class="roulette-num black" data-bet="number" data-value="3">3</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="6">6</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="9">9</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="12">12</td>
+                            <td class="roulette-num black" data-bet="number" data-value="15">15</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="18">18</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="21">21</td>
+                            <td class="roulette-num black" data-bet="number" data-value="24">24</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="27">27</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="30">30</td>
+                            <td class="roulette-num black" data-bet="number" data-value="33">33</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="36">36</td>
+                            <td class="roulette-col-btn"   data-bet="column3">2:1</td>
+                        </tr>
+                        <tr>
+                            <td class="roulette-num black" data-bet="number" data-value="2">2</td>
+                            <td class="roulette-num black" data-bet="number" data-value="5">5</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="8">8</td>
+                            <td class="roulette-num black" data-bet="number" data-value="11">11</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="14">14</td>
+                            <td class="roulette-num black" data-bet="number" data-value="17">17</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="20">20</td>
+                            <td class="roulette-num black" data-bet="number" data-value="23">23</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="26">26</td>
+                            <td class="roulette-num black" data-bet="number" data-value="29">29</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="32">32</td>
+                            <td class="roulette-num black" data-bet="number" data-value="35">35</td>
+                            <td class="roulette-col-btn"   data-bet="column2">2:1</td>
+                        </tr>
+                        <tr>
+                            <td class="roulette-num red"   data-bet="number" data-value="1">1</td>
+                            <td class="roulette-num black" data-bet="number" data-value="4">4</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="7">7</td>
+                            <td class="roulette-num black" data-bet="number" data-value="10">10</td>
+                            <td class="roulette-num black" data-bet="number" data-value="13">13</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="16">16</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="19">19</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="22">22</td>
+                            <td class="roulette-num black" data-bet="number" data-value="25">25</td>
+                            <td class="roulette-num black" data-bet="number" data-value="28">28</td>
+                            <td class="roulette-num black" data-bet="number" data-value="31">31</td>
+                            <td class="roulette-num red"   data-bet="number" data-value="34">34</td>
+                            <td class="roulette-col-btn"   data-bet="column1">2:1</td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="4"  class="roulette-outside-btn" data-bet="dozen1">1 do 12</td>
+                            <td colspan="4"  class="roulette-outside-btn" data-bet="dozen2">13 do 24</td>
+                            <td colspan="4"  class="roulette-outside-btn" data-bet="dozen3">25 do 36</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td></td>
+                            <td colspan="2" class="roulette-outside-btn"               data-bet="low">1–18</td>
+                            <td colspan="2" class="roulette-outside-btn"               data-bet="even">Parzyste</td>
+                            <td colspan="2" class="roulette-outside-btn roulette-red"  data-bet="red">Czerwone</td>
+                            <td colspan="2" class="roulette-outside-btn roulette-black" data-bet="black">Czarne</td>
+                            <td colspan="2" class="roulette-outside-btn"               data-bet="odd">Nieparzyste</td>
+                            <td colspan="2" class="roulette-outside-btn"               data-bet="high">19–36</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+                @* Markery splitów / narożników generowane przez JS *@
+            </div>
         </div>
 
     </section>

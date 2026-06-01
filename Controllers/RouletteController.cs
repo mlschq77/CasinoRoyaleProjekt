@@ -17,12 +17,16 @@ public class RouletteController : ControllerBase
     private readonly IBalanceService _balanceService;
     private readonly RouletteService _rouletteService;
 
-    private static readonly string[] ValidTypes =
-    [
-        "number", "red", "black", "odd", "even",
-        "low", "high", "dozen1", "dozen2", "dozen3",
-        "column1", "column2", "column3"
-    ];
+    private static readonly HashSet<string> SimpleTypes = new()
+    {
+        "red", "black", "odd", "even", "low", "high",
+        "dozen1", "dozen2", "dozen3", "column1", "column2", "column3"
+    };
+
+    private static readonly HashSet<string> MultiNumberTypes = new()
+    {
+        "split", "street", "corner", "sixline"
+    };
 
     public RouletteController(Automaty db, IBalanceService balanceService, RouletteService rouletteService)
     {
@@ -40,22 +44,29 @@ public class RouletteController : ControllerBase
         if (request.Bets == null || request.Bets.Count == 0)
             return BadRequest(new { error = "Brak zakładów." });
 
-        if (request.Bets.Count > 13)
-            return BadRequest(new { error = "Maksymalnie 13 zakładów na raz." });
-
-        // Walidacja każdego zakładu
         foreach (var entry in request.Bets)
         {
             if (entry.Bet <= 0)
                 return BadRequest(new { error = "Każda stawka musi być większa od zera." });
-            if (entry.Bet > 100_000)
-                return BadRequest(new { error = "Maksymalna stawka to 100 000." });
-            if (!ValidTypes.Contains(entry.BetType))
-                return BadRequest(new { error = $"Nieprawidłowy typ zakładu: {entry.BetType}" });
+            if (entry.Bet > 1_000_000)
+                return BadRequest(new { error = "Maksymalna stawka to 1 000 000." });
+
             if (entry.BetType == "number")
             {
                 if (!int.TryParse(entry.BetValue, out var num) || num < 0 || num > 36)
                     return BadRequest(new { error = "Nieprawidłowy numer (0–36)." });
+            }
+            else if (MultiNumberTypes.Contains(entry.BetType))
+            {
+                if (string.IsNullOrEmpty(entry.BetValue))
+                    return BadRequest(new { error = $"Brak wartości dla zakładu {entry.BetType}." });
+                var parts = entry.BetValue.Split('-');
+                if (!parts.All(p => int.TryParse(p, out var n) && n >= 0 && n <= 36))
+                    return BadRequest(new { error = $"Nieprawidłowe numery dla zakładu {entry.BetType}." });
+            }
+            else if (!SimpleTypes.Contains(entry.BetType))
+            {
+                return BadRequest(new { error = $"Nieprawidłowy typ zakładu: {entry.BetType}" });
             }
         }
 
@@ -67,7 +78,6 @@ public class RouletteController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            // Pobieramy łączną stawkę jednym wywołaniem
             var betResult = await _balanceService.PlaceBetAsync(userId.Value, totalBet);
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
@@ -75,7 +85,6 @@ public class RouletteController : ControllerBase
             var number = _rouletteService.Spin();
             var color  = _rouletteService.GetColor(number);
 
-            // Wyniki per-zakład
             var results = request.Bets.Select(b =>
             {
                 var win = _rouletteService.CalculateWin(b.BetType, b.BetValue ?? "", number, b.Bet);
@@ -86,13 +95,13 @@ public class RouletteController : ControllerBase
 
             _db.RouletteGames.Add(new RouletteGame
             {
-                UserId    = userId.Value,
-                BetAmount = totalBet,
-                BetType   = request.Bets.Count == 1 ? request.Bets[0].BetType : "multi",
-                BetValue  = request.Bets.Count == 1 ? (request.Bets[0].BetValue ?? "") : "",
+                UserId       = userId.Value,
+                BetAmount    = totalBet,
+                BetType      = request.Bets.Count == 1 ? request.Bets[0].BetType : "multi",
+                BetValue     = request.Bets.Count == 1 ? (request.Bets[0].BetValue ?? "") : "",
                 ResultNumber = number,
-                WinAmount = totalWin,
-                BetsJson  = JsonSerializer.Serialize(results)
+                WinAmount    = totalWin,
+                BetsJson     = JsonSerializer.Serialize(results)
             });
             await _db.SaveChangesAsync();
 
@@ -111,14 +120,7 @@ public class RouletteController : ControllerBase
 
             await transaction.CommitAsync();
 
-            return Ok(new
-            {
-                number,
-                color,
-                totalWin,
-                balance = finalBalance,
-                results
-            });
+            return Ok(new { number, color, totalWin, balance = finalBalance, results });
         }, null, CancellationToken.None);
     }
 
