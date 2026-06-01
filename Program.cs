@@ -43,6 +43,7 @@ public class Program
 
         builder.Services.AddScoped<MinesService>();
         builder.Services.AddScoped<PlinkoService>();
+        builder.Services.AddScoped<FruitsService>();
         builder.Services.AddScoped<BlackjackService>();
         builder.Services.AddScoped<CrashService>();
         builder.Services.AddScoped<RouletteService>();

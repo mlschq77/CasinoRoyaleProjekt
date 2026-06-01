@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>40</x><y>60</y><w>210</w><h>145</h></coordinates>
+    <panel_attributes>User
+--
++Id: int
++Email: string
++Nazwa: string
++IsAdmin: bool
+--
++maUprawnieniaAdmina(): bool</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>330</x><y>50</y><w>240</w><h>175</h></coordinates>
+    <panel_attributes>AdminController
+--
+-_db: Automaty
+--
++KatalogGier(): IActionResult
++DodajGre(model): IActionResult
++EdytujGre(id, model): IActionResult
++UsunGre(id): IActionResult
++UkryjGre(id): IActionResult
++PublikujGre(id): IActionResult</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>650</x><y>50</y><w>240</w><h>175</h></coordinates>
+    <panel_attributes>AutomatInfo
+--
++Id: int
++Nazwa: string
++ProviderId: int?
++CzyWidoczna: bool
++DataDodania: DateTime
++Kategorie: ICollection&lt;Kategoria&gt;
+--
++PrzypiszKategorie(kategorie)
++ZmienWidocznosc(czyWidoczna)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>970</x><y>35</y><w>220</w><h>105</h></coordinates>
+    <panel_attributes>AutomatProvider
+--
++Id: int
++Nazwa: string
++Automaty: ICollection&lt;AutomatInfo&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>970</x><y>190</y><w>220</w><h>105</h></coordinates>
+    <panel_attributes>Kategoria
+--
++Id: int
++Nazwa: string
++Automaty: ICollection&lt;AutomatInfo&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>700</x><y>320</y><w>180</w><h>85</h></coordinates>
+    <panel_attributes>AutomatKategoria
+--
++AutomatId: int
++KategoriaId: int</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>330</x><y>330</y><w>250</w><h>160</h></coordinates>
+    <panel_attributes>Automaty : DbContext
+--
++AutomatyInfo: DbSet&lt;AutomatInfo&gt;
++Kategorie: DbSet&lt;Kategoria&gt;
++AutomatProviderzy: DbSet&lt;AutomatProvider&gt;
++Users: DbSet&lt;User&gt;
+--
++SaveChangesAsync()
++FindAsync(id)
++Add(entity)
++Remove(entity)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>40</x><y>330</y><w>210</w><h>120</h></coordinates>
+    <panel_attributes>GameCatalogViewModel
+--
++Gry: List&lt;AutomatInfo&gt;
++Kategorie: List&lt;Kategoria&gt;
++Providerzy: List&lt;AutomatProvider&gt;
++Komunikat: string</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates><x>650</x><y>500</y><w>240</w><h>110</h></coordinates>
+    <panel_attributes>AutomatyController
+--
+-_dbContext: Automaty
+--
++Oferta(kategoria): IActionResult</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>240</x><y>120</y><w>110</w><h>40</h></coordinates>
+    <panel_attributes>lt=-&gt;
+zarzadza</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>560</x><y>130</y><w>110</w><h>40</h></coordinates>
+    <panel_attributes>lt=-&gt;
+tworzy/edytuje</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>880</x><y>80</y><w>110</w><h>40</h></coordinates>
+    <panel_attributes>lt=&lt;-
+m1=0..*
+m2=1
+provider</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>880</x><y>140</y><w>110</w><h>110</h></coordinates>
+    <panel_attributes>lt=-
+m1=0..*
+m2=0..*
+kategorie</panel_attributes>
+    <additional_attributes>10;10;90;90</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>790</x><y>220</y><w>40</w><h>120</h></coordinates>
+    <panel_attributes>lt=.</panel_attributes>
+    <additional_attributes>10;10;10;100</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>570</x><y>180</y><w>110</w><h>200</h></coordinates>
+    <panel_attributes>lt=-&gt;
+zapisuje</panel_attributes>
+    <additional_attributes>10;180;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>240</x><y>370</y><w>110</w><h>40</h></coordinates>
+    <panel_attributes>lt=&lt;-
+wypelnia</panel_attributes>
+    <additional_attributes>10;10;90;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>570</x><y>400</y><w>110</w><h>150</h></coordinates>
+    <panel_attributes>lt=-&gt;
+odczyt katalogu</panel_attributes>
+    <additional_attributes>10;10;90;130</additional_attributes>
+  </element>
+</diagram>

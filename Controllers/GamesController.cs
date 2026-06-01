@@ -26,9 +26,14 @@ public class GamesController : Controller
         return View();
     }
 
-    public IActionResult Slot()
+    public IActionResult Fruits()
     {
         return View();
+    }
+
+    public IActionResult Slot()
+    {
+        return RedirectToAction(nameof(Fruits));
     }
 
     public IActionResult Roulette()

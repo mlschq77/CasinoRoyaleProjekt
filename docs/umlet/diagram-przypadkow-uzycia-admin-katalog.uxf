@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.3">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLActor</id>
+    <coordinates><x>60</x><y>230</y><w>80</w><h>120</h></coordinates>
+    <panel_attributes>Admin</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLFrame</id>
+    <coordinates><x>210</x><y>40</y><w>760</w><h>560</h></coordinates>
+    <panel_attributes>System: Casino Royale - katalog gier</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>300</x><y>90</y><w>180</w><h>70</h></coordinates>
+    <panel_attributes>Zaloguj sie do
+panelu admina</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>570</x><y>90</y><w>190</w><h>70</h></coordinates>
+    <panel_attributes>Sprawdz
+uprawnienia admina</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>300</x><y>210</y><w>180</w><h>70</h></coordinates>
+    <panel_attributes>Dodaj gre
+do katalogu</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>570</x><y>200</y><w>190</w><h>70</h></coordinates>
+    <panel_attributes>Wprowadz dane gry:
+nazwa, provider</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>570</x><y>300</y><w>190</w><h>70</h></coordinates>
+    <panel_attributes>Przypisz gre
+do kategorii</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>300</x><y>330</y><w>180</w><h>70</h></coordinates>
+    <panel_attributes>Edytuj dane gry
+w katalogu</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>300</x><y>450</y><w>180</w><h>70</h></coordinates>
+    <panel_attributes>Usun gre
+z katalogu</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>570</x><y>430</y><w>190</w><h>70</h></coordinates>
+    <panel_attributes>Publikuj albo
+ukryj gre</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>790</x><y>250</y><w>150</w><h>70</h></coordinates>
+    <panel_attributes>Zapisz zmiany
+w bazie danych</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLUseCase</id>
+    <coordinates><x>790</x><y>370</y><w>150</w><h>70</h></coordinates>
+    <panel_attributes>Wyswietl aktualny
+katalog gier</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>130</x><y>120</y><w>190</w><h>140</h></coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10;120;170;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>130</x><y>250</y><w>190</w><h>30</h></coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10;10;170;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>130</x><y>290</y><w>190</w><h>90</h></coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10;10;170;70</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>130</x><y>290</y><w>190</w><h>210</h></coordinates>
+    <panel_attributes>lt=-</panel_attributes>
+    <additional_attributes>10;10;170;190</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>470</x><y>120</y><w>120</w><h>30</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;100;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>470</x><y>230</y><w>120</w><h>30</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;100;10</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>470</x><y>260</y><w>120</w><h>90</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;100;70</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>750</x><y>250</y><w>60</w><h>60</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;40;40</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>470</x><y>370</y><w>340</w><h>50</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;320;30</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>470</x><y>480</y><w>340</w><h>50</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;include&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;320;30</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates><x>750</x><y>450</y><w>70</w><h>40</h></coordinates>
+    <panel_attributes>lt=.&gt;
+&lt;&lt;extend&gt;&gt;</panel_attributes>
+    <additional_attributes>10;10;50;20</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates><x>230</x><y>620</y><w>650</w><h>70</h></coordinates>
+    <panel_attributes>Opis przypadku: administrator zarzadza katalogiem gier.
+Moze dodac gre, uzupelnic jej dane, przypisac kategorie i providera,
+a nastepnie zapisac zmiany tak, aby gra pojawila sie w katalogu dla uzytkownikow.</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

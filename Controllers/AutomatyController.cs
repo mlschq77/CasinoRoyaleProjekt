@@ -36,46 +36,18 @@ public class AutomatyController : Controller
             var provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" };
             var originalsCat = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } };
 
-            gry.Add(new AutomatInfo
+            var originals = new[]
             {
-                Id = 1,
-                Nazwa = "Blackjack",
-                Provider = provider,
-                Kategorie = originalsCat
-            });
+                new AutomatInfo { Id = 1, Nazwa = "Blackjack", Provider = provider, Kategorie = originalsCat },
+                new AutomatInfo { Id = 0, Nazwa = "Mines", Provider = provider, Kategorie = originalsCat },
+                new AutomatInfo { Id = 2, Nazwa = "Plinko", Provider = provider, Kategorie = originalsCat },
+                new AutomatInfo { Id = 3, Nazwa = "Crash", Provider = provider, Kategorie = originalsCat },
+                new AutomatInfo { Id = 5, Nazwa = "Fruits", Provider = provider, Kategorie = originalsCat },
+                new AutomatInfo { Id = 4, Nazwa = "Ruletka", Provider = provider, Kategorie = originalsCat }
+            };
 
-            gry.Add(new AutomatInfo
-            {
-                Id = 0,
-                Nazwa = "Mines",
-                Provider = provider,
-                Kategorie = originalsCat
-            });
-
-            gry.Add(new AutomatInfo
-            {
-                Id = 2,
-                Nazwa = "Plinko",
-                Provider = provider,
-                Kategorie = originalsCat
-            });
-
-            gry.Add(new AutomatInfo
-            {
-                Id = 3,
-                Nazwa = "Crash",
-                Provider = provider,
-                Kategorie = originalsCat
-            });
-
-            gry.Add(new AutomatInfo
-            {
-                Id = 4,
-                Nazwa = "Ruletka",
-                Provider = provider,
-                Kategorie = originalsCat
-            });
-
+            gry.AddRange(originals);
+            gry = gry.OrderBy(automat => automat.Nazwa).ToList();
         }
 
         var model = new SlotsViewModel

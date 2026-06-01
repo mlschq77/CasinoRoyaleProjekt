@@ -1,0 +1,72 @@
+@{
+    ViewData["Title"] = "Fruits";
+}
+
+<link rel="stylesheet" href="~/css/fruits.css" asp-append-version="true" />
+
+<div class="container py-5">
+    <section class="fruits-shell">
+        <div class="fruits-controls">
+            <span class="casino-section-label">
+                <i class="fa-solid fa-clover"></i>CasinoRoyale Originals
+            </span>
+            <h1 class="text-white mt-3 mb-2">Fruits</h1>
+            <p class="casino-section-text mb-4">
+                Prosty automat owocowy: ustaw stawke, zakrec bebny i poluj na serie.
+            </p>
+
+            <label class="casino-label" for="fruits-bet">Stawka</label>
+            <div class="casino-input-wrapper mb-3">
+                <i class="fa-solid fa-coins casino-input-icon"></i>
+                <input id="fruits-bet" type="number" min="1" step="1" value="100" class="casino-input" />
+            </div>
+
+            <div class="fruits-quick-bets mb-3" aria-label="Szybki wybor stawki">
+                <button type="button" data-bet="25">25</button>
+                <button type="button" data-bet="100">100</button>
+                <button type="button" data-bet="500">500</button>
+                <button type="button" data-bet="1000">1000</button>
+            </div>
+
+            <button id="fruits-spin" class="btn casino-btn-primary w-100">
+                <i class="fa-solid fa-rotate me-2"></i>Zakręć
+            </button>
+
+            <div class="fruits-result mt-4" aria-live="polite">
+                <span id="fruits-status">Gotowy do gry</span>
+                <strong id="fruits-win">-</strong>
+            </div>
+        </div>
+
+        <div class="fruits-machine-wrap">
+            <div class="fruits-machine" aria-label="Automat Fruits">
+                <div class="fruits-topline">
+                    <span>Fruits</span>
+                    <span id="fruits-multiplier">x0.00</span>
+                </div>
+                <div class="fruits-reels" id="fruits-reels">
+                    <div class="fruits-reel"><span>🍒</span></div>
+                    <div class="fruits-reel"><span>🍋</span></div>
+                    <div class="fruits-reel"><span>🍊</span></div>
+                    <div class="fruits-reel"><span>🍇</span></div>
+                    <div class="fruits-reel"><span>🍉</span></div>
+                </div>
+                <div class="fruits-payline" aria-hidden="true"></div>
+            </div>
+
+            <div class="fruits-paytable mt-4">
+                <div class="fruits-paytable-head">
+                    <span>Symbol</span>
+                    <span>3x</span>
+                    <span>4x</span>
+                    <span>5x</span>
+                </div>
+                <div id="fruits-paytable-rows" class="fruits-paytable-rows"></div>
+            </div>
+        </div>
+    </section>
+</div>
+
+@section Scripts {
+    <script src="~/js/games/fruits.js" asp-append-version="true"></script>
+}
