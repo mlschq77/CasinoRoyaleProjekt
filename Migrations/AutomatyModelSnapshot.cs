@@ -80,6 +80,45 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("AutomatProviderzy", (string)null);
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.BetRecord", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("AmountFromBonus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("BonusDeductions")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SessionKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("Settled")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "SessionKey", "Settled");
+
+                    b.ToTable("BetRecords");
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.BlackjackGame", b =>
                 {
                     b.Property<int>("Id")
@@ -183,6 +222,83 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("CrashSessions");
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.DiceGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Multiplier")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Mode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Roll")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Target")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("WinAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DiceGames");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.LoginHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("IpAddress")
+                        .IsRequired()
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<DateTime>("LoggedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Successful")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("UserAgent")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "LoggedAt");
+
+                    b.ToTable("LoginHistories", (string)null);
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.Kategoria", b =>
                 {
                     b.Property<int>("Id")
@@ -224,6 +340,9 @@ namespace CasinoRoyale.Migrations
 
                     b.Property<DateTime>("Utworzono")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("WageringMultiplier")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime?>("WaznyDo")
                         .HasColumnType("datetime2");
@@ -286,6 +405,45 @@ namespace CasinoRoyale.Migrations
                     b.ToTable("KycDocuments");
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.KenoGame", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DrawnNumbers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Hits")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Multiplier")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("SelectedNumbers")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("WinAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("KenoGames");
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.MinesGame", b =>
                 {
                     b.Property<int>("Id")
@@ -342,6 +500,9 @@ namespace CasinoRoyale.Migrations
 
                     b.Property<string>("BetValue")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BetsJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -468,9 +629,6 @@ namespace CasinoRoyale.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("DataRejestracji")
                         .HasColumnType("datetime2");
 
@@ -516,6 +674,9 @@ namespace CasinoRoyale.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<decimal>("BonusAmount")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("KodBonusowyId")
                         .HasColumnType("int");
 
@@ -543,6 +704,43 @@ namespace CasinoRoyale.Migrations
                         .IsUnique();
 
                     b.ToTable("UzyteKodyBonusowe", (string)null);
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.Wallet", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("ActiveBonusId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("BalanceBonus")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("BalanceReal")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("BonusExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal?>("WageringProgress")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal?>("WageringRequired")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("CasinoRoyale.Models.AutomatInfo", b =>
@@ -594,9 +792,26 @@ namespace CasinoRoyale.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CasinoRoyale.Models.Wallet", b =>
+                {
+                    b.HasOne("CasinoRoyale.Models.User", "User")
+                        .WithOne("Wallet")
+                        .HasForeignKey("CasinoRoyale.Models.Wallet", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CasinoRoyale.Models.AutomatProvider", b =>
                 {
                     b.Navigation("Automaty");
+                });
+
+            modelBuilder.Entity("CasinoRoyale.Models.User", b =>
+                {
+                    b.Navigation("Wallet")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

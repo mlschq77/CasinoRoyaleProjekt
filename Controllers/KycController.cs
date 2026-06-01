@@ -17,9 +17,7 @@ public class KycController : Controller
         _kycService = kycService;
     }
 
-    /// <summary>
-    /// Lista dokumentów użytkownika + formularz do przesłania nowego.
-    /// </summary>
+
     public async Task<IActionResult> Index()
     {
         var userId = GetCurrentUserId();
@@ -29,18 +27,13 @@ public class KycController : Controller
         return View(documents);
     }
 
-    /// <summary>
-    /// Formularz przesyłania dokumentu.
-    /// </summary>
     public IActionResult Upload()
     {
         ViewBag.DocumentTypes = GetDocumentTypeSelectList();
         return View();
     }
 
-    /// <summary>
-    /// Zapisuje przesłany dokument.
-    /// </summary>
+ 
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Upload(IFormFile file, KycDocumentType documentType)
@@ -70,9 +63,6 @@ public class KycController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    /// <summary>
-    /// Podgląd pliku dokumentu (tylko dla właściciela).
-    /// </summary>
     public async Task<IActionResult> File(int id)
     {
         var userId = GetCurrentUserId();

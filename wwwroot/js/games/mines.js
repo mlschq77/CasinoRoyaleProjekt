@@ -1,12 +1,5 @@
 let gameId = null;
 
-function updateBalance(balance) {
-    const balanceDisplay = document.getElementById("balance-display");
-    if (!balanceDisplay || balance === undefined || balance === null) return;
-
-    balanceDisplay.innerText = Number(balance).toFixed(2);
-}
-
 async function parseResponse(res) {
     const text = await res.text();
     let data = null;
@@ -52,7 +45,7 @@ async function startGame() {
         const data = await parseResponse(res);
 
         gameId = data.id;
-        updateBalance(data.balance);
+        updateBalanceDisplay(data);
 
         createGrid();
 
@@ -106,7 +99,7 @@ async function cashout() {
         const data = await parseResponse(res);
 
         await revealMines();
-        updateBalance(data.balance);
+        updateBalanceDisplay(data);
 
         document.getElementById("status").innerText =
             `💰 Win: ${Number(data.win).toFixed(2)} (x${data.multiplier})`;

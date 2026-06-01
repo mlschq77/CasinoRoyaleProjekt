@@ -26,17 +26,27 @@ public class GamesController : Controller
         return View();
     }
 
-    public IActionResult Fruits()
+    public IActionResult Slot()
     {
         return View();
     }
 
-    public IActionResult Slot()
+    public IActionResult Roulette()
     {
-        return RedirectToAction(nameof(Fruits));
+        return View();
     }
 
-    public IActionResult Roulette()
+    public IActionResult Dice()
+    {
+        return View();
+    }
+
+    public IActionResult Keno()
+    {
+        return View();
+    }
+
+    public IActionResult Baccarat()
     {
         return View();
     }

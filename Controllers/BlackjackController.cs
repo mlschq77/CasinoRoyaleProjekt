@@ -19,6 +19,12 @@ namespace CasinoRoyale.Controllers
             _balanceService = balanceService;
         }
 
+        private async Task<decimal?> GetBalanceBonusAsync(int userId)
+        {
+            var info = await _balanceService.GetBalanceInfoAsync(userId);
+            return info?.BalanceBonus;
+        }
+
         [HttpPost("start")]
         public async Task<IActionResult> Start([FromBody] StartRequest req)
         {
@@ -29,7 +35,8 @@ namespace CasinoRoyale.Controllers
             if (!success) return BadRequest(new { error, balance });
 
             var state = _service.BuildGameState(game!);
-            return Ok(new { state, balance });
+            var bonus = await GetBalanceBonusAsync(userId.Value);
+            return Ok(new { state, balance, balanceBonus = bonus });
         }
 
         [HttpPost("hit")]
@@ -42,7 +49,8 @@ namespace CasinoRoyale.Controllers
             if (!success) return BadRequest(new { error, balance });
 
             var state = _service.BuildGameState(game!);
-            return Ok(new { state, balance });
+            var bonus = await GetBalanceBonusAsync(userId.Value);
+            return Ok(new { state, balance, balanceBonus = bonus });
         }
 
         [HttpPost("stand")]
@@ -55,7 +63,8 @@ namespace CasinoRoyale.Controllers
             if (!success) return BadRequest(new { error });
 
             var state = _service.BuildGameState(game!);
-            return Ok(new { state, balance });
+            var bonus = await GetBalanceBonusAsync(userId.Value);
+            return Ok(new { state, balance, balanceBonus = bonus });
         }
 
         [HttpPost("double")]
@@ -68,7 +77,8 @@ namespace CasinoRoyale.Controllers
             if (!success) return BadRequest(new { error, balance });
 
             var state = _service.BuildGameState(game!);
-            return Ok(new { state, balance });
+            var bonus = await GetBalanceBonusAsync(userId.Value);
+            return Ok(new { state, balance, balanceBonus = bonus });
         }
 
         [HttpPost("split")]
@@ -81,7 +91,8 @@ namespace CasinoRoyale.Controllers
             if (!success) return BadRequest(new { error });
 
             var state = _service.BuildGameState(game!);
-            return Ok(new { state, balance });
+            var bonus = await GetBalanceBonusAsync(userId.Value);
+            return Ok(new { state, balance, balanceBonus = bonus });
         }
 
         [HttpGet("balance")]
@@ -90,8 +101,10 @@ namespace CasinoRoyale.Controllers
             var userId = GetUserId();
             if (userId == null) return Unauthorized();
 
-            var balance = await _balanceService.GetBalanceAsync(userId.Value);
-            return Ok(new { balance });
+            var info = await _balanceService.GetBalanceInfoAsync(userId.Value);
+            var balanceReal = info?.BalanceReal ?? 0m;
+            var balanceBonus = info?.BalanceBonus ?? 0m;
+            return Ok(new { balance = balanceReal + balanceBonus, balanceBonus });
         }
 
         private int? GetUserId()

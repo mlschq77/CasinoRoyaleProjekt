@@ -16,7 +16,7 @@ public class KycService : IKycService
         "application/pdf"
     };
 
-    private const long MaxFileSize = 10 * 1024 * 1024; // 10 MB
+    private const long MaxFileSize = 10 * 1024 * 1024;
 
     public KycService(Automaty db, IWebHostEnvironment env)
     {
@@ -35,7 +35,6 @@ public class KycService : IKycService
         if (!AllowedContentTypes.Contains(file.ContentType))
             throw new ArgumentException("Niedozwolony typ pliku. Akceptujemy tylko JPEG, PNG, WebP i PDF.");
 
-        // Przygotowanie ścieżki storage (poza wwwroot)
         var storageDir = Path.Combine(_env.ContentRootPath, "App_Data", "kyc", userId.ToString());
         Directory.CreateDirectory(storageDir);
 

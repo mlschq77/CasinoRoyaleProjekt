@@ -195,8 +195,8 @@ public class PaymentsController : Controller
             var bonusResult = await _bonusCodeService.ApplyAsync(userId.Value, kodString, paidAmount, stripePayment);
             var bonusAmount = bonusResult.BonusAmount;
 
-            var finalAmountToAdd = paidAmount + bonusAmount;
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, finalAmountToAdd);
+            // Wp�ata idzie na BalanceReal, bonus na BalanceBonus (osobno)
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, paidAmount);
 
             if (!payoutResult.Success)
             {
@@ -204,10 +204,21 @@ public class PaymentsController : Controller
                 return RedirectToAction(nameof(Deposit), new { message = payoutResult.Error });
             }
 
+            // Dodaj bonus do BalanceBonus przez UzytyKodBonusowy (ju� zapisany w ApplyAsync)
+            if (bonusAmount > 0)
+            {
+                // BalanceBonus jest aktualizowany przez RefreshBalanceBonusAsync w BalanceService
+                // po dodaniu wpisu UzytyKodBonusowy przez ApplyAsync
+            }
+
             await transaction.CommitAsync();
 
+            var wageringInfo = bonusAmount > 0 && bonusResult.WageringRequired > 0
+                ? $" Musisz wykonac obrot w wysokosci {bonusResult.WageringRequired:0.00} PLN przed wyp�at�."
+                : string.Empty;
+
             var successMessage = bonusAmount > 0
-                ? $"Zasilenie {paidAmount:0.00} PLN udane! Otrzymujesz {bonusAmount:0.00} PLN bonusu. Lacznie dodano {finalAmountToAdd:0.00} PLN."
+                ? $"Zasilenie {paidAmount:0.00} PLN udane! Otrzymujesz {bonusAmount:0.00} PLN bonusu. Bonus wygasa {bonusResult.ExpiresAt:. dd.MM.yyyy}.{wageringInfo}"
                 : bonusResult.AlreadyUsed
                     ? $"Doladowano balans o {paidAmount:0.00} PLN. Kod bonusowy byl juz wykorzystany, wiec bonus nie zostal naliczony."
                     : $"Doladowano balans o {paidAmount:0.00} PLN.";

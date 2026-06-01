@@ -36,18 +36,70 @@ public class AutomatyController : Controller
             var provider = new AutomatProvider { Id = 0, Nazwa = "Casino Royale" };
             var originalsCat = new List<Kategoria> { new Kategoria { Id = 0, Nazwa = "Originals" } };
 
-            var originals = new[]
+            gry.Add(new AutomatInfo
             {
-                new AutomatInfo { Id = 1, Nazwa = "Blackjack", Provider = provider, Kategorie = originalsCat },
-                new AutomatInfo { Id = 0, Nazwa = "Mines", Provider = provider, Kategorie = originalsCat },
-                new AutomatInfo { Id = 2, Nazwa = "Plinko", Provider = provider, Kategorie = originalsCat },
-                new AutomatInfo { Id = 3, Nazwa = "Crash", Provider = provider, Kategorie = originalsCat },
-                new AutomatInfo { Id = 5, Nazwa = "Fruits", Provider = provider, Kategorie = originalsCat },
-                new AutomatInfo { Id = 4, Nazwa = "Ruletka", Provider = provider, Kategorie = originalsCat }
-            };
+                Id = 1,
+                Nazwa = "Blackjack",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
 
-            gry.AddRange(originals);
-            gry = gry.OrderBy(automat => automat.Nazwa).ToList();
+            gry.Add(new AutomatInfo
+            {
+                Id = 0,
+                Nazwa = "Mines",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 2,
+                Nazwa = "Plinko",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 3,
+                Nazwa = "Crash",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 4,
+                Nazwa = "Ruletka",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 5,
+                Nazwa = "Dice",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 6,
+                Nazwa = "Keno",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry.Add(new AutomatInfo
+            {
+                Id = 7,
+                Nazwa = "Baccarat",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
         }
 
         var model = new SlotsViewModel

@@ -22,37 +22,46 @@
 
             <div class="casino-profile-layout mt-4">
                 <article class="casino-profile-card">
+           
                     <div class="casino-profile-head">
                         <div class="casino-profile-avatar">@Model.Inicjaly</div>
                         <div>
                             <h2 class="casino-profile-name">@Model.PelneImie</h2>
+            
                             <p class="casino-section-text mb-0">Aktywny gracz CasinoRoyale</p>
                         </div>
                     </div>
 
                     <form asp-action="Update" method="post" class="casino-profile-form mt-4">
+            
                         @Html.AntiForgeryToken()
 
                         <div class="casino-profile-edit-grid">
                             <div>
                                 <label class="casino-label" asp-for="Imie">Imie</label>
+ 
                                 <input class="casino-input" asp-for="Imie" maxlength="80" placeholder="Twoje imie" />
-                                <span asp-validation-for="Imie" class="casino-validation"></span> @* Nie wiem czy powinnismy dawac mozliwosc edycji imienia i nazwiska ale to jak zrobimy ten upload dokumentu *@
+                                <span asp-validation-for="Imie" class="casino-validation"></span>
                             </div>
                             <div>
                                 <label class="casino-label" asp-for="Nazwisko">Nazwisko</label>
+                    
                                 <input class="casino-input" asp-for="Nazwisko" maxlength="120" placeholder="Twoje nazwisko" />
                                 <span asp-validation-for="Nazwisko" class="casino-validation"></span>
                             </div>
+                    
                             <div>
                                 <label class="casino-label" asp-for="Nazwa">Nazwa gracza</label>
                                 <input class="casino-input" asp-for="Nazwa" maxlength="80" placeholder="Twoja nazwa gracza" autocomplete="username" />
+                 
                                 <span asp-validation-for="Nazwa" class="casino-validation"></span>
                             </div>
                             <div>
+                           
                                 <label class="casino-label" asp-for="Email">Email</label>
                                 <input class="casino-input" asp-for="Email" type="email" maxlength="160" placeholder="twoj@email.com" autocomplete="email" />
                                 <span asp-validation-for="Email" class="casino-validation"></span>
+                    
                             </div>
                         </div>
 
@@ -64,14 +73,23 @@
 
                 <aside class="casino-profile-card">
                     <h2 class="h4 text-white mb-3">Podsumowanie</h2>
+        
                     <div class="casino-profile-stat">
                         <span>Nazwa gracza</span>
                         <strong>@Model.Nazwa</strong>
                     </div>
+                  
                     <div class="casino-profile-stat">
-                        <span>Aktualne saldo</span>
+                        <span>Saldo rzeczywiste</span>
                         <strong>@Model.Balance.ToString("0.00") PLN</strong>
                     </div>
+                    @if (Model.BalanceBonus > 0)
+                    {
+                        <div class="casino-profile-stat">
+                            <span>Saldo bonusowe</span>
+                            <strong class="text-warning">@Model.BalanceBonus.ToString("0.00") PLN</strong>
+                        </div>
+                    }
                     <div class="casino-profile-stat">
                         <span>Status konta</span>
                         <strong>Aktywne</strong>
@@ -91,12 +109,25 @@
                     </div>
 
                     <div class="casino-profile-actions">
+                        @if (Model.BalanceBonus > 0)
+                        {
+                            <a asp-action="Bonuses" class="btn casino-btn-primary btn w-100">
+                                <i class="fa-solid fa-gift me-1"></i>Bonusy i obrot
+                            </a>
+                        }
                         <button class="casino-btn-secondary btn" type="button" data-history-open="transactions">
                             <i class="fa-solid fa-receipt me-1"></i>Historia transakcji
                         </button>
                         <button class="casino-btn-secondary btn" type="button" data-history-open="bets">
                             <i class="fa-solid fa-coins me-1"></i>Historia zakladow
                         </button>
+                        <button class="casino-btn-secondary btn" type="button" data-history-open="logins">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i>Historia logowan
+                        </button>
+                        
+                        <a asp-action="DownloadHistoryPdf" class="casino-btn-secondary btn w-100 mt-2 d-flex align-items-center justify-content-center text-decoration-none">
+                            <i class="fa-solid fa-file-pdf me-2"></i>Pobierz raport PDF
+                        </a>
                     </div>
                 </aside>
             </div>
@@ -104,12 +135,12 @@
     </main>
 </div>
 
-<!-- Modal potwierdzenia zmiany danych osobowych -->
 <div class="casino-confirm-modal" id="kyc-confirm-modal" aria-hidden="true">
     <div class="casino-confirm-panel">
         <div class="casino-confirm-icon">
             <i class="fa-solid fa-triangle-exclamation"></i>
         </div>
+      
         <h2 class="casino-confirm-title">Zmiana danych osobowych</h2>
         <p class="casino-confirm-text">
             Czy na pewno chcesz zmienić swoje dane osobowe?<br><br>
@@ -159,6 +190,7 @@
             <i class="fa-solid fa-xmark"></i>
         </button>
         <h2>Historia zakladow</h2>
+    
         <div class="casino-history-list">
             @if (Model.BetHistory.Any())
             {
@@ -174,6 +206,48 @@
             else
             {
                 <div class="casino-history-empty">Brak zakladow.</div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="casino-history-modal" id="logins-modal" aria-hidden="true">
+    <div class="casino-history-panel">
+        <button class="casino-history-close" type="button" data-history-close>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <h2>Historia logowan</h2>
+        <div class="casino-history-list">
+            @if (Model.LoginHistory.Any())
+            {
+                foreach (var item in Model.LoginHistory)
+                {
+                    <div class="casino-history-row">
+                        <span>
+                            @if (item.EventType == "login")
+                            {
+                                <i class="fa-solid fa-check-circle text-success me-1"></i>
+                            }
+                            else if (item.EventType == "failed_login")
+                            {
+                                <i class="fa-solid fa-xmark-circle text-danger me-1"></i>
+                            }
+                            else if (item.EventType == "logout")
+                            {
+                                <i class="fa-solid fa-arrow-right-from-bracket text-secondary me-1"></i>
+                            }
+                            @item.EventTypeDisplay
+                        </span>
+                        <span class="text-secondary small" title="IP: @item.IpAddress">
+                            @item.IpAddress
+                        </span>
+                        <time title="@item.UserAgent">@item.LoggedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="casino-history-empty">Brak historii logowan.</div>
             }
         </div>
     </div>
@@ -225,7 +299,7 @@
                     e.preventDefault();
                     pendingSubmit = e.target;
                     modal.classList.add('is-open');
-                    // Przenieś focus do modala
+                    
                     const firstBtn = modal.querySelector('[data-confirm-no]');
                     if (firstBtn) firstBtn.focus();
                 }
@@ -248,7 +322,7 @@
                 });
             }
 
-            // Zamknij po kliknięciu w tło
+            
             if (modal) {
                 modal.addEventListener('click', function (e) {
                     if (e.target === modal) {

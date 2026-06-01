@@ -47,6 +47,9 @@ public class Program
         builder.Services.AddScoped<BlackjackService>();
         builder.Services.AddScoped<CrashService>();
         builder.Services.AddScoped<RouletteService>();
+        builder.Services.AddScoped<DiceService>();
+        builder.Services.AddScoped<KenoService>();
+        builder.Services.AddScoped<BaccaratService>();
         builder.Services.AddScoped<IBalanceService, BalanceService>();
         builder.Services.AddScoped<IBonusCodeService, BonusCodeService>();
         builder.Services.AddScoped<IKycService, KycService>();
