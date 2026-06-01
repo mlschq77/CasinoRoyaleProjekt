@@ -27,6 +27,7 @@ namespace CasinoRoyale.Data
         public DbSet<DiceGame> DiceGames { get; set; }
         public DbSet<KenoGame> KenoGames { get; set; }
         public DbSet<LoginHistory> LoginHistories { get; set; }
+        public DbSet<BaccaratGame> BaccaratGames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

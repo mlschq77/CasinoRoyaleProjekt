@@ -1,0 +1,615 @@
+:root {
+    --bac-green: #1a5c2a;
+    --bac-green-dark: #0f3a1a;
+    --bac-felt: #1e6b30;
+    --bac-gold: #d4af37;
+    --bac-gold-soft: #f3d67a;
+    --bac-card-w: 60px;
+    --bac-card-h: 86px;
+    --bac-player: #2a7ad9;
+    --bac-banker: #d92a4a;
+    --bac-tie: #7a5a2a;
+}
+
+.bac-wrapper {
+    height: calc(100vh - 72px);
+    display: grid;
+    grid-template-columns: 1fr minmax(700px, 860px) 1fr;
+    grid-template-areas: ". table .";
+    padding: 0.75rem;
+    position: relative;
+    background: radial-gradient(ellipse at top, rgba(212,175,55,0.12), transparent 55%), linear-gradient(180deg, #050505 0%, #0c0c0c 100%);
+}
+
+.bac-table {
+    grid-area: table;
+    min-width: 0;
+    max-width: 860px;
+    background: radial-gradient(ellipse at center, var(--bac-felt) 0%, var(--bac-green-dark) 100%);
+    border-radius: 120px 120px 30px 30px;
+    border: 5px solid #3a2600;
+    box-shadow: 0 0 0 3px rgba(212,175,55,0.35), 0 0 60px rgba(0,0,0,0.8), inset 0 0 60px rgba(0,0,0,0.3);
+    padding: 1.2rem 2rem 1.5rem;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bac-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.bac-title {
+    color: var(--bac-gold-soft);
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 0 12px rgba(212,175,55,0.4);
+    letter-spacing: 0.05em;
+}
+
+.bac-balance-info {
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 999px;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.8rem;
+    color: #f5f1e6;
+}
+
+.bac-balance-label {
+    opacity: 0.7;
+    margin-right: 0.4rem;
+}
+
+.bac-balance-value {
+    color: var(--bac-gold-soft);
+    font-weight: 700;
+}
+
+/* ── Bet type selection ── */
+
+.bac-bet-type-select {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+    background: rgba(0,0,0,0.2);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+}
+
+.bac-bet-label {
+    font-size: 0.82rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.5);
+}
+
+.bac-bet-options {
+    display: flex;
+    gap: 6px;
+}
+
+.bac-bet-option {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.05);
+    color: rgba(255,255,255,0.7);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.78rem;
+}
+
+.bac-bet-option:hover {
+    border-color: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+}
+
+.bac-bet-option.active {
+    border-color: var(--bac-gold);
+    background: rgba(212,175,55,0.15);
+    color: var(--bac-gold-soft);
+    box-shadow: 0 0 12px rgba(212,175,55,0.15);
+}
+
+.bac-bet-player.active {
+    border-color: var(--bac-player);
+    background: rgba(42,122,217,0.15);
+    color: #8abff5;
+    box-shadow: 0 0 12px rgba(42,122,217,0.15);
+}
+
+.bac-bet-banker.active {
+    border-color: var(--bac-banker);
+    background: rgba(217,42,74,0.15);
+    color: #f58a9a;
+    box-shadow: 0 0 12px rgba(217,42,74,0.15);
+}
+
+.bac-bet-tie.active {
+    border-color: var(--bac-tie);
+    background: rgba(122,90,42,0.2);
+    color: #e8c87a;
+    box-shadow: 0 0 12px rgba(122,90,42,0.15);
+}
+
+.bac-bet-name {
+    font-weight: 700;
+}
+
+.bac-bet-pays {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    padding: 1px 5px;
+    border-radius: 4px;
+    background: rgba(0,0,0,0.25);
+}
+
+/* ── Hands ── */
+
+.bac-hands {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.bac-hand-zone {
+    min-height: 100px;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.bac-player-zone {
+    order: 2;
+}
+
+.bac-banker-zone {
+    order: 0;
+}
+
+.bac-hand-win {
+    background: rgba(42,167,69,0.14);
+    box-shadow: inset 0 0 0 1px rgba(42,167,69,0.55), 0 0 18px rgba(42,167,69,0.18);
+}
+
+.bac-hand-lose {
+    background: rgba(220,53,69,0.10);
+    box-shadow: inset 0 0 0 1px rgba(220,53,69,0.35), 0 0 18px rgba(220,53,69,0.10);
+}
+
+.bac-zone-label {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 0.3rem;
+}
+
+.bac-zone-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.bac-hand-value {
+    display: inline-block;
+    background: rgba(0,0,0,0.4);
+    color: var(--bac-gold-soft);
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 0.05rem 0.5rem;
+    font-size: 0.8rem;
+    min-width: 1.5rem;
+    text-align: center;
+}
+
+.bac-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: flex-start;
+    min-height: var(--bac-card-h);
+}
+
+/* ── Cards ── */
+
+.bac-card {
+    width: var(--bac-card-w);
+    height: var(--bac-card-h);
+    border-radius: 8px;
+    position: relative;
+    transform-origin: center bottom;
+    flex-shrink: 0;
+}
+
+.bac-card.bac-card-deal {
+    animation: bacDealCard 0.52s cubic-bezier(.22,.61,.36,1) both;
+}
+
+@keyframes bacDealCard {
+    from {
+        opacity: 0;
+        transform: translateY(-40px) rotate(-8deg) scale(0.85);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) rotate(0) scale(1);
+    }
+}
+
+.bac-card-face {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+    font-family: 'Georgia', serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    user-select: none;
+    overflow: hidden;
+}
+
+.bac-card-face.red {
+    color: #c0392b;
+}
+
+.bac-card-face.black {
+    color: #1a1a1a;
+}
+
+.bac-card-corner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+    font-size: 0.8rem;
+}
+
+.bac-card-corner.bottom {
+    transform: rotate(180deg);
+    align-self: flex-end;
+}
+
+.bac-card-center {
+    font-size: 1.6rem;
+    text-align: center;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Result banner ── */
+
+.bac-result-banner {
+    min-height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    border-radius: 10px;
+    transition: all 0.3s;
+    order: 1;
+}
+
+.bac-result-banner.win {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(42,167,69,0.3), rgba(42,167,69,0.1));
+    border: 1px solid rgba(42,167,69,0.5);
+    text-shadow: 0 0 20px rgba(42,167,69,0.8);
+    animation: bacBannerPop 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+.bac-result-banner.lose {
+    color: #fff;
+    background: linear-gradient(135deg, rgba(220,53,69,0.3), rgba(220,53,69,0.1));
+    border: 1px solid rgba(220,53,69,0.5);
+    text-shadow: 0 0 20px rgba(220,53,69,0.6);
+    animation: bacBannerPop 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+.bac-result-banner.push {
+    color: var(--bac-gold-soft);
+    background: linear-gradient(135deg, rgba(212,175,55,0.2), rgba(212,175,55,0.05));
+    border: 1px solid rgba(212,175,55,0.4);
+    animation: bacBannerPop 0.4s cubic-bezier(.22,.61,.36,1);
+}
+
+@keyframes bacBannerPop {
+    from {
+        transform: scale(0.85);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ── Controls ── */
+
+.bac-controls {
+    margin-top: auto;
+}
+
+.bac-bet-area {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bac-bet-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+.bac-chip {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: 2px solid var(--bac-gold);
+    background: radial-gradient(circle at 35% 35%, #2a2a2a, #111);
+    color: var(--bac-gold-soft);
+    font-weight: 800;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.bac-chip:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 6px 16px rgba(212,175,55,0.4), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+
+.bac-chip:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.bac-bet-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.bac-bet-display {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(212,175,55,0.3);
+    border-radius: 10px;
+    padding: 0.35rem 0.8rem;
+    color: var(--bac-gold-soft);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.bac-clear-btn {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.6);
+    border-radius: 6px;
+    padding: 2px 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    margin-left: 0.6rem;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.bac-clear-btn:hover {
+    border-color: rgba(255,255,255,0.5);
+    color: #fff;
+}
+
+.bac-deal-btn {
+    padding: 0.4rem 1.5rem;
+    font-size: 0.9rem;
+}
+
+.bac-action-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.bac-action-btn {
+    min-width: 120px;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* ── History tracker (sidebar) ── */
+
+.bac-history-track {
+    position: absolute;
+    right: 0.75rem;
+    top: 0.75rem;
+    bottom: 0.75rem;
+    width: 180px;
+    padding: 0.8rem;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(212,175,55,0.12);
+    border-radius: 30px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+}
+
+.bac-history-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: rgba(255,255,255,0.4);
+    margin-bottom: 0.3rem;
+}
+
+.bac-history-dots {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.bac-hist-dot {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #fff;
+    animation: bacDotPop 0.25s ease;
+    cursor: default;
+}
+
+.bac-hist-dot.bac-dot-player {
+    background: var(--bac-player);
+}
+
+.bac-hist-dot.bac-dot-banker {
+    background: var(--bac-banker);
+}
+
+.bac-hist-dot.bac-dot-tie {
+    background: var(--bac-tie);
+}
+
+@keyframes bacDotPop {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* ── Responsive ── */
+
+@media (max-width: 1240px) {
+    .bac-wrapper {
+        grid-template-columns: 1fr;
+        grid-template-areas: "table";
+        justify-items: center;
+        height: auto;
+        min-height: calc(100vh - 72px);
+        padding: 0.5rem;
+    }
+
+    .bac-history-track {
+        position: static;
+        width: auto;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0.5rem 0.8rem;
+        margin-top: 0.5rem;
+    }
+
+    .bac-history-dots {
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex: none;
+        overflow-y: visible;
+        padding-right: 0;
+    }
+
+    .bac-table {
+        border-radius: 24px;
+        padding: 0.8rem 0.8rem 1rem;
+        gap: 0.35rem;
+    }
+
+    :root {
+        --bac-card-w: 48px;
+        --bac-card-h: 72px;
+    }
+
+    .bac-chip {
+        width: 40px;
+        height: 40px;
+        font-size: 0.7rem;
+        border-width: 2px;
+    }
+
+    .bac-bet-type-select {
+        border-radius: 16px;
+        padding: 0.3rem 0.5rem;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .bac-bet-option {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.72rem;
+    }
+
+    .bac-bet-pays {
+        font-size: 0.55rem;
+    }
+
+    .bac-hand-zone {
+        min-height: 80px;
+        padding: 0.35rem 0.5rem;
+    }
+
+    .bac-title {
+        font-size: 1rem;
+    }
+
+    .bac-result-banner {
+        min-height: 30px;
+        font-size: 0.9rem;
+    }
+
+    .bac-bet-display {
+        font-size: 0.8rem;
+        padding: 0.25rem 0.6rem;
+    }
+
+    .bac-deal-btn {
+        padding: 0.3rem 1rem;
+        font-size: 0.8rem;
+    }
+
+    .bac-hist-dot {
+        width: 20px;
+        height: 20px;
+        font-size: 0.5rem;
+    }
+}
+

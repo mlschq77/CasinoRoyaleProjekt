@@ -92,6 +92,14 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
+            gry.Add(new AutomatInfo
+            {
+                Id = 7,
+                Nazwa = "Baccarat",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
         }
 
         var model = new SlotsViewModel
