@@ -100,6 +100,15 @@ public class AutomatyController : Controller
                 Kategorie = originalsCat
             });
 
+            gry.Add(new AutomatInfo
+            {
+                Id = 8,
+                Nazwa = "Fruits",
+                Provider = provider,
+                Kategorie = originalsCat
+            });
+
+            gry = gry.OrderBy(automat => automat.Nazwa).ToList();
         }
 
         var model = new SlotsViewModel

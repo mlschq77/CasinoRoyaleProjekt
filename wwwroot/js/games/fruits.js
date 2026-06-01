@@ -1,6 +1,6 @@
 'use strict';
 
-const fruitsSymbols = ['🍒', '🍋', '🍊', '🍇', '🍉', '7'];
+const fruitsSymbols = ['\u{1F352}', '\u{1F34B}', '\u{1F34A}', '\u{1F347}', '\u{1F349}', '7'];
 let fruitsSpinning = false;
 
 const fruitsSpinButton = document.getElementById('fruits-spin');

@@ -28,6 +28,11 @@ public class GamesController : Controller
 
     public IActionResult Slot()
     {
+        return RedirectToAction(nameof(Fruits));
+    }
+
+    public IActionResult Fruits()
+    {
         return View();
     }
 

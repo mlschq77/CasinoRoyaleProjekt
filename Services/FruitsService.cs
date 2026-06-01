@@ -6,11 +6,11 @@ public class FruitsService
 {
     private static readonly FruitSymbol[] Symbols =
     {
-        new("cherry", "🍒", "Wisnie", 3m),
-        new("lemon", "🍋", "Cytryny", 4m),
-        new("orange", "🍊", "Pomarancze", 5m),
-        new("grape", "🍇", "Winogrona", 7m),
-        new("watermelon", "🍉", "Arbuzy", 10m),
+        new("cherry", "\U0001F352", "Wisnie", 3m),
+        new("lemon", "\U0001F34B", "Cytryny", 4m),
+        new("orange", "\U0001F34A", "Pomarancze", 5m),
+        new("grape", "\U0001F347", "Winogrona", 7m),
+        new("watermelon", "\U0001F349", "Arbuzy", 10m),
         new("seven", "7", "Siodemki", 20m)
     };
 
