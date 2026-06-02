@@ -242,7 +242,7 @@ spinBtn.addEventListener('click', async () => {
         highlightTableResult(data.number);
         highlightWinningMarkers(data.number);
         addToHistory(data.number, data.color);
-        updateBalance(data.balance);
+        updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
         showResults(data);
 
     } catch (err) {
@@ -313,12 +313,6 @@ function addToHistory(number, color) {
     historyEl.prepend(chip);
     const chips = historyEl.querySelectorAll('.roulette-chip');
     if (chips.length > 20) chips[chips.length - 1].remove();
-}
-
-function updateBalance(balance) {
-    if (balanceEl && balance != null) {
-        balanceEl.textContent = parseFloat(balance).toFixed(2);
-    }
 }
 
 // ─── Budowanie markerów splitów / narożników / streetów ──────────────────────

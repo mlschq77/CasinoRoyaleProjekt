@@ -64,7 +64,8 @@ public class FruitsController : ControllerBase
                 multiplier = result.Multiplier,
                 win = result.Win,
                 result.Message,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }

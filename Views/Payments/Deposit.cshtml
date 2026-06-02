@@ -34,7 +34,8 @@
 
             <div>
                 <label asp-for="KodBonusowy" class="casino-label"></label>
-                <input asp-for="KodBonusowy" class="casino-input" maxlength="64" placeholder="Wpisz kod bonusowy" autocomplete="off" />
+                <input asp-for="KodBonusowy" class="casino-input" maxlength="64" placeholder="Wpisz kod bonusowy" autocomplete="off"
+                       style="text-transform: uppercase;" />
                 <span asp-validation-for="KodBonusowy" class="casino-validation"></span>
                 <span id="kodBonusowyLiveValidation" class="casino-validation"></span>
             </div>
@@ -79,7 +80,7 @@
             };
 
             const validateBonusCode = async () => {
-                const kodBonusowy = codeInput.value.trim();
+                const kodBonusowy = codeInput.value.trim().toUpperCase();
                 if (!kodBonusowy) {
                     setMessage("", true);
                     setSubmitDisabled(false);
@@ -115,6 +116,14 @@
                 window.clearTimeout(validationTimer);
                 validationTimer = window.setTimeout(validateBonusCode, 350);
             };
+
+            // Convert bonus code to uppercase in real-time while preserving cursor position
+            codeInput?.addEventListener("input", function () {
+                const start = this.selectionStart;
+                const end = this.selectionEnd;
+                this.value = this.value.toUpperCase();
+                this.setSelectionRange(start, end);
+            });
 
             codeInput?.addEventListener("input", scheduleValidation);
             amountInput?.addEventListener("input", scheduleValidation);

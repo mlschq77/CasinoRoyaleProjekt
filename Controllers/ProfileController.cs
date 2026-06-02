@@ -231,7 +231,7 @@ public class ProfileController : Controller
 
         var betRecords = await _dbContext.BetRecords
             .AsNoTracking()
-            .Where(r => r.UserId == userId && r.GameName != null && r.GameName != "")
+            .Where(r => r.UserId == userId && r.GameName != null && r.GameName != "" && r.PayoutAmount != null)
             .OrderByDescending(r => r.CreatedAt)
             .Take(50)
             .Select(r => new BetHistoryItemViewModel

@@ -75,6 +75,7 @@ async function clickTile(position, tile) {
 
             await revealMines();
 
+            updateBalanceDisplay(data);
             document.getElementById("status").innerText = "💥 You lost!";
             gameId = null;
         } else {

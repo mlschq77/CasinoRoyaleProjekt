@@ -76,7 +76,8 @@ public class KenoController : ControllerBase
                 hits = result.Hits,
                 multiplier = result.Multiplier,
                 win = result.Win,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }

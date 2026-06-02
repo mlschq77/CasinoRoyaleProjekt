@@ -154,6 +154,7 @@ namespace CasinoRoyale.Services
 
             var deck = JsonConvert.DeserializeObject<List<BlackjackCard>>(game.DeckJson)!;
             decimal balance = 0;
+            bool needsBalanceRefresh = true;
 
             if (game.IsPlayingSplitHand)
             {
@@ -166,6 +167,7 @@ namespace CasinoRoyale.Services
                 {
                     game.IsPlayerTurn = false;
                     (game, balance) = await RunDealerAndFinishAsync(game);
+                    needsBalanceRefresh = false;
                 }
             }
             else
@@ -183,11 +185,18 @@ namespace CasinoRoyale.Services
                     {
                         game.IsPlayerTurn = false;
                         (game, balance) = await RunDealerAndFinishAsync(game);
+                        needsBalanceRefresh = false;
                     }
                 }
             }
 
             await _db.SaveChangesAsync();
+
+            if (needsBalanceRefresh)
+            {
+                balance = await _balanceService.GetBalanceAsync(userId) ?? 0;
+            }
+
             return (true, "", game, balance);
         }
 
@@ -202,7 +211,8 @@ namespace CasinoRoyale.Services
             {
                 game.IsPlayingSplitHand = true;
                 await _db.SaveChangesAsync();
-                return (true, "", game, 0);
+                var currentBalance = await _balanceService.GetBalanceAsync(userId) ?? 0;
+                return (true, "", game, currentBalance);
             }
 
             game.IsPlayerTurn = false;

@@ -57,7 +57,7 @@ public class PaymentsController : Controller
         if (userId == null)
             return Unauthorized();
 
-        var validation = await _bonusCodeService.ValidateAsync(userId.Value, kodBonusowy, amount);
+        var validation = await _bonusCodeService.ValidateAsync(userId.Value, kodBonusowy?.Trim().ToUpperInvariant(), amount);
         if (validation.Error != null)
             return Json(new { isValid = false, message = validation.Error });
 
@@ -90,7 +90,7 @@ public class PaymentsController : Controller
         var kycResult = await EnforceKycAsync(userId.Value, "Najpierw zweryfikuj konto w profilu, aby móc dokonywać wpłat.");
         if (kycResult != null) return kycResult;
 
-        var normalizedBonusCode = model.KodBonusowy?.Trim();
+        var normalizedBonusCode = model.KodBonusowy?.Trim().ToUpperInvariant();
         if (!string.IsNullOrWhiteSpace(normalizedBonusCode))
         {
             var validation = await _bonusCodeService.ValidateAsync(userId.Value, normalizedBonusCode, model.Amount);
@@ -205,7 +205,7 @@ public class PaymentsController : Controller
             await _dbContext.SaveChangesAsync();
 
             session.Metadata.TryGetValue("kodBonusowy", out var kodString);
-            var bonusResult = await _bonusCodeService.ApplyAsync(userId.Value, kodString, paidAmount, stripePayment);
+            var bonusResult = await _bonusCodeService.ApplyAsync(userId.Value, kodString?.ToUpperInvariant(), paidAmount, stripePayment);
             var bonusAmount = bonusResult.BonusAmount;
 
             // Wp�ata idzie na BalanceReal, bonus na BalanceBonus (osobno)

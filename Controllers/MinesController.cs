@@ -106,9 +106,14 @@ namespace CasinoRoyale.Controllers
                 await _context.SaveChangesAsync();
 
                 var sessionKey = "min:" + game.Id;
-                await _balanceService.PayoutAsync(userId.Value, 0, sessionKey);
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, 0, sessionKey);
 
-                return Ok(new { result = "lose" });
+                return Ok(new
+                {
+                    result = "lose",
+                    balance = payoutResult.Balance,
+                    balanceBonus = payoutResult.BalanceBonus
+                });
             }
 
             revealed.Add(position);

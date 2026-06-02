@@ -75,7 +75,8 @@ public class DiceController : ControllerBase
                 chance = result.Chance,
                 multiplier = result.Multiplier,
                 win = result.Win,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }
