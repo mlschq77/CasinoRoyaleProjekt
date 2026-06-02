@@ -34,8 +34,15 @@ public class PaymentsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Deposit(string? message = null)
+    public async Task<IActionResult> Deposit(string? message = null)
     {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var kycResult = await EnforceKycAsync(userId.Value, "Wpłaty są dostępne tylko dla zweryfikowanych użytkowników. Przejdź do profilu, aby ukończyć weryfikację KYC.");
+        if (kycResult != null) return kycResult;
+
         return View(new DepositViewModel
         {
             Message = message,
@@ -79,6 +86,9 @@ public class PaymentsController : Controller
         var userId = GetCurrentUserId();
         if (userId == null)
             return Unauthorized();
+
+        var kycResult = await EnforceKycAsync(userId.Value, "Najpierw zweryfikuj konto w profilu, aby móc dokonywać wpłat.");
+        if (kycResult != null) return kycResult;
 
         var normalizedBonusCode = model.KodBonusowy?.Trim();
         if (!string.IsNullOrWhiteSpace(normalizedBonusCode))
@@ -148,6 +158,9 @@ public class PaymentsController : Controller
         var userId = GetCurrentUserId();
         if (userId == null)
             return Unauthorized();
+
+        var kycResult = await EnforceKycAsync(userId.Value, "Operacja zablokowana — zweryfikuj konto w profilu.");
+        if (kycResult != null) return kycResult;
 
         StripeConfiguration.ApiKey = GetStripeSecretKey();
 
@@ -234,8 +247,15 @@ public class PaymentsController : Controller
     }
 
     [HttpGet]
-    public IActionResult Withdraw(string? message = null)
+    public async Task<IActionResult> Withdraw(string? message = null)
     {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+            return Unauthorized();
+
+        var kycResult = await EnforceKycAsync(userId.Value, "Wypłaty są dostępne tylko dla zweryfikowanych użytkowników. Przejdź do profilu, aby ukończyć weryfikację KYC.");
+        if (kycResult != null) return kycResult;
+
         return View(new WithdrawViewModel
         {
             Message = message,
@@ -260,6 +280,9 @@ public class PaymentsController : Controller
         var userId = GetCurrentUserId();
         if (userId == null)
             return Unauthorized();
+
+        var kycResult = await EnforceKycAsync(userId.Value, "Najpierw zweryfikuj konto w profilu, aby móc wypłacać środki.");
+        if (kycResult != null) return kycResult;
 
         var withdrawResult = await _balanceService.WithdrawAsync(userId.Value, amount);
         if (!withdrawResult.Success)
@@ -302,6 +325,22 @@ public class PaymentsController : Controller
             await _balanceService.PayoutAsync(userId.Value, amount);
             return RedirectToAction(nameof(Withdraw), new { message = $"Stripe odrzucil wyplate: {ex.StripeError?.Message ?? ex.Message}" });
         }
+    }
+
+    private async Task<IActionResult?> EnforceKycAsync(int userId, string message)
+    {
+        var user = await _dbContext.Users
+            .Where(u => u.Id == userId)
+            .Select(u => u.KycStatus)
+            .FirstOrDefaultAsync();
+
+        if (user != UserKycStatus.Approved)
+        {
+            TempData["KycMessage"] = message;
+            return RedirectToAction("Index", "Kyc");
+        }
+
+        return null;
     }
 
     private string? GetStripeSecretKey()
