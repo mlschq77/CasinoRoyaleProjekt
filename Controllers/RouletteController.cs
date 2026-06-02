@@ -108,13 +108,14 @@ public class RouletteController : ControllerBase
             decimal finalBalance;
             if (totalWin > 0)
             {
-                var payoutResult = await _balanceService.PayoutAsync(userId.Value, totalWin);
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, totalWin, betResult.SessionKey);
                 if (!payoutResult.Success)
                     return BadRequest(new { error = payoutResult.Error });
                 finalBalance = payoutResult.Balance;
             }
             else
             {
+                await _balanceService.PayoutAsync(userId.Value, 0, betResult.SessionKey);
                 finalBalance = (await _balanceService.GetBalanceAsync(userId.Value)) ?? 0;
             }
 

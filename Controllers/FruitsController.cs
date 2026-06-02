@@ -46,7 +46,7 @@ public class FruitsController : ControllerBase
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
             var result = _fruitsService.Spin(bet);
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win, betResult.SessionKey);
 
             if (!payoutResult.Success)
                 return BadRequest(new { error = payoutResult.Error });

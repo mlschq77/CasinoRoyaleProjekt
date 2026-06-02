@@ -197,6 +197,9 @@ namespace CasinoRoyale.Controllers
                 else
                 {
                     // Gracz spóźnił się - CrashPoint został już przekroczony
+                    var sessionKey = "csh:" + session.Id;
+                    await _balanceService.PayoutAsync(userId.Value, 0, sessionKey);
+
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 

@@ -228,6 +228,10 @@ namespace CasinoRoyale.Services
                         return (false, payoutResult.Error ?? "Blad wyplaty.", null, 0);
                     }
                 }
+                else
+                {
+                    await _balanceService.PayoutAsync(userId, 0, sessionKey);
+                }
 
                 await tx.CommitAsync();
 

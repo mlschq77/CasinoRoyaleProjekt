@@ -238,7 +238,8 @@ public class ProfileController : Controller
             {
                 GameName = r.GameName,
                 CreatedAt = r.CreatedAt,
-                BetAmount = r.Amount
+                BetAmount = r.Amount,
+                PayoutAmount = r.PayoutAmount
             })
             .ToListAsync();
 
@@ -307,6 +308,7 @@ public class ProfileController : Controller
                             columns.RelativeColumn(2);
                             columns.RelativeColumn(2);
                             columns.RelativeColumn(1);
+                            columns.RelativeColumn(1);
                         });
 
                         table.Header(header =>
@@ -314,19 +316,25 @@ public class ProfileController : Controller
                             header.Cell().BorderBottom(1).Padding(2).Text("Data");
                             header.Cell().BorderBottom(1).Padding(2).Text("Gra");
                             header.Cell().BorderBottom(1).Padding(2).Text("Stawka");
+                            header.Cell().BorderBottom(1).Padding(2).Text("Wynik");
                         });
 
                         if (!profile.BetHistory.Any())
                         {
-                            table.Cell().ColumnSpan(3).Padding(2).Text("Brak zakładów.");
+                            table.Cell().ColumnSpan(4).Padding(2).Text("Brak zakładów.");
                         }
                         else
                         {
                             foreach (var bet in profile.BetHistory)
                             {
+                                var resultText = bet.PayoutAmount.HasValue
+                                    ? $"{bet.PayoutAmount.Value:0.00} PLN"
+                                    : "—";
+
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(bet.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"));
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(bet.GameName);
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text($"{bet.BetAmount:0.00} PLN");
+                                table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(resultText);
                             }
                         }
                     });

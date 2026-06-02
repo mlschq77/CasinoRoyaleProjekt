@@ -90,7 +90,7 @@ public class BalanceService : IBalanceService
 
         await _dbContext.SaveChangesAsync();
 
-        return BalanceResult.Ok(wallet.BalanceReal, wallet.BalanceBonus, amountFromBonus);
+        return BalanceResult.Ok(wallet.BalanceReal, wallet.BalanceBonus, amountFromBonus, sessionKey);
     }
 
     public async Task<BalanceResult> PayoutAsync(int userId, decimal amount, string? sessionKey = null)
@@ -124,6 +124,9 @@ public class BalanceService : IBalanceService
                 foreach (var record in unsettledRecords)
                 {
                     record.Settled = true;
+                    record.PayoutAmount = totalAmount > 0
+                        ? decimal.Round(amount * (record.Amount / totalAmount), 2)
+                        : amount;
                 }
             }
         }
@@ -141,7 +144,7 @@ public class BalanceService : IBalanceService
         if (wallet.WageringProgress == null || wallet.WageringRequired == null)
             _bonusCodeService.ConvertBonusToReal(wallet);
 
-            await _dbContext.SaveChangesAsync();
+        await _dbContext.SaveChangesAsync();
 
         var updatedWallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == userId);
         return BalanceResult.Ok(updatedWallet!.BalanceReal, updatedWallet.BalanceBonus);

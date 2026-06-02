@@ -63,7 +63,7 @@ public class KenoController : ControllerBase
             });
             await _db.SaveChangesAsync();
 
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win, betResult.SessionKey);
             if (!payoutResult.Success)
                 return BadRequest(new { error = payoutResult.Error });
 

@@ -18,13 +18,17 @@ public class BalanceResult
     /// <summary>Ile z zakładu zostało pobrane z bonusu (tylko dla PlaceBet).</summary>
     public decimal AmountFromBonus { get; init; }
 
-    public static BalanceResult Ok(decimal balanceReal, decimal balanceBonus = 0, decimal amountFromBonus = 0) => new()
+    /// <summary>SessionKey wygenerowany lub przekazany dla zakładu (tylko dla PlaceBet).</summary>
+    public string? SessionKey { get; init; }
+
+    public static BalanceResult Ok(decimal balanceReal, decimal balanceBonus = 0, decimal amountFromBonus = 0, string? sessionKey = null) => new()
     {
         Success = true,
         Balance = balanceReal + balanceBonus,
         BalanceReal = balanceReal,
         BalanceBonus = balanceBonus,
-        AmountFromBonus = amountFromBonus
+        AmountFromBonus = amountFromBonus,
+        SessionKey = sessionKey
     };
 
     public static BalanceResult Failed(string error, decimal balanceReal = 0, decimal balanceBonus = 0) => new()

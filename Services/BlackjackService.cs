@@ -381,15 +381,16 @@ namespace CasinoRoyale.Services
 
             await _db.SaveChangesAsync();
 
+            var sessionKey = "bj:" + game.Id;
             decimal finalBalance;
             if (totalWin > 0)
             {
-                var sessionKey = "bj:" + game.Id;
                 var payoutResult = await _balanceService.PayoutAsync(game.UserId, totalWin, sessionKey);
                 finalBalance = payoutResult.Balance;
             }
             else
             {
+                await _balanceService.PayoutAsync(game.UserId, 0, sessionKey);
                 finalBalance = (await _balanceService.GetBalanceAsync(game.UserId)) ?? 0;
             }
 

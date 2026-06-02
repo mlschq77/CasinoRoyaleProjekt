@@ -189,25 +189,32 @@
         <button class="casino-history-close" type="button" data-history-close>
             <i class="fa-solid fa-xmark"></i>
         </button>
-        <h2>Historia zakladow</h2>
-    
-        <div class="casino-history-list">
-            @if (Model.BetHistory.Any())
-            {
-                foreach (var item in Model.BetHistory)
-                {
-                    <div class="casino-history-row">
-                        <span>@item.GameName</span>
-                        <strong>@item.BetAmount.ToString("0.00") PLN</strong>
-                        <time>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+        <h2>Historia zakladow</h2>                    <div class="casino-history-list">
+                        @if (Model.BetHistory.Any())
+                        {
+                            foreach (var item in Model.BetHistory)
+                            {
+                                <div class="casino-history-row">
+                                    <span>@item.GameName</span>
+                                    <strong class="text-white">@item.BetAmount.ToString("0.00") PLN</strong>
+                                    @if (item.PayoutAmount.HasValue)
+                                    {
+                                        var cssClass = item.PayoutAmount.Value > item.BetAmount ? "text-success" : (item.PayoutAmount.Value < item.BetAmount ? "text-secondary" : "text-gold-soft");
+                                        <strong class="@cssClass">@item.PayoutAmount.Value.ToString("0.00") PLN</strong>
+                                    }
+                                    else
+                                    {
+                                        <strong class="text-secondary">w trakcie</strong>
+                                    }
+                                    <time>@item.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm")</time>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="casino-history-empty">Brak zakladow.</div>
+                        }
                     </div>
-                }
-            }
-            else
-            {
-                <div class="casino-history-empty">Brak zakladow.</div>
-            }
-        </div>
     </div>
 </div>
 
