@@ -78,7 +78,7 @@ public class RouletteController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, totalBet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, totalBet, gameName: "Roulette");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 

@@ -44,7 +44,7 @@ public class DiceController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, request.Bet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, request.Bet, gameName: "Dice");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 

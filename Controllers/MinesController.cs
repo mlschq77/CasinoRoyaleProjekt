@@ -60,7 +60,7 @@ namespace CasinoRoyale.Controllers
                     await _context.SaveChangesAsync();
 
                     var sessionKey = "min:" + game.Id;
-                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey, gameName: "Mines");
                     if (!betResult.Success)
                     {
                         await transaction.RollbackAsync();

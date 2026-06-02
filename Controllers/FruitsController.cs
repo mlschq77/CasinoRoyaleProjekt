@@ -41,7 +41,7 @@ public class FruitsController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, gameName: "Fruits");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 

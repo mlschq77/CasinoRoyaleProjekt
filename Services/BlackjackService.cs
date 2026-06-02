@@ -132,7 +132,7 @@ namespace CasinoRoyale.Services
 
                 // Zapisz grę PRZED PlaceBet — potrzebujemy game.Id do sessionKey
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                 {
                     await tx.RollbackAsync();
@@ -230,7 +230,7 @@ namespace CasinoRoyale.Services
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na double.", (BlackjackGame?)null, betResult.Balance);
 
@@ -272,7 +272,7 @@ namespace CasinoRoyale.Services
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na split.", (BlackjackGame?)null, betResult.Balance);
 

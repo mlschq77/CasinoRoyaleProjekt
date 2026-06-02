@@ -43,7 +43,7 @@ public class PlinkoController : ControllerBase
             await using var transaction = await _context.Database.BeginTransactionAsync();
 
             var sessionKey = "pln:" + Guid.NewGuid().ToString("N");
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey, gameName: "Plinko");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 

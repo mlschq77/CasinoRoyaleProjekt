@@ -229,65 +229,20 @@ public class ProfileController : Controller
             .Take(30)
             .ToList();
 
-        var blackjackBets = await _dbContext.BlackjackGames
+        var betRecords = await _dbContext.BetRecords
             .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Blackjack", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount + game.SplitBetAmount })
-            .ToListAsync();
-
-        var minesBets = await _dbContext.MinesGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Mines", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var plinkoBets = await _dbContext.PlinkoGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Plinko", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var crashBets = await _dbContext.CrashSessions
-            .AsNoTracking()
-            .Where(session => session.UserId == userId)
-            .Select(session => new BetHistoryItemViewModel { GameName = "Crash", CreatedAt = session.CreatedAt, BetAmount = session.BetAmount })
-            .ToListAsync();
-
-        var diceBets = await _dbContext.DiceGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Dice", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var kenoBets = await _dbContext.KenoGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Keno", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var rouletteBets = await _dbContext.RouletteGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Roulette", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var baccaratBets = await _dbContext.BaccaratGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Baccarat", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        profile.BetHistory = blackjackBets
-            .Concat(minesBets)
-            .Concat(plinkoBets)
-            .Concat(crashBets)
-            .Concat(diceBets)
-            .Concat(kenoBets)
-            .Concat(rouletteBets)
-            .Concat(baccaratBets)
-            .OrderByDescending(item => item.CreatedAt)
+            .Where(r => r.UserId == userId && r.GameName != null && r.GameName != "")
+            .OrderByDescending(r => r.CreatedAt)
             .Take(50)
-            .ToList();
+            .Select(r => new BetHistoryItemViewModel
+            {
+                GameName = r.GameName,
+                CreatedAt = r.CreatedAt,
+                BetAmount = r.Amount
+            })
+            .ToListAsync();
+
+        profile.BetHistory = betRecords;
 
         var loginRaw = await _dbContext.LoginHistories
             .AsNoTracking()

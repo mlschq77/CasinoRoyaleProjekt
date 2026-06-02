@@ -40,7 +40,7 @@ public class BalanceService : IBalanceService
         };
     }
 
-    public async Task<BalanceResult> PlaceBetAsync(int userId, decimal amount, string? sessionKey = null)
+    public async Task<BalanceResult> PlaceBetAsync(int userId, decimal amount, string? sessionKey = null, string? gameName = null)
     {
         if (amount <= 0)
             return BalanceResult.Failed("Stawka musi byc wieksza od zera.");
@@ -82,6 +82,7 @@ public class BalanceService : IBalanceService
             Amount = amount,
             AmountFromBonus = amountFromBonus,
             SessionKey = sessionKey,
+            GameName = gameName ?? string.Empty,
             BonusDeductions = null,
             Settled = false,
             CreatedAt = DateTime.UtcNow
