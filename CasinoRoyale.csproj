@@ -34,5 +34,10 @@
 	<ItemGroup>
 		<Folder Include="Views\Automaty\Originals\" />
 	</ItemGroup>
-
+	<ItemGroup>
+		<Compile Remove="CasinoRoyale.Tests\**" />
+		<Content Remove="CasinoRoyale.Tests\**" />
+		<EmbeddedResource Remove="CasinoRoyale.Tests\**" />
+		<None Remove="CasinoRoyale.Tests\**" />
+	</ItemGroup>
 </Project>
