@@ -1,1 +1,1 @@
-# casino-web-app
+- Diagramy UML w katalogu `docs`.
