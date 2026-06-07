@@ -16,9 +16,14 @@ public class Program
 
         builder.Services.AddDbContext<Automaty>(options =>
             options.UseSqlServer(
-                builder.Configuration.GetConnectionString("DefaultConnection"),
-                sql => sql.EnableRetryOnFailure()
-            ));
+                builder.Configuration.GetConnectionString("DefaultConnection"), 
+                sqlServerOptions =>
+                {
+                    sqlServerOptions.EnableRetryOnFailure(
+                        maxRetryCount: 5, 
+                        maxRetryDelay: TimeSpan.FromSeconds(30),
+                        errorNumbersToAdd: null);
+                }));
 
 
 
