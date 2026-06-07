@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using static CasinoRoyale.Services.PaginationHelper;
 
 namespace CasinoRoyale.Controllers;
 
@@ -62,11 +63,11 @@ public class AdminController : Controller
 
     // ─── UZYTKOWNICY ─────────────────────────────────────────────────────────
 
-    public async Task<IActionResult> Uzytkownicy(string? search)
+    public async Task<IActionResult> Uzytkownicy(string? search, int page = 1)
     {
         if (!await IsAdminAsync()) return Forbid();
 
-        var query = _db.Users.Include(u => u.Wallet).AsQueryable();
+        var query = _db.Users.Include(u => u.Wallet).AsNoTracking().AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -78,10 +79,11 @@ public class AdminController : Controller
                 u.Nazwisko.ToLower().Contains(s));
         }
 
-        var users = await query.OrderByDescending(u => u.DataRejestracji).ToListAsync();
+        query = query.OrderByDescending(u => u.DataRejestracji);
+        var result = await PaginateAsync(query, page);
 
         // Pobierz ostatnie udane logowanie dla każdego użytkownika
-        var userIds = users.Select(u => u.Id).ToList();
+        var userIds = result.Items.Select(u => u.Id).ToList();
         var ostatnieLogowania = await _db.LoginHistories
             .Where(h => userIds.Contains(h.UserId) && h.EventType == "login" && h.Successful)
             .GroupBy(h => h.UserId)
@@ -94,7 +96,9 @@ public class AdminController : Controller
 
         ViewBag.OstatnieLogowania = ostatnieLogowania;
         ViewBag.Search = search;
-        return View(users);
+        ViewBag.Page = result.Page;
+        ViewBag.TotalPages = result.TotalPages;
+        return View(result.Items);
     }
 
     [HttpPost]
@@ -317,7 +321,7 @@ public class AdminController : Controller
 
     // ─── HISTORIA LOGOWAŃ ────────────────────────────────────────────────────
 
-    public async Task<IActionResult> LoginHistory(int userId)
+    public async Task<IActionResult> LoginHistory(int userId, int page = 1)
     {
         if (!await IsAdminAsync()) return Forbid();
 
@@ -327,16 +331,19 @@ public class AdminController : Controller
 
         if (user == null) return NotFound();
 
-        var logins = await _db.LoginHistories
+        var query = _db.LoginHistories
             .AsNoTracking()
             .Where(h => h.UserId == userId)
-            .OrderByDescending(h => h.LoggedAt)
-            .ToListAsync();
+            .OrderByDescending(h => h.LoggedAt);
+
+        var result = await PaginateAsync(query, page);
 
         ViewBag.UserName = $"{user.Imie} {user.Nazwisko} (@{user.Nazwa})";
         ViewBag.UserEmail = user.Email;
         ViewBag.UserId = userId;
-        return View(logins);
+        ViewBag.Page = result.Page;
+        ViewBag.TotalPages = result.TotalPages;
+        return View(result.Items);
     }
 
     // ─── STATYSTYKI GIER ─────────────────────────────────────────────────────

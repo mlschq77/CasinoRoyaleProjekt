@@ -11,6 +11,7 @@ using System.Security.Claims;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
+using static CasinoRoyale.Services.PaginationHelper;
 
 namespace CasinoRoyale.Controllers;
 
@@ -229,28 +230,29 @@ public class ProfileController : Controller
             .Take(30)
             .ToList();
 
-        var betRecords = await _dbContext.BetRecords
+        var betQuery = _dbContext.BetRecords
             .AsNoTracking()
             .Where(r => r.UserId == userId && r.GameName != null && r.GameName != "" && r.PayoutAmount != null)
             .OrderByDescending(r => r.CreatedAt)
-            .Take(50)
             .Select(r => new BetHistoryItemViewModel
             {
                 GameName = r.GameName,
                 CreatedAt = r.CreatedAt,
                 BetAmount = r.Amount,
                 PayoutAmount = r.PayoutAmount
-            })
-            .ToListAsync();
+            });
 
-        profile.BetHistory = betRecords;
+        var betResult = await PaginateAsync(betQuery, page: 1, pageSize: 50);
+        profile.BetHistory = betResult.Items.ToList();
+        profile.TotalBetRecords = betResult.TotalCount;
 
-        var loginRaw = await _dbContext.LoginHistories
+        var loginQuery = _dbContext.LoginHistories
             .AsNoTracking()
             .Where(h => h.UserId == userId)
-            .OrderByDescending(h => h.LoggedAt)
-            .Take(30)
-            .ToListAsync();
+            .OrderByDescending(h => h.LoggedAt);
+
+        var loginResult = await PaginateAsync(loginQuery, page: 1, pageSize: 30);
+        var loginRaw = loginResult.Items;
 
         profile.LoginHistory = loginRaw.Select(h => new LoginHistoryItemViewModel
         {

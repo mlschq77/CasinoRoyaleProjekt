@@ -63,6 +63,16 @@ namespace CasinoRoyale.Data
                 .HasIndex(w => w.UserId)
                 .IsUnique();
 
+            modelBuilder.Entity<Wallet>()
+                .HasIndex(w => w.BalanceReal)
+                .HasDatabaseName("IX_Wallets_BalanceReal")
+                .HasFilter("[BalanceReal] > 0");
+
+            // ── Users ────────────────────────────────────
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Nazwa)
+                .HasDatabaseName("IX_Users_Nazwa");
+
             // ── MinesGame ─────────────────────────────────────
             modelBuilder.Entity<MinesGame>()
                 .Property(game => game.BetAmount)
@@ -102,6 +112,12 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<StripePayment>()
                 .HasIndex(payment => payment.SessionId)
                 .IsUnique();
+
+            modelBuilder.Entity<StripePayment>()
+                .HasIndex(payment => new { payment.UserId, payment.CreatedAt })
+                .HasDatabaseName("IX_StripePayments_UserId_CreatedAt");
+
+
 
             // ── KodBonusowy ───────────────────────────────────
             modelBuilder.Entity<KodBonusowy>()
@@ -165,6 +181,28 @@ namespace CasinoRoyale.Data
                 .HasForeignKey(uzytyKod => uzytyKod.StripePaymentId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            // ── BaccaratGame ──────────────────────────────
+            modelBuilder.Entity<BaccaratGame>()
+                .Property(g => g.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BaccaratGame>()
+                .Property(g => g.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
+            // ── BlackjackGame ─────────────────────────────
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(g => g.BetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(g => g.SplitBetAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BlackjackGame>()
+                .Property(g => g.WinAmount)
+                .HasColumnType("decimal(18,2)");
+
             // ── Kategoria ─────────────────────────────────────
             modelBuilder.Entity<Kategoria>()
                 .ToTable("Kategorie");
@@ -208,6 +246,10 @@ namespace CasinoRoyale.Data
             modelBuilder.Entity<StripeWithdrawal>()
                 .HasIndex(withdrawal => withdrawal.TransferId)
                 .IsUnique();
+
+            modelBuilder.Entity<StripeWithdrawal>()
+                .HasIndex(withdrawal => new { withdrawal.UserId, withdrawal.CreatedAt })
+                .HasDatabaseName("IX_StripeWithdrawals_UserId_CreatedAt");
 
             // ── AutomatProvider ──────────────────────────────
             modelBuilder.Entity<AutomatProvider>()
@@ -267,6 +309,14 @@ namespace CasinoRoyale.Data
 
             modelBuilder.Entity<LoginHistory>()
                 .HasIndex(h => new { h.UserId, h.LoggedAt });
+
+            modelBuilder.Entity<LoginHistory>()
+                .HasIndex(h => h.LoggedAt)
+                .HasDatabaseName("IX_LoginHistories_LoggedAt");
+
+            // ── GameResults ────────────────────────────────
+            // Table already exists via raw SQL migration 20260512200000_AddGameResults
+            // Indexes are created in that same migration
 
 
             // ── AutomatInfo ───────────────────────────────────

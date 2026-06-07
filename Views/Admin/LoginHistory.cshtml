@@ -96,4 +96,34 @@
             </table>
         </div>
     </div>
+
+    @{
+        var page = ViewBag.Page as int? ?? 1;
+        var totalPages = ViewBag.TotalPages as int? ?? 1;
+    }
+    @if (totalPages > 1)
+    {
+        <nav class="mt-4">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link bg-dark text-white border-secondary" asp-action="LoginHistory" asp-route-userId="@userId" asp-route-page="1">Pierwsza</a>
+                </li>
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link bg-dark text-white border-secondary" asp-action="LoginHistory" asp-route-userId="@userId" asp-route-page="@(page - 1)"><i class="fa-solid fa-chevron-left"></i></a>
+                </li>
+                @for (var p = Math.Max(1, page - 2); p <= Math.Min(totalPages, page + 2); p++)
+                {
+                    <li class="page-item @(p == page ? "active" : "")">
+                        <a class="page-link bg-dark text-white border-secondary @(p == page ? "casino-btn-primary border-0" : "")" asp-action="LoginHistory" asp-route-userId="@userId" asp-route-page="@p">@p</a>
+                    </li>
+                }
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link bg-dark text-white border-secondary" asp-action="LoginHistory" asp-route-userId="@userId" asp-route-page="@(page + 1)"><i class="fa-solid fa-chevron-right"></i></a>
+                </li>
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link bg-dark text-white border-secondary" asp-action="LoginHistory" asp-route-userId="@userId" asp-route-page="@totalPages">Ostatnia</a>
+                </li>
+            </ul>
+        </nav>
+    }
 </div>

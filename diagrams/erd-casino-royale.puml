@@ -1,0 +1,187 @@
+@startuml
+skinparam style strictuml
+skinparam classAttributeIconSize 0
+title Diagram ERD - Casino Royale
+
+entity "Users" as Users {
+  Id : int <<PK>>
+  --
+  Imie : nvarchar(50)
+  Nazwisko : nvarchar(50)
+  Nazwa : nvarchar(50)
+  Email : nvarchar(450) <<UQ>>
+  HasloHash : nvarchar(max)
+  IsAdmin : bit
+  DataRejestracji : datetime2
+  KycStatus : int
+}
+
+entity "Wallets" as Wallets {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>> <<UQ>>
+  BalanceReal : decimal(18,2)
+  BalanceBonus : decimal(18,2)
+  ActiveBonusId : int?
+  WageringRequired : decimal(18,2)?
+  WageringProgress : decimal(18,2)?
+  BonusExpiresAt : datetime2?
+}
+
+entity "BetRecords" as BetRecords {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  Amount : decimal(18,2)
+  AmountFromBonus : decimal(18,2)
+  BonusDeductions : nvarchar(500)?
+  SessionKey : nvarchar(100)
+  Settled : bit
+  CreatedAt : datetime2
+  GameName : nvarchar(32)
+  PayoutAmount : decimal(18,2)?
+}
+
+entity "LoginHistories" as LoginHistories {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  IpAddress : nvarchar(45)
+  UserAgent : nvarchar(500)
+  Successful : bit
+  EventType : nvarchar(20)
+  LoggedAt : datetime2
+}
+
+entity "KodyBonusowe" as KodyBonusowe {
+  Id : int <<PK>>
+  --
+  Kod : nvarchar(64) <<UQ>>
+  MinimalnaWplata : decimal(18,2)
+  BonusProcentowy : decimal(5,2)
+  BonusKwotowy : decimal(18,2)
+  Utworzono : datetime2
+  WaznyDo : datetime2?
+  WageringMultiplier : decimal(18,2)
+}
+
+entity "UzyteKodyBonusowe" as UzyteKodyBonusowe {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  KodBonusowyId : int <<FK>>
+  StripePaymentId : int? <<FK>>
+  BonusAmount : decimal(18,2)
+  SessionId : nvarchar(450)
+  UzytyW : datetime2
+}
+
+entity "StripePayments" as StripePayments {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  Amount : decimal(18,2)
+  Currency : nvarchar(10)
+  SessionId : nvarchar(450) <<UQ>>
+  CreatedAt : datetime2
+}
+
+entity "StripeWithdrawals" as StripeWithdrawals {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  Amount : decimal(18,2)
+  Currency : nvarchar(10)
+  TransferId : nvarchar(450) <<UQ>>
+  CreatedAt : datetime2
+}
+
+entity "KycDocuments" as KycDocuments {
+  Id : int <<PK>>
+  --
+  UserId : int <<FK>>
+  DocumentType : int
+  FileName : nvarchar(255)
+  ContentType : nvarchar(100)
+  StoragePath : nvarchar(500)
+  Status : int
+  UploadedAt : datetime2
+  AdminComment : nvarchar(1000)?
+  ReviewedByUserId : int?
+  ReviewedAt : datetime2?
+}
+
+entity "GameResults" as GameResults {
+  Id : int <<PK>>
+  --
+  UserId : int
+  GameKey : nvarchar(max)
+  GameName : nvarchar(max)
+  BetAmount : decimal(18,2)
+  PayoutAmount : decimal(18,2)
+  WinAmount : decimal(18,2)
+  PlayedAtUtc : datetime2
+}
+
+entity "AutomatyInfo" as AutomatyInfo {
+  Id : int <<PK>>
+  --
+  Nazwa : nvarchar(max)
+  ProviderId : int? <<FK>>
+}
+
+entity "AutomatProviderzy" as AutomatProviderzy {
+  Id : int <<PK>>
+  --
+  Nazwa : nvarchar(450) <<UQ>>
+}
+
+entity "Kategorie" as Kategorie {
+  Id : int <<PK>>
+  --
+  Nazwa : nvarchar(450) <<UQ>>
+}
+
+entity "AutomatyKategorie" as AutomatyKategorie {
+  AutomatId : int <<FK>>
+  KategoriaId : int <<FK>>
+}
+
+entity "MinesGames" as MinesGames {
+  Id : int <<PK>>
+  UserId : int <<FK>>
+  GridSize : int
+  MineCount : int
+  BetAmount : decimal(18,2)
+  IsActive : bit
+  CreatedAt : datetime2
+}
+
+entity "PlinkoGames" as PlinkoGames {
+  Id : int <<PK>>
+  UserId : int <<FK>>
+  BetAmount : decimal(18,2)
+  Risk : nvarchar(50)
+  WinAmount : decimal(18,2)
+  CreatedAt : datetime2
+}
+
+Users ||--o| Wallets : posiada
+Users ||--o{ BetRecords : zaklady
+Users ||--o{ LoginHistories : logowania
+Users ||--o{ KycDocuments : dokumenty
+Users ||--o{ StripePayments : wplaty
+Users ||--o{ StripeWithdrawals : wyplaty
+Users ||--o{ UzyteKodyBonusowe : uzyte_kody
+Users ||--o{ MinesGames : gra_mines
+Users ||--o{ PlinkoGames : gra_plinko
+
+KodyBonusowe ||--o{ UzyteKodyBonusowe : kod
+StripePayments ||--o{ UzyteKodyBonusowe : platnosc
+
+AutomatProviderzy ||--o{ AutomatyInfo : provider
+AutomatyInfo }o--o{ Kategorie : kategorie
+AutomatyKategorie }o--|| AutomatyInfo : join
+AutomatyKategorie }o--|| Kategorie : join
+
+@enduml

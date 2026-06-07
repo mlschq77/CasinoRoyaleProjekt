@@ -3,6 +3,7 @@ using CasinoRoyale.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
+using System.Text.Json.Serialization;
 
 namespace CasinoRoyale;
 
@@ -12,7 +13,14 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Services.AddControllersWithViews();
+        builder.Services.AddControllersWithViews()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+            });
+
+        builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 
         builder.Services.AddDbContext<Automaty>(options =>
             options.UseSqlServer(
@@ -57,6 +65,10 @@ public class Program
         var app = builder.Build();
 
         ApplyDatabaseMigrations(app);
+        if (SeedDataIfRequested(app, args))
+        {
+            return;
+        }
 
         if (!app.Environment.IsDevelopment())
         {
@@ -129,6 +141,55 @@ public class Program
                 Thread.Sleep(TimeSpan.FromSeconds(5));
             }
         }
+    }
+
+    private static bool SeedDataIfRequested(WebApplication app, string[] args)
+    {
+        var seedEverything = args.Contains("--seed-fake-data");
+        var seedUsers = args.Contains("--seed-users");
+        var seedGames = args.Contains("--seed-games") || args.Contains("--seed-catalog");
+
+        if (!seedEverything && !seedUsers && !seedGames)
+        {
+            return false;
+        }
+
+        var userCount = GetFakeUserCount(args);
+
+        using var scope = app.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<Automaty>();
+
+        if (seedEverything)
+        {
+            FakeDataSeeder.SeedAsync(dbContext, userCount).GetAwaiter().GetResult();
+            return true;
+        }
+
+        if (seedGames)
+        {
+            FakeDataSeeder.SeedProvidersGamesAndCategoriesAsync(dbContext).GetAwaiter().GetResult();
+        }
+
+        if (seedUsers)
+        {
+            FakeDataSeeder.SeedUsersAsync(dbContext, userCount).GetAwaiter().GetResult();
+        }
+
+        return true;
+    }
+
+    private static int GetFakeUserCount(string[] args)
+    {
+        var countArg = args.FirstOrDefault(arg => arg.StartsWith("--fake-users=", StringComparison.OrdinalIgnoreCase));
+
+        if (countArg is null)
+        {
+            return 25;
+        }
+
+        return int.TryParse(countArg["--fake-users=".Length..], out var count)
+            ? count
+            : 25;
     }
 }
 

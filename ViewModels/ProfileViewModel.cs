@@ -29,6 +29,7 @@ public class ProfileViewModel
     public DateTime DataRejestracji { get; set; }
     public List<TransactionHistoryItemViewModel> TransactionHistory { get; set; } = new();
     public List<BetHistoryItemViewModel> BetHistory { get; set; } = new();
+    public int TotalBetRecords { get; set; }
     public List<LoginHistoryItemViewModel> LoginHistory { get; set; } = new();
 
     public string PelneImie
