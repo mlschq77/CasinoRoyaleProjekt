@@ -231,8 +231,16 @@ namespace CasinoRoyale.Data
                 .HasColumnType("decimal(18,2)");
 
             modelBuilder.Entity<BetRecord>()
+                .Property(r => r.PayoutAmount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<BetRecord>()
                 .Property(r => r.SessionKey)
                 .HasMaxLength(100);
+
+            modelBuilder.Entity<BetRecord>()
+                .Property(r => r.GameName)
+                .HasMaxLength(32);
 
             modelBuilder.Entity<BetRecord>()
                 .Property(r => r.BonusDeductions)

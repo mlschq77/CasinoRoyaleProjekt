@@ -60,7 +60,7 @@ namespace CasinoRoyale.Controllers
                     await _context.SaveChangesAsync();
 
                     var sessionKey = "min:" + game.Id;
-                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey, gameName: "Mines");
                     if (!betResult.Success)
                     {
                         await transaction.RollbackAsync();
@@ -81,13 +81,13 @@ namespace CasinoRoyale.Controllers
 
 
         [HttpPost("click")]
-        public IActionResult Click(int gameId, int position)
+        public async Task<IActionResult> Click(int gameId, int position)
         {
             var userId = GetCurrentUserId();
             if (userId == null)
                 return Unauthorized();
 
-            var game = _context.MinesGames.Find(gameId);
+            var game = await _context.MinesGames.FindAsync(gameId);
 
             if (game == null || game.UserId != userId.Value || !game.IsActive)
                 return BadRequest(new { error = "Game ended" });
@@ -103,15 +103,23 @@ namespace CasinoRoyale.Controllers
             if (mines.Contains(position))
             {
                 game.IsActive = false;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
-                return Ok(new { result = "lose" });
+                var sessionKey = "min:" + game.Id;
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, 0, sessionKey);
+
+                return Ok(new
+                {
+                    result = "lose",
+                    balance = payoutResult.Balance,
+                    balanceBonus = payoutResult.BalanceBonus
+                });
             }
 
             revealed.Add(position);
             game.RevealedPositions = string.Join(",", revealed);
 
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return Ok(new { result = "safe" });
         }

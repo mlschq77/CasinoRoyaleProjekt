@@ -44,7 +44,7 @@ public class DiceController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, request.Bet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, request.Bet, gameName: "Dice");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
@@ -61,7 +61,7 @@ public class DiceController : ControllerBase
             });
             await _db.SaveChangesAsync();
 
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win, betResult.SessionKey);
             if (!payoutResult.Success)
                 return BadRequest(new { error = payoutResult.Error });
 
@@ -75,7 +75,8 @@ public class DiceController : ControllerBase
                 chance = result.Chance,
                 multiplier = result.Multiplier,
                 win = result.Win,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }

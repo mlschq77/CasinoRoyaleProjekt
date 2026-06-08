@@ -34,6 +34,7 @@ async function fetchBalance() {
     if (res.ok) {
         const data = await res.json();
         setBalance(data.balance);
+        updateBalanceDisplay(data);
     }
 }
 
@@ -265,6 +266,7 @@ async function playRound() {
 
         if (data.balance !== undefined && data.balance !== null) {
             setBalance(data.balance);
+            updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
         }
 
     } catch (e) {

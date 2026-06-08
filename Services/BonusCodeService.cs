@@ -16,7 +16,7 @@ public class BonusCodeService : IBonusCodeService
 
     public async Task<BonusCodeValidationResult> ValidateAsync(int userId, string? kodBonusowy, decimal amount)
     {
-        var normalizedBonusCode = kodBonusowy?.Trim();
+        var normalizedBonusCode = kodBonusowy?.Trim().ToUpperInvariant();
         if (string.IsNullOrWhiteSpace(normalizedBonusCode))
             return new BonusCodeValidationResult();
 

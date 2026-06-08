@@ -14,18 +14,18 @@ public class AdminDashboardViewModel
 
 public class AdminStatystykiViewModel
 {
-    public int LiczbaBlackjack { get; set; }
-    public int LiczbaMines { get; set; }
-    public int LiczbaPlinko { get; set; }
-    public int LiczbaDice { get; set; }
-    public int LiczbaKeno { get; set; }
-    public decimal SumaWplatBlackjack { get; set; }
-    public decimal SumaWplatMines { get; set; }
-    public decimal SumaWplatPlinko { get; set; }
-    public decimal SumaWplatDice { get; set; }
-    public decimal SumaWplatKeno { get; set; }
-    public int LacznaLiczbaGier => LiczbaBlackjack + LiczbaMines + LiczbaPlinko + LiczbaDice + LiczbaKeno;
-    public decimal LacznaSumaWplat => SumaWplatBlackjack + SumaWplatMines + SumaWplatPlinko + SumaWplatDice + SumaWplatKeno;
+    public List<GameStatEntry> Gry { get; set; } = new();
+
+    public int LacznaLiczbaGier => Gry.Sum(g => g.LiczbaGier);
+    public decimal LacznaSumaWplat => Gry.Sum(g => g.SumaZakladow);
+}
+
+public class GameStatEntry
+{
+    public string GameKey { get; set; } = string.Empty;
+    public string GameName { get; set; } = string.Empty;
+    public int LiczbaGier { get; set; }
+    public decimal SumaZakladow { get; set; }
 }
 
 public class AdminKycViewModel

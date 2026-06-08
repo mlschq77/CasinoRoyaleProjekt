@@ -59,7 +59,7 @@ namespace CasinoRoyale.Controllers
                     await _context.SaveChangesAsync();
 
                     var sessionKey = "csh:" + session.Id;
-                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey);
+                    var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, sessionKey, gameName: "Crash");
                     if (!betResult.Success)
                     {
                         await transaction.RollbackAsync();
@@ -197,17 +197,21 @@ namespace CasinoRoyale.Controllers
                 else
                 {
                     // Gracz spóźnił się - CrashPoint został już przekroczony
+                    var sessionKey = "csh:" + session.Id;
+                    await _balanceService.PayoutAsync(userId.Value, 0, sessionKey);
+
                     await _context.SaveChangesAsync();
                     await transaction.CommitAsync();
 
-                    var balance = await _balanceService.GetBalanceAsync(userId.Value);
+                    var balanceInfo = await _balanceService.GetBalanceInfoAsync(userId.Value);
 
                     return Ok(new
                     {
                         success = true,
                         won = false,
                         crashPoint = session.CrashPoint,
-                        balance
+                        balance = balanceInfo?.BalanceReal + balanceInfo?.BalanceBonus,
+                        balanceBonus = balanceInfo?.BalanceBonus
                     });
                 }
             }, null, CancellationToken.None);

@@ -121,7 +121,7 @@ namespace CasinoRoyale.Services
 
                 // 1. Pobranie zakładu
                 var sessionKey = "bac:" + Guid.NewGuid().ToString("N");
-                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey, gameName: "Baccarat");
                 if (!betResult.Success)
                 {
                     await tx.RollbackAsync();
@@ -227,6 +227,10 @@ namespace CasinoRoyale.Services
                         await tx.RollbackAsync();
                         return (false, payoutResult.Error ?? "Blad wyplaty.", null, 0);
                     }
+                }
+                else
+                {
+                    await _balanceService.PayoutAsync(userId, 0, sessionKey);
                 }
 
                 await tx.CommitAsync();

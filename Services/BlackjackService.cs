@@ -132,7 +132,7 @@ namespace CasinoRoyale.Services
 
                 // Zapisz grę PRZED PlaceBet — potrzebujemy game.Id do sessionKey
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, bet, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                 {
                     await tx.RollbackAsync();
@@ -154,6 +154,7 @@ namespace CasinoRoyale.Services
 
             var deck = JsonConvert.DeserializeObject<List<BlackjackCard>>(game.DeckJson)!;
             decimal balance = 0;
+            bool needsBalanceRefresh = true;
 
             if (game.IsPlayingSplitHand)
             {
@@ -166,6 +167,7 @@ namespace CasinoRoyale.Services
                 {
                     game.IsPlayerTurn = false;
                     (game, balance) = await RunDealerAndFinishAsync(game);
+                    needsBalanceRefresh = false;
                 }
             }
             else
@@ -183,11 +185,18 @@ namespace CasinoRoyale.Services
                     {
                         game.IsPlayerTurn = false;
                         (game, balance) = await RunDealerAndFinishAsync(game);
+                        needsBalanceRefresh = false;
                     }
                 }
             }
 
             await _db.SaveChangesAsync();
+
+            if (needsBalanceRefresh)
+            {
+                balance = await _balanceService.GetBalanceAsync(userId) ?? 0;
+            }
+
             return (true, "", game, balance);
         }
 
@@ -202,7 +211,8 @@ namespace CasinoRoyale.Services
             {
                 game.IsPlayingSplitHand = true;
                 await _db.SaveChangesAsync();
-                return (true, "", game, 0);
+                var currentBalance = await _balanceService.GetBalanceAsync(userId) ?? 0;
+                return (true, "", game, currentBalance);
             }
 
             game.IsPlayerTurn = false;
@@ -230,7 +240,7 @@ namespace CasinoRoyale.Services
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na double.", (BlackjackGame?)null, betResult.Balance);
 
@@ -272,7 +282,7 @@ namespace CasinoRoyale.Services
                 await using var tx = await _db.Database.BeginTransactionAsync();
 
                 var sessionKey = "bj:" + game.Id;
-                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey);
+                var betResult = await _balanceService.PlaceBetAsync(userId, game.BetAmount, sessionKey, gameName: "Blackjack");
                 if (!betResult.Success)
                     return (false, betResult.Error ?? "Brak srodkow na split.", (BlackjackGame?)null, betResult.Balance);
 
@@ -381,15 +391,16 @@ namespace CasinoRoyale.Services
 
             await _db.SaveChangesAsync();
 
+            var sessionKey = "bj:" + game.Id;
             decimal finalBalance;
             if (totalWin > 0)
             {
-                var sessionKey = "bj:" + game.Id;
                 var payoutResult = await _balanceService.PayoutAsync(game.UserId, totalWin, sessionKey);
                 finalBalance = payoutResult.Balance;
             }
             else
             {
+                await _balanceService.PayoutAsync(game.UserId, 0, sessionKey);
                 finalBalance = (await _balanceService.GetBalanceAsync(game.UserId)) ?? 0;
             }
 

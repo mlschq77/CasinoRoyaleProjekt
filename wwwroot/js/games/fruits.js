@@ -11,13 +11,6 @@ const fruitsMultiplier = document.getElementById('fruits-multiplier');
 const fruitsReels = Array.from(document.querySelectorAll('.fruits-reel span'));
 const fruitsPaytableRows = document.getElementById('fruits-paytable-rows');
 
-function updateFruitsBalance(balance) {
-    const balanceDisplay = document.getElementById('balance-display');
-    if (balanceDisplay && balance !== undefined && balance !== null) {
-        balanceDisplay.textContent = Number(balance).toFixed(2);
-    }
-}
-
 async function parseFruitsResponse(response) {
     const text = await response.text();
     const data = text ? JSON.parse(text) : {};
@@ -79,7 +72,7 @@ async function spinFruits() {
         const data = await parseFruitsResponse(response);
 
         await animateFruitsReels(data.reels);
-        updateFruitsBalance(data.balance);
+        updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
 
         const multiplier = Number(data.multiplier);
         const win = Number(data.win);

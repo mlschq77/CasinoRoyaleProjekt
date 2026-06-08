@@ -78,7 +78,7 @@ public class RouletteController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, totalBet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, totalBet, gameName: "Roulette");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
@@ -106,21 +106,25 @@ public class RouletteController : ControllerBase
             await _db.SaveChangesAsync();
 
             decimal finalBalance;
+            decimal finalBalanceBonus = 0;
             if (totalWin > 0)
             {
-                var payoutResult = await _balanceService.PayoutAsync(userId.Value, totalWin);
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, totalWin, betResult.SessionKey);
                 if (!payoutResult.Success)
                     return BadRequest(new { error = payoutResult.Error });
                 finalBalance = payoutResult.Balance;
+                finalBalanceBonus = payoutResult.BalanceBonus;
             }
             else
             {
-                finalBalance = (await _balanceService.GetBalanceAsync(userId.Value)) ?? 0;
+                var payoutResult = await _balanceService.PayoutAsync(userId.Value, 0, betResult.SessionKey);
+                finalBalance = payoutResult.Balance;
+                finalBalanceBonus = payoutResult.BalanceBonus;
             }
 
             await transaction.CommitAsync();
 
-            return Ok(new { number, color, totalWin, balance = finalBalance, results });
+            return Ok(new { number, color, totalWin, balance = finalBalance, balanceBonus = finalBalanceBonus, results });
         }, null, CancellationToken.None);
     }
 

@@ -229,65 +229,21 @@ public class ProfileController : Controller
             .Take(30)
             .ToList();
 
-        var blackjackBets = await _dbContext.BlackjackGames
+        var betRecords = await _dbContext.BetRecords
             .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Blackjack", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount + game.SplitBetAmount })
-            .ToListAsync();
-
-        var minesBets = await _dbContext.MinesGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Mines", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var plinkoBets = await _dbContext.PlinkoGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Plinko", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var crashBets = await _dbContext.CrashSessions
-            .AsNoTracking()
-            .Where(session => session.UserId == userId)
-            .Select(session => new BetHistoryItemViewModel { GameName = "Crash", CreatedAt = session.CreatedAt, BetAmount = session.BetAmount })
-            .ToListAsync();
-
-        var diceBets = await _dbContext.DiceGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Dice", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var kenoBets = await _dbContext.KenoGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Keno", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var rouletteBets = await _dbContext.RouletteGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Roulette", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        var baccaratBets = await _dbContext.BaccaratGames
-            .AsNoTracking()
-            .Where(game => game.UserId == userId)
-            .Select(game => new BetHistoryItemViewModel { GameName = "Baccarat", CreatedAt = game.CreatedAt, BetAmount = game.BetAmount })
-            .ToListAsync();
-
-        profile.BetHistory = blackjackBets
-            .Concat(minesBets)
-            .Concat(plinkoBets)
-            .Concat(crashBets)
-            .Concat(diceBets)
-            .Concat(kenoBets)
-            .Concat(rouletteBets)
-            .Concat(baccaratBets)
-            .OrderByDescending(item => item.CreatedAt)
+            .Where(r => r.UserId == userId && r.GameName != null && r.GameName != "" && r.PayoutAmount != null)
+            .OrderByDescending(r => r.CreatedAt)
             .Take(50)
-            .ToList();
+            .Select(r => new BetHistoryItemViewModel
+            {
+                GameName = r.GameName,
+                CreatedAt = r.CreatedAt,
+                BetAmount = r.Amount,
+                PayoutAmount = r.PayoutAmount
+            })
+            .ToListAsync();
+
+        profile.BetHistory = betRecords;
 
         var loginRaw = await _dbContext.LoginHistories
             .AsNoTracking()
@@ -352,6 +308,7 @@ public class ProfileController : Controller
                             columns.RelativeColumn(2);
                             columns.RelativeColumn(2);
                             columns.RelativeColumn(1);
+                            columns.RelativeColumn(1);
                         });
 
                         table.Header(header =>
@@ -359,19 +316,25 @@ public class ProfileController : Controller
                             header.Cell().BorderBottom(1).Padding(2).Text("Data");
                             header.Cell().BorderBottom(1).Padding(2).Text("Gra");
                             header.Cell().BorderBottom(1).Padding(2).Text("Stawka");
+                            header.Cell().BorderBottom(1).Padding(2).Text("Wynik");
                         });
 
                         if (!profile.BetHistory.Any())
                         {
-                            table.Cell().ColumnSpan(3).Padding(2).Text("Brak zakładów.");
+                            table.Cell().ColumnSpan(4).Padding(2).Text("Brak zakładów.");
                         }
                         else
                         {
                             foreach (var bet in profile.BetHistory)
                             {
+                                var resultText = bet.PayoutAmount.HasValue
+                                    ? $"{bet.PayoutAmount.Value:0.00} PLN"
+                                    : "—";
+
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(bet.CreatedAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm"));
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(bet.GameName);
                                 table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text($"{bet.BetAmount:0.00} PLN");
+                                table.Cell().BorderBottom(1).BorderColor(Colors.Grey.Lighten2).Padding(2).Text(resultText);
                             }
                         }
                     });

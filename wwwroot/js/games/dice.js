@@ -24,11 +24,7 @@ function setDiceMarkerPosition(roll) {
     diceMarker.style.left = `${left}px`;
 }
 
-function updateBalance(balance) {
-    const balanceDisplay = document.getElementById("balance-display");
-    if (!balanceDisplay || balance === undefined || balance === null) return;
-    balanceDisplay.innerText = Number(balance).toFixed(2);
-}
+
 
 async function parseResponse(res) {
     const text = await res.text();
@@ -93,7 +89,7 @@ async function rollDice() {
         });
         const data = await parseResponse(res);
 
-        updateBalance(data.balance);
+        updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
         diceMarker.textContent = data.roll;
         setDiceMarkerPosition(data.roll);
 

@@ -14,11 +14,7 @@ function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function updateBalance(balance) {
-    const balanceDisplay = document.getElementById("balance-display");
-    if (!balanceDisplay || balance === undefined || balance === null) return;
-    balanceDisplay.innerText = Number(balance).toFixed(2);
-}
+
 
 async function parseResponse(res) {
     const text = await res.text();
@@ -128,7 +124,7 @@ async function drawKeno() {
         });
         const data = await parseResponse(res);
 
-        updateBalance(data.balance);
+        updateBalanceDisplay({ balance: data.balance, balanceBonus: data.balanceBonus });
         await animateResults(data.drawnNumbers, data.selectedNumbers);
         kenoHits.textContent = data.hits;
         kenoStatus.textContent = `Mnoznik x${Number(data.multiplier).toFixed(2)}`;

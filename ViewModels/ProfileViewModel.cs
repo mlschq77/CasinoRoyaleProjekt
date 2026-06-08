@@ -71,6 +71,9 @@ public class BetHistoryItemViewModel
     public string GameName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public decimal BetAmount { get; set; }
+    public decimal? PayoutAmount { get; set; }
+
+    public decimal? NetResult => PayoutAmount.HasValue ? PayoutAmount.Value - BetAmount : null;
 }
 
 public class LoginHistoryItemViewModel

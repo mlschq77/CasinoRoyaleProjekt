@@ -41,12 +41,12 @@ public class FruitsController : ControllerBase
         {
             await using var transaction = await _db.Database.BeginTransactionAsync();
 
-            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet);
+            var betResult = await _balanceService.PlaceBetAsync(userId.Value, bet, gameName: "Fruits");
             if (!betResult.Success)
                 return BadRequest(new { error = betResult.Error, balance = betResult.Balance });
 
             var result = _fruitsService.Spin(bet);
-            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win);
+            var payoutResult = await _balanceService.PayoutAsync(userId.Value, result.Win, betResult.SessionKey);
 
             if (!payoutResult.Success)
                 return BadRequest(new { error = payoutResult.Error });
@@ -64,7 +64,8 @@ public class FruitsController : ControllerBase
                 multiplier = result.Multiplier,
                 win = result.Win,
                 result.Message,
-                balance = payoutResult.Balance
+                balance = payoutResult.Balance,
+                balanceBonus = payoutResult.BalanceBonus
             });
         }, null, CancellationToken.None);
     }

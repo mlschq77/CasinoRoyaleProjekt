@@ -43,6 +43,10 @@ body.casino-body {
   color: var(--casino-gold);
 }
 
+.text-gold-soft {
+  color: var(--casino-gold-soft);
+}
+
 .casino-navbar {
   background: rgba(7, 7, 7, 0.82);
   border-bottom: 1px solid var(--casino-border);
