@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using System.Text.Json.Serialization;
+using Microsoft.OpenApi.Models;
 
 namespace CasinoRoyale;
 
@@ -19,6 +20,14 @@ public class Program
                 options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
             });
+
+        builder.Services.AddEndpointsApiExplorer();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Casino Royale API", Version = "v1" });
+            c.CustomSchemaIds(type => type.FullName?.Replace("+", "."));
+            c.IgnoreObsoleteActions();
+        });
 
         builder.Services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 
@@ -74,6 +83,16 @@ public class Program
         {
             app.UseExceptionHandler("/Home/Error");
             app.UseHsts();
+        }
+        else
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Casino Royale API v1");
+                c.RoutePrefix = "swagger";
+            });
         }
 
         

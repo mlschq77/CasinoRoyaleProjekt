@@ -293,7 +293,7 @@ namespace CasinoRoyale.Data
 
             // ── LoginHistory ────────────────────────────────
             modelBuilder.Entity<LoginHistory>()
-                .ToTable("LoginHistories");
+                .ToTable("LoginHistories", tb => tb.UseSqlOutputClause(false));
 
             modelBuilder.Entity<LoginHistory>()
                 .Property(h => h.IpAddress)

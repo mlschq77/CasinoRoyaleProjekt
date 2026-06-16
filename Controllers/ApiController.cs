@@ -8,9 +8,13 @@ using static CasinoRoyale.Services.PaginationHelper;
 
 namespace CasinoRoyale.Controllers;
 
+/// <summary>
+/// REST API dla zalogowanych użytkowników. Wymaga autoryzacji ciasteczkowej.
+/// </summary>
 [Authorize]
 [ApiController]
-[Route("api/[controller]")]
+[Route("api")]
+[Produces("application/json")]
 public class ApiController : ControllerBase
 {
     private readonly Automaty _db;
@@ -23,8 +27,18 @@ public class ApiController : ControllerBase
     private int GetUserId() =>
         int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
+    /// <summary>
+    /// Historia zakładów z paginacją.
+    /// </summary>
+    /// <param name="page">Numer strony (1-based)</param>
+    /// <param name="pageSize">Rozmiar strony (max 100)</param>
+    /// <param name="gameName">Filtrowanie po nazwie gry (opcjonalne)</param>
+    /// <returns>PaginatedResult z listą zakładów</returns>
+    /// <response code="200">Zwraca stronicowaną historię zakładów</response>
+    /// <response code="401">Brak autoryzacji</response>
     [HttpGet("bet-history")]
-    public async Task<ActionResult<PaginatedResult<BetHistoryDto>>> GetBetHistory(
+    [ProducesResponseType(typeof(PaginatedResult<BetHistoryDto>), 200)]
+    public async Task<IActionResult> GetBetHistory(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] string? gameName = null)
@@ -51,11 +65,15 @@ public class ApiController : ControllerBase
             CreatedAt = r.CreatedAt
         }).ToList();
 
-        return new PaginatedResult<BetHistoryDto>(dtos, result.TotalCount, result.Page, result.PageSize);
+        return Ok(new PaginatedResult<BetHistoryDto>(dtos, result.TotalCount, result.Page, result.PageSize));
     }
 
+    /// <summary>
+    /// Statystyki gier: liczba zakładów, suma stawek, suma wygranych, RTP%.
+    /// </summary>
     [HttpGet("game-stats")]
-    public async Task<ActionResult<List<GameStatsDto>>> GetGameStats()
+    [ProducesResponseType(typeof(List<GameStatsDto>), 200)]
+    public async Task<IActionResult> GetGameStats()
     {
         var userId = GetUserId();
 
@@ -76,8 +94,12 @@ public class ApiController : ControllerBase
         return Ok(stats);
     }
 
+    /// <summary>
+    /// Aktualny stan konta: saldo real, bonus, wagering progress.
+    /// </summary>
     [HttpGet("balance")]
-    public async Task<ActionResult<BalanceDto>> GetBalance()
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public async Task<IActionResult> GetBalance()
     {
         var userId = GetUserId();
 
@@ -97,28 +119,45 @@ public class ApiController : ControllerBase
     }
 }
 
+/// <summary>Szczegóły pojedynczego zakładu.</summary>
 public class BetHistoryDto
 {
+    /// <summary>Identyfikator zakładu.</summary>
     public int Id { get; set; }
+    /// <summary>Nazwa gry (np. "Mines", "Blackjack").</summary>
     public string GameName { get; set; } = string.Empty;
+    /// <summary>Kwota zakładu.</summary>
     public decimal Amount { get; set; }
+    /// <summary>Kwota wypłaty (null jeśli nierozliczony).</summary>
     public decimal? PayoutAmount { get; set; }
+    /// <summary>Data utworzenia zakładu (UTC).</summary>
     public DateTime CreatedAt { get; set; }
 }
 
+/// <summary>Statystyki dla jednej gry.</summary>
 public class GameStatsDto
 {
+    /// <summary>Nazwa gry.</summary>
     public string GameName { get; set; } = string.Empty;
+    /// <summary>Liczba zakładów.</summary>
     public int TotalBets { get; set; }
+    /// <summary>Suma postawionych kwot.</summary>
     public decimal TotalAmount { get; set; }
+    /// <summary>Suma wypłat.</summary>
     public decimal TotalPayout { get; set; }
+    /// <summary>Procent zwrotu (RTP).</summary>
     public decimal RtpPercent { get; set; }
 }
 
+/// <summary>Stan konta użytkownika.</summary>
 public class BalanceDto
 {
+    /// <summary>Saldo prawdziwych środków.</summary>
     public decimal BalanceReal { get; set; }
+    /// <summary>Saldo bonusowe.</summary>
     public decimal BalanceBonus { get; set; }
+    /// <summary>Postęp wageringu.</summary>
     public decimal WageringProgress { get; set; }
+    /// <summary>Wymagany wagering.</summary>
     public decimal WageringRequired { get; set; }
 }

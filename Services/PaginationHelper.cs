@@ -4,20 +4,25 @@ namespace CasinoRoyale.Services;
 
 public class PaginatedResult<T>
 {
-    public IReadOnlyList<T> Items { get; }
-    public int Page { get; }
-    public int PageSize { get; }
-    public int TotalCount { get; }
-    public int TotalPages => (int)Math.Ceiling(TotalCount / (double)PageSize);
-    public bool HasPrevious => Page > 1;
-    public bool HasNext => Page < TotalPages;
+    public List<T> Items { get; set; } = new();
+    public int Page { get; set; }
+    public int PageSize { get; set; }
+    public int TotalCount { get; set; }
+    public int TotalPages { get; set; }
+    public bool HasPrevious { get; set; }
+    public bool HasNext { get; set; }
 
-    public PaginatedResult(IReadOnlyList<T> items, int totalCount, int page, int pageSize)
+    public PaginatedResult() { }
+
+    public PaginatedResult(List<T> items, int totalCount, int page, int pageSize)
     {
         Items = items;
         TotalCount = totalCount;
         Page = page;
         PageSize = pageSize;
+        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize);
+        HasPrevious = page > 1;
+        HasNext = page < TotalPages;
     }
 }
 
